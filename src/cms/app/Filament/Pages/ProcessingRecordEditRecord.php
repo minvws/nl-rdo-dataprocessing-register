@@ -1,0 +1,32 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Filament\Pages;
+
+use App\Filament\Widgets\ProcessingRecordHeaderWidget;
+use App\Models\Contracts\EntityNumerable;
+use App\Models\Contracts\SnapshotSource;
+use Filament\Resources\Pages\EditRecord;
+use Webmozart\Assert\Assert;
+
+use function sprintf;
+
+class ProcessingRecordEditRecord extends EditRecord
+{
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            ProcessingRecordHeaderWidget::class,
+        ];
+    }
+
+    public function getTitle(): string
+    {
+        $record = $this->getRecord();
+        Assert::implementsInterface($record, EntityNumerable::class);
+        Assert::implementsInterface($record, SnapshotSource::class);
+
+        return sprintf('%s (%s)', $record->getDisplayName(), $record->getNumber());
+    }
+}

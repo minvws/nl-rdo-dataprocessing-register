@@ -1,0 +1,49 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Filament\Resources\LookupListResource;
+
+use App\Filament\Tables\Columns\CreatedAtColumn;
+use App\Filament\Tables\Columns\UpdatedAtColumn;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
+
+use function __;
+use function sprintf;
+
+class LookupListResourceTable
+{
+    /**
+     * @param class-string<Model> $model
+     */
+    public static function table(Table $table, string $emptyStateHeading, string $model): Table
+    {
+        return $table
+            ->columns([
+                TextColumn::make('name')
+                    ->label(__('general.name'))
+                    ->searchable()
+                    ->sortable(),
+                IconColumn::make('enabled')
+                    ->label(__('general.enabled'))
+                    ->boolean(),
+                CreatedAtColumn::make(),
+                UpdatedAtColumn::make(),
+            ])
+            ->defaultSort(sprintf('%s.updated_at', $model::getModel()->getTable()), 'desc')
+            ->emptyStateHeading($emptyStateHeading)
+            ->emptyStateDescription(null)
+            ->actions([
+                EditAction::make()
+                    ->label(''),
+            ])
+            ->bulkActions([
+                DeleteBulkAction::make(),
+            ]);
+    }
+}

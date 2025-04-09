@@ -1,0 +1,48 @@
+@import '/vendor/filament/filament/resources/css/theme.css';
+
+@config 'tailwind.config.js';
+
+.related-record {
+    @apply rounded-md border border-primary-600 dark:border-primary-400 py-2 px-5 m-0 inline-block;
+}
+
+.vertical .fi-in-tabs {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    width: 100%;
+    gap: 20px;
+    background-color: transparent !important;
+    box-shadow: none;
+}
+
+.vertical .tabs__list .fi-tabs {
+    @apply bg-white rounded-xl shadow-sm ring-1 ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10;
+    flex-direction: column;
+    align-items: flex-start;
+    overflow: hidden;
+    width: 300px;
+    border-bottom: 0;
+}
+
+.vertical .tabs__list .fi-tabs .fi-active {
+    @apply bg-gray-300;
+
+    & .fi-tabs-item-label {
+        @apply text-gray-900;
+    }
+}
+
+.vertical .fi-tabs-item{
+    text-align: left;
+}
+
+.vertical .tabs__content {
+    @apply bg-white rounded-xl shadow-sm ring-1 ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10;
+    width: 100%;
+}
+
+.vertical .tabs__content ul.list-disc {
+    list-style-position: outside;
+    margin-left: 1rem;
+}

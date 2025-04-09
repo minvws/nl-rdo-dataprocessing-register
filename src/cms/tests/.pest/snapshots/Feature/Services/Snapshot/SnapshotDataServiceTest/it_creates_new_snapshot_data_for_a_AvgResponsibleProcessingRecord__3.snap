@@ -1,0 +1,16 @@
+# blanditiis
+
+Hier vindt u een beschrijving van gegevensverwerking _blanditiis_ in het kader van de Algemene Verordening Gegevensbescherming (AVG), met als doel:
+
+Quos non maiores non.
+
+
+# Automatische besluitvorming
+Er is <u>wel</u> sprake van besluitvorming over persoonsgegevens op basis van automatisch verwerkte gegevens.
+
+<!--- #App\Models\Receiver# --->
+
+# Doorgifte buiten EER
+Er is <u>wel</u> sprake van doorgifte van persoonsgegevens aan één of meer landen buiten de Europese Economische Ruimte (EER) of aan een internationale organisatie.
+
+<!--- #App\Models\Responsible# --->

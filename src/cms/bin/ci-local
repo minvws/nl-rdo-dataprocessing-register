@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+set -eo pipefail
+
+BASE_PATH=$(dirname "$0")/..
+SAIL="${BASE_PATH}/vendor/bin/sail"
+YELLOW="\033[33m"
+NC="\033[0m"
+
+echo -e "\n${YELLOW}===[ Assert Unique Migration Names ]======${NC}"
+"$BASE_PATH"/bin/assert-unique-migration-names
+
+echo -e "\n${YELLOW}===[ Code Sniffer ]======${NC}"
+"$SAIL" bin phpcs -n
+
+echo -e "\n${YELLOW}===[ PHPStan ]======${NC}"
+"$SAIL" bin phpstan
+
+echo -e "\n${YELLOW}===[ Mess Detector ]======${NC}"
+"$SAIL" bin phpmd app github ./phpmd.xml && echo "✓ ok"
+
+echo -e "\n${YELLOW}===[ Pest ]======${NC}"
+XDEBUG_MODE=coverage "$SAIL" pest --coverage --min=100

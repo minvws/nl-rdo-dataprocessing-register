@@ -1,0 +1,25 @@
+parameters:
+    paths:
+        - .
+    excludePaths:
+        - bootstrap/cache
+        - node_modules/
+        - public/
+        - packages/
+        - storage/
+        - tests/
+        - vendor/
+        - database/migrations/2023_11_22_140333_create_permission_tables.php
+    faker:
+        providerClasses:
+            - App\Faker\DateTimeProvider
+            - App\Faker\ImportProvider
+            - App\Faker\MarkupProvider
+            - App\Faker\SnapshotProvider
+    level: max
+    editorUrl: 'phpstorm://open?file=%%file%%&line=%%line%%'
+    ignoreErrors:
+        - '#Dynamic call to static method Illuminate\\.*#'
+        - '#Return type \(App\\Components\\Uuid\\UuidInterface\) of method App\\Models\\[A-Za-z0-9]+::newUniqueId\(\) should be compatible with return type \(string\) of method Illuminate\\Database\\Eloquent\\Model::newUniqueId\(\)#'
+includes:
+	- phpstan-baseline.neon

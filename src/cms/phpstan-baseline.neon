@@ -1,0 +1,2197 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Cannot call method delete\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Filament/Actions/DeleteActionWithRelationChecks.php
+
+		-
+			message: '#^Property App\\Filament\\Actions\\DeleteActionWithRelationChecks\:\:\$relations with generic class Illuminate\\Database\\Eloquent\\Relations\\Relation does not specify its types\: TRelatedModel, TDeclaringModel, TResult$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Filament/Actions/DeleteActionWithRelationChecks.php
+
+		-
+			message: '#^Variable method call on Closure\|Illuminate\\Database\\Eloquent\\Model\.$#'
+			identifier: method.dynamicName
+			count: 1
+			path: app/Filament/Actions/DeleteActionWithRelationChecks.php
+
+		-
+			message: '#^Method App\\Filament\\Exports\\Exporter\:\:modifyQuery\(\) has parameter \$query with generic class Illuminate\\Database\\Eloquent\\Builder but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Filament/Exports/Exporter.php
+
+		-
+			message: '#^Method App\\Filament\\Exports\\Exporter\:\:modifyQuery\(\) return type with generic class Illuminate\\Database\\Eloquent\\Builder does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Filament/Exports/Exporter.php
+
+		-
+			message: '#^Call to static method Webmozart\\Assert\\Assert\:\:isInstanceOf\(\) with App\\Models\\Organisation and ''App\\\\Models\\\\Organisation'' will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: app/Http/Controllers/RedirectToTenantController.php
+
+		-
+			message: '#^Method App\\Http\\Middleware\\EnforceOneTimePassword\:\:handle\(\) should return Symfony\\Component\\HttpFoundation\\Response but returns mixed\.$#'
+			identifier: return.type
+			count: 3
+			path: app/Http/Middleware/EnforceOneTimePassword.php
+
+		-
+			message: '#^Method App\\Http\\Middleware\\IPAllowFilter\:\:handle\(\) should return Symfony\\Component\\HttpFoundation\\Response but returns mixed\.$#'
+			identifier: return.type
+			count: 2
+			path: app/Http/Middleware/IPAllowFilter.php
+
+		-
+			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
+			identifier: empty.notAllowed
+			count: 1
+			path: app/Http/Middleware/RedirectIfAuthenticated.php
+
+		-
+			message: '#^Cannot call method save\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Import/Factories/AbstractFactory.php
+
+		-
+			message: '#^Method App\\Import\\Factories\\AbstractFactory\:\:createRelations\(\) has parameter \$collection with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Import/Factories/AbstractFactory.php
+
+		-
+			message: '#^Method App\\Import\\Factories\\AbstractFactory\:\:getDescriptionFromOptions\(\) has parameter \$options with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Import/Factories/AbstractFactory.php
+
+		-
+			message: '#^Method App\\Import\\Factories\\AbstractFactory\:\:toArray\(\) has parameter \$input with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Import/Factories/AbstractFactory.php
+
+		-
+			message: '#^Method App\\Import\\Factories\\AbstractFactory\:\:toArray\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Import/Factories/AbstractFactory.php
+
+		-
+			message: '#^Method App\\Import\\Factories\\AbstractFactory\:\:toString\(\) has parameter \$input with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Import/Factories/AbstractFactory.php
+
+		-
+			message: '#^Method App\\Import\\Factories\\AbstractFactory\:\:toStringOrNull\(\) has parameter \$input with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Import/Factories/AbstractFactory.php
+
+		-
+			message: '#^Parameter \#1 \$data of method App\\Import\\Factory\:\:create\(\) expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Import/Factories/AbstractFactory.php
+
+		-
+			message: '#^Parameter \#1 \$string of static method Illuminate\\Support\\Str\:\:of\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/Import/Factories/AbstractFactory.php
+
+		-
+			message: '#^Variable method call on Illuminate\\Database\\Eloquent\\Model\.$#'
+			identifier: method.dynamicName
+			count: 1
+			path: app/Import/Factories/AbstractFactory.php
+
+		-
+			message: '#^Method App\\Import\\Factories\\AddressFactory\:\:create\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Import/Factories/AddressFactory.php
+
+		-
+			message: '#^Parameter \#1 \$input of method App\\Import\\Factories\\AbstractFactory\:\:toString\(\) expects array\|bool\|int\|string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 8
+			path: app/Import/Factories/AddressFactory.php
+
+		-
+			message: '#^Method App\\Import\\Factories\\Avg\\AvgGoalFactory\:\:create\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Import/Factories/Avg/AvgGoalFactory.php
+
+		-
+			message: '#^Parameter \#1 \$input of method App\\Import\\Factories\\AbstractFactory\:\:toString\(\) expects array\|bool\|int\|string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Import/Factories/Avg/AvgGoalFactory.php
+
+		-
+			message: '#^Parameter \#1 \$input of method App\\Import\\Factories\\AbstractFactory\:\:toStringOrNull\(\) expects array\|int\|string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Import/Factories/Avg/AvgGoalFactory.php
+
+		-
+			message: '#^Parameter \#2 \$inputRechtsgrond of method App\\Import\\Factories\\Avg\\AvgGoalFactory\:\:setAvgGoalLegalBaseAndRemarks\(\) expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Import/Factories/Avg/AvgGoalFactory.php
+
+		-
+			message: '#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 1
+			path: app/Import/Factories/Avg/AvgProcessorProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''BelangGevolgen'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Avg/AvgProcessorProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''BuitenEu'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Avg/AvgProcessorProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''BuitenEuOmschrijving'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Avg/AvgProcessorProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''BuitenEuPassendBeschermingsniveau'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Avg/AvgProcessorProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''BuitenEuPassendBeschermingsniveauOmschrijving'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Avg/AvgProcessorProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''ElectronischeWeg'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Avg/AvgProcessorProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''Encryptie'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Avg/AvgProcessorProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''HasBesluitvorming'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Avg/AvgProcessorProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''HasBeveiliging'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Avg/AvgProcessorProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''Logica'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Avg/AvgProcessorProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''Maatregelen'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Avg/AvgProcessorProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''Pseudonimisering'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: app/Import/Factories/Avg/AvgProcessorProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''Toegang'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Avg/AvgProcessorProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''Uitgevoerd'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Avg/AvgProcessorProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''Verantwoordelijken'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Avg/AvgProcessorProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''Verwerkers'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Avg/AvgProcessorProcessingRecordFactory.php
+
+		-
+			message: '#^Method App\\Import\\Factories\\Avg\\AvgProcessorProcessingRecordFactory\:\:create\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Import/Factories/Avg/AvgProcessorProcessingRecordFactory.php
+
+		-
+			message: '#^Parameter \#1 \$input of method App\\Import\\Factories\\AbstractFactory\:\:toArray\(\) expects array\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Import/Factories/Avg/AvgProcessorProcessingRecordFactory.php
+
+		-
+			message: '#^Parameter \#1 \$input of method App\\Import\\Factories\\AbstractFactory\:\:toBoolean\(\) expects bool\|string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 5
+			path: app/Import/Factories/Avg/AvgProcessorProcessingRecordFactory.php
+
+		-
+			message: '#^Parameter \#1 \$input of method App\\Import\\Factories\\AbstractFactory\:\:toCarbon\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/Import/Factories/Avg/AvgProcessorProcessingRecordFactory.php
+
+		-
+			message: '#^Parameter \#1 \$input of method App\\Import\\Factories\\AbstractFactory\:\:toString\(\) expects array\|bool\|int\|string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 13
+			path: app/Import/Factories/Avg/AvgProcessorProcessingRecordFactory.php
+
+		-
+			message: '#^Parameter \#1 \$input of method App\\Import\\Factories\\AbstractFactory\:\:toStringOrNull\(\) expects array\|int\|string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Import/Factories/Avg/AvgProcessorProcessingRecordFactory.php
+
+		-
+			message: '#^Parameter \#1 \$state of method App\\Import\\Factories\\AbstractFactory\:\:skipState\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Import/Factories/Avg/AvgProcessorProcessingRecordFactory.php
+
+		-
+			message: '#^Parameter \#1 \$string of static method Illuminate\\Support\\Str\:\:of\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Import/Factories/Avg/AvgProcessorProcessingRecordFactory.php
+
+		-
+			message: '#^Parameter \#2 \$version of method App\\Import\\Factories\\AbstractFactory\:\:createSnapshot\(\) expects int, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Import/Factories/Avg/AvgProcessorProcessingRecordFactory.php
+
+		-
+			message: '#^Parameter \#3 \$status of method App\\Import\\Factories\\AbstractFactory\:\:createSnapshot\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Import/Factories/Avg/AvgProcessorProcessingRecordFactory.php
+
+		-
+			message: '#^Parameter \#3 \$value of method App\\Import\\Factories\\General\\LookupListFactory\:\:create\(\) expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Import/Factories/Avg/AvgProcessorProcessingRecordFactory.php
+
+		-
+			message: '#^Parameter \#4 \$collection of method App\\Import\\Factories\\AbstractFactory\:\:createRelations\(\) expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 7
+			path: app/Import/Factories/Avg/AvgProcessorProcessingRecordFactory.php
+
+		-
+			message: '#^Property App\\Models\\Avg\\AvgProcessorProcessingRecord\:\:\$import_number \(string\|null\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Import/Factories/Avg/AvgProcessorProcessingRecordFactory.php
+
+		-
+			message: '#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 1
+			path: app/Import/Factories/Avg/AvgResponsibleProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''BelangGevolgen'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Avg/AvgResponsibleProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''BuitenEu'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Avg/AvgResponsibleProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''BuitenEuOmschrijving'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Avg/AvgResponsibleProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''BuitenEuPassendBeschermingsniveau'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Avg/AvgResponsibleProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''BuitenEuPassendBeschermingsniveauOmschrijving'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Avg/AvgResponsibleProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''ElectronischeWeg'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Avg/AvgResponsibleProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''Encryptie'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Avg/AvgResponsibleProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''HasBesluitvorming'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Avg/AvgResponsibleProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''HasBeveiliging'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Avg/AvgResponsibleProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''IsGeautomatiseerdProfilering'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Avg/AvgResponsibleProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''IsGebpiaAlUitgevoerd'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Avg/AvgResponsibleProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''IsGrootschaligeMonitoring'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Avg/AvgResponsibleProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''IsGrootschaligeVerwerking'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Avg/AvgResponsibleProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''IsHoogRisicoRechtenVrijheden'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Avg/AvgResponsibleProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''Logica'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Avg/AvgResponsibleProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''Maatregelen'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Avg/AvgResponsibleProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''Pseudonimisering'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: app/Import/Factories/Avg/AvgResponsibleProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''StaatOpLijstVerplichteGebpia'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Avg/AvgResponsibleProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''Toegang'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Avg/AvgResponsibleProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''Verantwoordelijken'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Avg/AvgResponsibleProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''Verwerkers'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Avg/AvgResponsibleProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''VoeldoetAanTweeCriteriaWP248'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Avg/AvgResponsibleProcessingRecordFactory.php
+
+		-
+			message: '#^Method App\\Import\\Factories\\Avg\\AvgResponsibleProcessingRecordFactory\:\:create\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Import/Factories/Avg/AvgResponsibleProcessingRecordFactory.php
+
+		-
+			message: '#^Parameter \#1 \$input of method App\\Import\\Factories\\AbstractFactory\:\:toArray\(\) expects array\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Import/Factories/Avg/AvgResponsibleProcessingRecordFactory.php
+
+		-
+			message: '#^Parameter \#1 \$input of method App\\Import\\Factories\\AbstractFactory\:\:toBoolean\(\) expects bool\|string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 11
+			path: app/Import/Factories/Avg/AvgResponsibleProcessingRecordFactory.php
+
+		-
+			message: '#^Parameter \#1 \$input of method App\\Import\\Factories\\AbstractFactory\:\:toCarbon\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/Import/Factories/Avg/AvgResponsibleProcessingRecordFactory.php
+
+		-
+			message: '#^Parameter \#1 \$input of method App\\Import\\Factories\\AbstractFactory\:\:toString\(\) expects array\|bool\|int\|string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 10
+			path: app/Import/Factories/Avg/AvgResponsibleProcessingRecordFactory.php
+
+		-
+			message: '#^Parameter \#1 \$input of method App\\Import\\Factories\\AbstractFactory\:\:toStringOrNull\(\) expects array\|int\|string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 4
+			path: app/Import/Factories/Avg/AvgResponsibleProcessingRecordFactory.php
+
+		-
+			message: '#^Parameter \#1 \$state of method App\\Import\\Factories\\AbstractFactory\:\:skipState\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Import/Factories/Avg/AvgResponsibleProcessingRecordFactory.php
+
+		-
+			message: '#^Parameter \#1 \$string of static method Illuminate\\Support\\Str\:\:of\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Import/Factories/Avg/AvgResponsibleProcessingRecordFactory.php
+
+		-
+			message: '#^Parameter \#1 \$value of function count expects array\|Countable, mixed given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/Import/Factories/Avg/AvgResponsibleProcessingRecordFactory.php
+
+		-
+			message: '#^Parameter \#2 \$version of method App\\Import\\Factories\\AbstractFactory\:\:createSnapshot\(\) expects int, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Import/Factories/Avg/AvgResponsibleProcessingRecordFactory.php
+
+		-
+			message: '#^Parameter \#3 \$status of method App\\Import\\Factories\\AbstractFactory\:\:createSnapshot\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Import/Factories/Avg/AvgResponsibleProcessingRecordFactory.php
+
+		-
+			message: '#^Parameter \#3 \$value of method App\\Import\\Factories\\General\\LookupListFactory\:\:create\(\) expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Import/Factories/Avg/AvgResponsibleProcessingRecordFactory.php
+
+		-
+			message: '#^Parameter \#4 \$collection of method App\\Import\\Factories\\AbstractFactory\:\:createRelations\(\) expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 8
+			path: app/Import/Factories/Avg/AvgResponsibleProcessingRecordFactory.php
+
+		-
+			message: '#^Property App\\Models\\Avg\\AvgResponsibleProcessingRecord\:\:\$import_number \(string\|null\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Import/Factories/Avg/AvgResponsibleProcessingRecordFactory.php
+
+		-
+			message: '#^Method App\\Import\\Factories\\ContactPersonFactory\:\:create\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Import/Factories/ContactPersonFactory.php
+
+		-
+			message: '#^Parameter \#1 \$input of method App\\Import\\Factories\\AbstractFactory\:\:toString\(\) expects array\|bool\|int\|string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 3
+			path: app/Import/Factories/ContactPersonFactory.php
+
+		-
+			message: '#^Parameter \#1 \$input of method App\\Import\\Factories\\AbstractFactory\:\:toStringOrNull\(\) expects array\|int\|string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Import/Factories/ContactPersonFactory.php
+
+		-
+			message: '#^Parameter \#3 \$value of method App\\Import\\Factories\\General\\LookupListFactory\:\:create\(\) expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Import/Factories/ContactPersonFactory.php
+
+		-
+			message: '#^Method App\\Import\\Factories\\ProcessorFactory\:\:create\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Import/Factories/ProcessorFactory.php
+
+		-
+			message: '#^Parameter \#1 \$input of method App\\Import\\Factories\\AbstractFactory\:\:toString\(\) expects array\|bool\|int\|string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 3
+			path: app/Import/Factories/ProcessorFactory.php
+
+		-
+			message: '#^Parameter \#1 \$input of method App\\Import\\Factories\\AbstractFactory\:\:toStringOrNull\(\) expects array\|int\|string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Import/Factories/ProcessorFactory.php
+
+		-
+			message: '#^Method App\\Import\\Factories\\ReceiverFactory\:\:create\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Import/Factories/ReceiverFactory.php
+
+		-
+			message: '#^Property App\\Models\\Receiver\:\:\$description \(string\|null\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Import/Factories/ReceiverFactory.php
+
+		-
+			message: '#^Method App\\Import\\Factories\\RemarkFactory\:\:create\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Import/Factories/RemarkFactory.php
+
+		-
+			message: '#^Parameter \#1 \$input of method App\\Import\\Factories\\AbstractFactory\:\:toCarbon\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Import/Factories/RemarkFactory.php
+
+		-
+			message: '#^Parameter \#1 \$input of method App\\Import\\Factories\\AbstractFactory\:\:toString\(\) expects array\|bool\|int\|string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Import/Factories/RemarkFactory.php
+
+		-
+			message: '#^Method App\\Import\\Factories\\ResponsibleFactory\:\:create\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Import/Factories/ResponsibleFactory.php
+
+		-
+			message: '#^Property App\\Models\\Responsible\:\:\$import_id \(string\|null\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Import/Factories/ResponsibleFactory.php
+
+		-
+			message: '#^Property App\\Models\\Responsible\:\:\$name \(string\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Import/Factories/ResponsibleFactory.php
+
+		-
+			message: '#^Method App\\Import\\Factories\\StakeholderDataItemFactory\:\:create\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Import/Factories/StakeholderDataItemFactory.php
+
+		-
+			message: '#^Parameter \#1 \$input of method App\\Import\\Factories\\AbstractFactory\:\:toBoolean\(\) expects bool\|string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/Import/Factories/StakeholderDataItemFactory.php
+
+		-
+			message: '#^Parameter \#1 \$input of method App\\Import\\Factories\\AbstractFactory\:\:toString\(\) expects array\|bool\|int\|string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 5
+			path: app/Import/Factories/StakeholderDataItemFactory.php
+
+		-
+			message: '#^Parameter \#1 \$input of method App\\Import\\Factories\\AbstractFactory\:\:toStringOrNull\(\) expects array\|int\|string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Import/Factories/StakeholderDataItemFactory.php
+
+		-
+			message: '#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 1
+			path: app/Import/Factories/StakeholderFactory.php
+
+		-
+			message: '#^Foreach overwrites \$data with its value variable\.$#'
+			identifier: foreach.valueOverwrite
+			count: 1
+			path: app/Import/Factories/StakeholderFactory.php
+
+		-
+			message: '#^Method App\\Import\\Factories\\StakeholderFactory\:\:create\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Import/Factories/StakeholderFactory.php
+
+		-
+			message: '#^Parameter \#1 \$data of method App\\Import\\Factories\\StakeholderDataItemFactory\:\:create\(\) expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Import/Factories/StakeholderFactory.php
+
+		-
+			message: '#^Parameter \#1 \$input of method App\\Import\\Factories\\AbstractFactory\:\:toBoolean\(\) expects bool\|string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 9
+			path: app/Import/Factories/StakeholderFactory.php
+
+		-
+			message: '#^Parameter \#1 \$input of method App\\Import\\Factories\\AbstractFactory\:\:toString\(\) expects array\|bool\|int\|string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Import/Factories/StakeholderFactory.php
+
+		-
+			message: '#^Parameter \#1 \$input of method App\\Import\\Factories\\AbstractFactory\:\:toStringOrNull\(\) expects array\|int\|string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Import/Factories/StakeholderFactory.php
+
+		-
+			message: '#^Method App\\Import\\Factories\\SystemFactory\:\:create\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Import/Factories/SystemFactory.php
+
+		-
+			message: '#^Property App\\Models\\System\:\:\$description \(string\|null\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Import/Factories/SystemFactory.php
+
+		-
+			message: '#^Method App\\Import\\Factories\\Wpg\\WpgGoalFactory\:\:create\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Import/Factories/Wpg/WpgGoalFactory.php
+
+		-
+			message: '#^Parameter \#1 \$input of method App\\Import\\Factories\\AbstractFactory\:\:toBoolean\(\) expects bool\|string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 9
+			path: app/Import/Factories/Wpg/WpgGoalFactory.php
+
+		-
+			message: '#^Parameter \#1 \$input of method App\\Import\\Factories\\AbstractFactory\:\:toString\(\) expects array\|bool\|int\|string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 3
+			path: app/Import/Factories/Wpg/WpgGoalFactory.php
+
+		-
+			message: '#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 1
+			path: app/Import/Factories/Wpg/WpgProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''Artikel15'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Wpg/WpgProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''Artikel15A'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Wpg/WpgProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''Artikel16'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Wpg/WpgProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''Artikel17'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Wpg/WpgProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''Artikel17A'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Wpg/WpgProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''Artikel18'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Wpg/WpgProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''Artikel19'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Wpg/WpgProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''Artikel20'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Wpg/WpgProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''Artikel22'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Wpg/WpgProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''BelangGevolgen'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Wpg/WpgProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''Derden'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Wpg/WpgProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''ElectronischeWeg'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Wpg/WpgProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''Encryptie'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Wpg/WpgProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''HasBesluitvorming'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Wpg/WpgProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''HasBeveiliging'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Wpg/WpgProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''IsHoogRisicoRechtenVrijheden'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Wpg/WpgProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''Logica'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Wpg/WpgProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''Maatregelen'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Wpg/WpgProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''Pseudonimisering'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: app/Import/Factories/Wpg/WpgProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''Slachtoffers'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Wpg/WpgProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''Toegang'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Wpg/WpgProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''ToelichtingDerden'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Wpg/WpgProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''ToelichtingDoorgifte'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Wpg/WpgProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''ToelichtingTerBeschikking'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Wpg/WpgProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''ToelichtingVertrekking'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Wpg/WpgProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''Verantwoordelijken'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Wpg/WpgProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''Verdachten'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Wpg/WpgProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''Veroordeelden'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Wpg/WpgProcessingRecordFactory.php
+
+		-
+			message: '#^Cannot access offset ''Verwerkers'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Import/Factories/Wpg/WpgProcessingRecordFactory.php
+
+		-
+			message: '#^Method App\\Import\\Factories\\Wpg\\WpgProcessingRecordFactory\:\:create\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Import/Factories/Wpg/WpgProcessingRecordFactory.php
+
+		-
+			message: '#^Parameter \#1 \$input of method App\\Import\\Factories\\AbstractFactory\:\:toArray\(\) expects array\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Import/Factories/Wpg/WpgProcessingRecordFactory.php
+
+		-
+			message: '#^Parameter \#1 \$input of method App\\Import\\Factories\\AbstractFactory\:\:toBoolean\(\) expects bool\|string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 17
+			path: app/Import/Factories/Wpg/WpgProcessingRecordFactory.php
+
+		-
+			message: '#^Parameter \#1 \$input of method App\\Import\\Factories\\AbstractFactory\:\:toCarbon\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/Import/Factories/Wpg/WpgProcessingRecordFactory.php
+
+		-
+			message: '#^Parameter \#1 \$input of method App\\Import\\Factories\\AbstractFactory\:\:toString\(\) expects array\|bool\|int\|string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 15
+			path: app/Import/Factories/Wpg/WpgProcessingRecordFactory.php
+
+		-
+			message: '#^Parameter \#1 \$state of method App\\Import\\Factories\\AbstractFactory\:\:skipState\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Import/Factories/Wpg/WpgProcessingRecordFactory.php
+
+		-
+			message: '#^Parameter \#1 \$string of static method Illuminate\\Support\\Str\:\:of\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Import/Factories/Wpg/WpgProcessingRecordFactory.php
+
+		-
+			message: '#^Parameter \#2 \$version of method App\\Import\\Factories\\AbstractFactory\:\:createSnapshot\(\) expects int, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Import/Factories/Wpg/WpgProcessingRecordFactory.php
+
+		-
+			message: '#^Parameter \#3 \$status of method App\\Import\\Factories\\AbstractFactory\:\:createSnapshot\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Import/Factories/Wpg/WpgProcessingRecordFactory.php
+
+		-
+			message: '#^Parameter \#3 \$value of method App\\Import\\Factories\\General\\LookupListFactory\:\:create\(\) expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Import/Factories/Wpg/WpgProcessingRecordFactory.php
+
+		-
+			message: '#^Parameter \#4 \$collection of method App\\Import\\Factories\\AbstractFactory\:\:createRelations\(\) expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 6
+			path: app/Import/Factories/Wpg/WpgProcessingRecordFactory.php
+
+		-
+			message: '#^Property App\\Models\\Wpg\\WpgProcessingRecord\:\:\$import_number \(string\|null\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Import/Factories/Wpg/WpgProcessingRecordFactory.php
+
+		-
+			message: '#^Method App\\Import\\Factory\:\:create\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Import/Factory.php
+
+		-
+			message: '#^Call to static method Webmozart\\Assert\\Assert\:\:string\(\) with string will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: app/Import/Importers/JsonImporter.php
+
+		-
+			message: '#^Method App\\Import\\Importers\\JsonImporter\:\:getDataFromJson\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Import/Importers/JsonImporter.php
+
+		-
+			message: '#^Call to static method Webmozart\\Assert\\Assert\:\:integer\(\) with int will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: app/Import/ZipImporter.php
+
+		-
+			message: '#^Call to static method Webmozart\\Assert\\Assert\:\:keyExists\(\) with array\{name\: string, index\: int, crc\: int, size\: int, mtime\: int, comp_size\: int, comp_method\: int, encryption_method\: int\} and ''size'' will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: app/Import/ZipImporter.php
+
+		-
+			message: '#^Method App\\Jobs\\Media\\MarkMediaUploadAsValidated\:\:middleware\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Jobs/Media/MarkMediaUploadAsValidated.php
+
+		-
+			message: '#^Call to static method Webmozart\\Assert\\Assert\:\:subclassOf\(\) with class\-string\<Illuminate\\Contracts\\Queue\\ShouldQueue\> and ''Illuminate\\\\Contracts\\\\Queue\\\\ShouldQueue'' will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: app/Jobs/Media/PostMediaUploadJobChain.php
+
+		-
+			message: '#^Method App\\Jobs\\Media\\PruneMetaData\:\:middleware\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Jobs/Media/PruneMetaData.php
+
+		-
+			message: '#^Method App\\Jobs\\Media\\ValidateMimeType\:\:middleware\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Jobs/Media/ValidateMimeType.php
+
+		-
+			message: '#^Property App\\Jobs\\Media\\ValidateMimeType\:\:\$permittedMimeTypes type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Jobs/Media/ValidateMimeType.php
+
+		-
+			message: '#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 1
+			path: app/Livewire/Snapshot/Approvals.php
+
+		-
+			message: '#^Method App\\Livewire\\Snapshot\\Approvals\:\:createRequestApprovalForm\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Livewire/Snapshot/Approvals.php
+
+		-
+			message: '#^Parameter \#1 \$form of method Filament\\Actions\\MountableAction\:\:form\(\) expects array\<Filament\\Forms\\Components\\Component\>\|Closure\|null, array given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Livewire/Snapshot/Approvals.php
+
+		-
+			message: '#^Method App\\Livewire\\User\\Profile\\PersonalInfo\:\:getProfileFormSchema\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Livewire/User/Profile/PersonalInfo.php
+
+		-
+			message: '#^Parameter \#1 \$components of method Filament\\Forms\\ComponentContainer\:\:schema\(\) expects array\<Filament\\Forms\\Components\\Component\>\|Closure, array given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Livewire/User/Profile/PersonalInfo.php
+
+		-
+			message: '#^Parameter \#1 \$keys of method Illuminate\\Support\\Collection\<string,mixed\>\:\:only\(\) expects array\<string\>\|Illuminate\\Support\\Enumerable\<\(int\|string\), string\>\|string\|null, array given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Livewire/User/Profile/PersonalInfo.php
+
+		-
+			message: '#^Property App\\Livewire\\User\\Profile\\PersonalInfo\:\:\$data type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Livewire/User/Profile/PersonalInfo.php
+
+		-
+			message: '#^Property App\\Livewire\\User\\Profile\\PersonalInfo\:\:\$only type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Livewire/User/Profile/PersonalInfo.php
+
+		-
+			message: '#^Class App\\Models\\Address uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Address.php
+
+		-
+			message: '#^Class App\\Models\\AdminLogEntry has PHPDoc tag @property for property \$context with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Models/AdminLogEntry.php
+
+		-
+			message: '#^Class App\\Models\\AdminLogEntry uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/AdminLogEntry.php
+
+		-
+			message: '#^Class App\\Models\\Algorithm\\AlgorithmMetaSchema uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Algorithm/AlgorithmMetaSchema.php
+
+		-
+			message: '''
+				#^Usage of deprecated trait App\\Models\\Concerns\\HasUuidAsKey in class App\\Models\\Algorithm\\AlgorithmMetaSchema\:
+				replaced by HasUuidAsId$#
+			'''
+			identifier: traitUse.deprecated
+			count: 1
+			path: app/Models/Algorithm/AlgorithmMetaSchema.php
+
+		-
+			message: '#^Class App\\Models\\Algorithm\\AlgorithmPublicationCategory uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Algorithm/AlgorithmPublicationCategory.php
+
+		-
+			message: '''
+				#^Usage of deprecated trait App\\Models\\Concerns\\HasUuidAsKey in class App\\Models\\Algorithm\\AlgorithmPublicationCategory\:
+				replaced by HasUuidAsId$#
+			'''
+			identifier: traitUse.deprecated
+			count: 1
+			path: app/Models/Algorithm/AlgorithmPublicationCategory.php
+
+		-
+			message: '#^Cannot call method get\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Models/Algorithm/AlgorithmRecord.php
+
+		-
+			message: '#^Class App\\Models\\Algorithm\\AlgorithmRecord uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Algorithm/AlgorithmRecord.php
+
+		-
+			message: '''
+				#^Usage of deprecated trait App\\Models\\Concerns\\HasUuidAsKey in class App\\Models\\Algorithm\\AlgorithmRecord\:
+				replaced by HasUuidAsId$#
+			'''
+			identifier: traitUse.deprecated
+			count: 1
+			path: app/Models/Algorithm/AlgorithmRecord.php
+
+		-
+			message: '#^Variable method call on \$this\(App\\Models\\Algorithm\\AlgorithmRecord\)\.$#'
+			identifier: method.dynamicName
+			count: 1
+			path: app/Models/Algorithm/AlgorithmRecord.php
+
+		-
+			message: '#^Class App\\Models\\Algorithm\\AlgorithmStatus uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Algorithm/AlgorithmStatus.php
+
+		-
+			message: '''
+				#^Usage of deprecated trait App\\Models\\Concerns\\HasUuidAsKey in class App\\Models\\Algorithm\\AlgorithmStatus\:
+				replaced by HasUuidAsId$#
+			'''
+			identifier: traitUse.deprecated
+			count: 1
+			path: app/Models/Algorithm/AlgorithmStatus.php
+
+		-
+			message: '#^Class App\\Models\\Algorithm\\AlgorithmTheme uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Algorithm/AlgorithmTheme.php
+
+		-
+			message: '''
+				#^Usage of deprecated trait App\\Models\\Concerns\\HasUuidAsKey in class App\\Models\\Algorithm\\AlgorithmTheme\:
+				replaced by HasUuidAsId$#
+			'''
+			identifier: traitUse.deprecated
+			count: 1
+			path: app/Models/Algorithm/AlgorithmTheme.php
+
+		-
+			message: '#^Class App\\Models\\Avg\\AvgGoal uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Avg/AvgGoal.php
+
+		-
+			message: '''
+				#^Usage of deprecated trait App\\Models\\Concerns\\HasUuidAsKey in class App\\Models\\Avg\\AvgGoal\:
+				replaced by HasUuidAsId$#
+			'''
+			identifier: traitUse.deprecated
+			count: 1
+			path: app/Models/Avg/AvgGoal.php
+
+		-
+			message: '#^Cannot call method get\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Models/Avg/AvgProcessorProcessingRecord.php
+
+		-
+			message: '#^Class App\\Models\\Avg\\AvgProcessorProcessingRecord uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Avg/AvgProcessorProcessingRecord.php
+
+		-
+			message: '''
+				#^Usage of deprecated trait App\\Models\\Concerns\\HasUuidAsKey in class App\\Models\\Avg\\AvgProcessorProcessingRecord\:
+				replaced by HasUuidAsId$#
+			'''
+			identifier: traitUse.deprecated
+			count: 1
+			path: app/Models/Avg/AvgProcessorProcessingRecord.php
+
+		-
+			message: '#^Variable method call on \$this\(App\\Models\\Avg\\AvgProcessorProcessingRecord\)\.$#'
+			identifier: method.dynamicName
+			count: 1
+			path: app/Models/Avg/AvgProcessorProcessingRecord.php
+
+		-
+			message: '#^Class App\\Models\\Avg\\AvgProcessorProcessingRecordService uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Avg/AvgProcessorProcessingRecordService.php
+
+		-
+			message: '''
+				#^Usage of deprecated trait App\\Models\\Concerns\\HasUuidAsKey in class App\\Models\\Avg\\AvgProcessorProcessingRecordService\:
+				replaced by HasUuidAsId$#
+			'''
+			identifier: traitUse.deprecated
+			count: 1
+			path: app/Models/Avg/AvgProcessorProcessingRecordService.php
+
+		-
+			message: '#^Cannot call method get\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Models/Avg/AvgResponsibleProcessingRecord.php
+
+		-
+			message: '#^Class App\\Models\\Avg\\AvgResponsibleProcessingRecord uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Avg/AvgResponsibleProcessingRecord.php
+
+		-
+			message: '''
+				#^Usage of deprecated trait App\\Models\\Concerns\\HasUuidAsKey in class App\\Models\\Avg\\AvgResponsibleProcessingRecord\:
+				replaced by HasUuidAsId$#
+			'''
+			identifier: traitUse.deprecated
+			count: 1
+			path: app/Models/Avg/AvgResponsibleProcessingRecord.php
+
+		-
+			message: '#^Variable method call on \$this\(App\\Models\\Avg\\AvgResponsibleProcessingRecord\)\.$#'
+			identifier: method.dynamicName
+			count: 1
+			path: app/Models/Avg/AvgResponsibleProcessingRecord.php
+
+		-
+			message: '#^Class App\\Models\\Avg\\AvgResponsibleProcessingRecordService uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Avg/AvgResponsibleProcessingRecordService.php
+
+		-
+			message: '''
+				#^Usage of deprecated trait App\\Models\\Concerns\\HasUuidAsKey in class App\\Models\\Avg\\AvgResponsibleProcessingRecordService\:
+				replaced by HasUuidAsId$#
+			'''
+			identifier: traitUse.deprecated
+			count: 1
+			path: app/Models/Avg/AvgResponsibleProcessingRecordService.php
+
+		-
+			message: '#^Cannot call method get\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Models/ContactPerson.php
+
+		-
+			message: '#^Class App\\Models\\ContactPerson uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/ContactPerson.php
+
+		-
+			message: '''
+				#^Usage of deprecated trait App\\Models\\Concerns\\HasUuidAsKey in class App\\Models\\ContactPerson\:
+				replaced by HasUuidAsId$#
+			'''
+			identifier: traitUse.deprecated
+			count: 1
+			path: app/Models/ContactPerson.php
+
+		-
+			message: '#^Variable method call on \$this\(App\\Models\\ContactPerson\)\.$#'
+			identifier: method.dynamicName
+			count: 1
+			path: app/Models/ContactPerson.php
+
+		-
+			message: '#^Class App\\Models\\ContactPersonPosition uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/ContactPersonPosition.php
+
+		-
+			message: '''
+				#^Usage of deprecated trait App\\Models\\Concerns\\HasUuidAsKey in class App\\Models\\ContactPersonPosition\:
+				replaced by HasUuidAsId$#
+			'''
+			identifier: traitUse.deprecated
+			count: 1
+			path: app/Models/ContactPersonPosition.php
+
+		-
+			message: '#^Class App\\Models\\DataBreachRecord has PHPDoc tag @property for property \$personal_data_categories with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Models/DataBreachRecord.php
+
+		-
+			message: '#^Class App\\Models\\DataBreachRecord has PHPDoc tag @property for property \$personal_data_special_categories with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Models/DataBreachRecord.php
+
+		-
+			message: '#^Class App\\Models\\DataBreachRecord has PHPDoc tag @property for property \$reported_to_involved_communication with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Models/DataBreachRecord.php
+
+		-
+			message: '#^Class App\\Models\\DataBreachRecord uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/DataBreachRecord.php
+
+		-
+			message: '#^PHPDoc type array\<int, string\> of property App\\Models\\DataBreachRecord\:\:\$fillable is not the same as PHPDoc type list\<string\> of overridden property Illuminate\\Database\\Eloquent\\Model\:\:\$fillable\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: app/Models/DataBreachRecord.php
+
+		-
+			message: '''
+				#^Usage of deprecated trait App\\Models\\Concerns\\HasUuidAsKey in class App\\Models\\DataBreachRecord\:
+				replaced by HasUuidAsId$#
+			'''
+			identifier: traitUse.deprecated
+			count: 1
+			path: app/Models/DataBreachRecord.php
+
+		-
+			message: '#^Class App\\Models\\Document uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Document.php
+
+		-
+			message: '''
+				#^Usage of deprecated trait App\\Models\\Concerns\\HasUuidAsKey in class App\\Models\\Document\:
+				replaced by HasUuidAsId$#
+			'''
+			identifier: traitUse.deprecated
+			count: 1
+			path: app/Models/Document.php
+
+		-
+			message: '#^Class App\\Models\\DocumentType uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/DocumentType.php
+
+		-
+			message: '''
+				#^Usage of deprecated trait App\\Models\\Concerns\\HasUuidAsKey in class App\\Models\\DocumentType\:
+				replaced by HasUuidAsId$#
+			'''
+			identifier: traitUse.deprecated
+			count: 1
+			path: app/Models/DocumentType.php
+
+		-
+			message: '#^Class App\\Models\\EntityNumber uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/EntityNumber.php
+
+		-
+			message: '''
+				#^Usage of deprecated trait App\\Models\\Concerns\\HasUuidAsKey in class App\\Models\\EntityNumber\:
+				replaced by HasUuidAsId$#
+			'''
+			identifier: traitUse.deprecated
+			count: 1
+			path: app/Models/EntityNumber.php
+
+		-
+			message: '#^Class App\\Models\\EntityNumberCounter uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/EntityNumberCounter.php
+
+		-
+			message: '''
+				#^Usage of deprecated trait App\\Models\\Concerns\\HasUuidAsKey in class App\\Models\\EntityNumberCounter\:
+				replaced by HasUuidAsId$#
+			'''
+			identifier: traitUse.deprecated
+			count: 1
+			path: app/Models/EntityNumberCounter.php
+
+		-
+			message: '''
+				#^Usage of deprecated trait App\\Models\\Concerns\\HasUuidAsKey in class App\\Models\\FgRemark\:
+				replaced by HasUuidAsId$#
+			'''
+			identifier: traitUse.deprecated
+			count: 1
+			path: app/Models/FgRemark.php
+
+		-
+			message: '#^Class App\\Models\\Organisation uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Organisation.php
+
+		-
+			message: '''
+				#^Usage of deprecated trait App\\Models\\Concerns\\HasUuidAsKey in class App\\Models\\Organisation\:
+				replaced by HasUuidAsId$#
+			'''
+			identifier: traitUse.deprecated
+			count: 1
+			path: app/Models/Organisation.php
+
+		-
+			message: '#^Cannot call method get\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Models/Processor.php
+
+		-
+			message: '#^Class App\\Models\\Processor uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Processor.php
+
+		-
+			message: '''
+				#^Usage of deprecated trait App\\Models\\Concerns\\HasUuidAsKey in class App\\Models\\Processor\:
+				replaced by HasUuidAsId$#
+			'''
+			identifier: traitUse.deprecated
+			count: 1
+			path: app/Models/Processor.php
+
+		-
+			message: '#^Variable method call on \$this\(App\\Models\\Processor\)\.$#'
+			identifier: method.dynamicName
+			count: 1
+			path: app/Models/Processor.php
+
+		-
+			message: '#^Class App\\Models\\PublicWebsite uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/PublicWebsite.php
+
+		-
+			message: '''
+				#^Usage of deprecated trait App\\Models\\Concerns\\HasUuidAsKey in class App\\Models\\PublicWebsite\:
+				replaced by HasUuidAsId$#
+			'''
+			identifier: traitUse.deprecated
+			count: 1
+			path: app/Models/PublicWebsite.php
+
+		-
+			message: '''
+				#^Usage of deprecated trait App\\Models\\Concerns\\HasUuidAsKey in class App\\Models\\PublicWebsiteCheck\:
+				replaced by HasUuidAsId$#
+			'''
+			identifier: traitUse.deprecated
+			count: 1
+			path: app/Models/PublicWebsiteCheck.php
+
+		-
+			message: '''
+				#^Usage of deprecated trait App\\Models\\Concerns\\HasUuidAsKey in class App\\Models\\PublicWebsiteTree\:
+				replaced by HasUuidAsId$#
+			'''
+			identifier: traitUse.deprecated
+			count: 1
+			path: app/Models/PublicWebsiteTree.php
+
+		-
+			message: '#^Cannot call method get\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Models/Receiver.php
+
+		-
+			message: '#^Class App\\Models\\Receiver uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Receiver.php
+
+		-
+			message: '''
+				#^Usage of deprecated trait App\\Models\\Concerns\\HasUuidAsKey in class App\\Models\\Receiver\:
+				replaced by HasUuidAsId$#
+			'''
+			identifier: traitUse.deprecated
+			count: 1
+			path: app/Models/Receiver.php
+
+		-
+			message: '#^Variable method call on \$this\(App\\Models\\Receiver\)\.$#'
+			identifier: method.dynamicName
+			count: 1
+			path: app/Models/Receiver.php
+
+		-
+			message: '#^Class App\\Models\\RelatedSnapshotSource uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/RelatedSnapshotSource.php
+
+		-
+			message: '''
+				#^Usage of deprecated trait App\\Models\\Concerns\\HasUuidAsKey in class App\\Models\\RelatedSnapshotSource\:
+				replaced by HasUuidAsId$#
+			'''
+			identifier: traitUse.deprecated
+			count: 1
+			path: app/Models/RelatedSnapshotSource.php
+
+		-
+			message: '#^Class App\\Models\\Remark uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Remark.php
+
+		-
+			message: '''
+				#^Usage of deprecated trait App\\Models\\Concerns\\HasUuidAsKey in class App\\Models\\Remark\:
+				replaced by HasUuidAsId$#
+			'''
+			identifier: traitUse.deprecated
+			count: 1
+			path: app/Models/Remark.php
+
+		-
+			message: '#^Cannot call method get\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Models/Responsible.php
+
+		-
+			message: '#^Class App\\Models\\Responsible uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Responsible.php
+
+		-
+			message: '''
+				#^Usage of deprecated trait App\\Models\\Concerns\\HasUuidAsKey in class App\\Models\\Responsible\:
+				replaced by HasUuidAsId$#
+			'''
+			identifier: traitUse.deprecated
+			count: 1
+			path: app/Models/Responsible.php
+
+		-
+			message: '#^Variable method call on \$this\(App\\Models\\Responsible\)\.$#'
+			identifier: method.dynamicName
+			count: 1
+			path: app/Models/Responsible.php
+
+		-
+			message: '#^Class App\\Models\\ResponsibleLegalEntity uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/ResponsibleLegalEntity.php
+
+		-
+			message: '''
+				#^Usage of deprecated trait App\\Models\\Concerns\\HasUuidAsKey in class App\\Models\\ResponsibleLegalEntity\:
+				replaced by HasUuidAsId$#
+			'''
+			identifier: traitUse.deprecated
+			count: 1
+			path: app/Models/ResponsibleLegalEntity.php
+
+		-
+			message: '#^Method App\\Models\\Scopes\\OrderByCreatedAtAscScope\:\:apply\(\) has parameter \$builder with generic class Illuminate\\Database\\Eloquent\\Builder but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Scopes/OrderByCreatedAtAscScope.php
+
+		-
+			message: '#^Method App\\Models\\Scopes\\OrderByCreatedAtAscScope\:\:apply\(\) return type with generic class Illuminate\\Database\\Eloquent\\Builder does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Scopes/OrderByCreatedAtAscScope.php
+
+		-
+			message: '#^Method App\\Models\\Scopes\\TenantScope\:\:apply\(\) has parameter \$builder with generic class Illuminate\\Database\\Eloquent\\Builder but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Scopes/TenantScope.php
+
+		-
+			message: '#^Method App\\Models\\Scopes\\TenantScope\:\:apply\(\) return type with generic class Illuminate\\Database\\Eloquent\\Builder does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Scopes/TenantScope.php
+
+		-
+			message: '#^Class App\\Models\\Snapshot uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Snapshot.php
+
+		-
+			message: '''
+				#^Usage of deprecated trait App\\Models\\Concerns\\HasUuidAsKey in class App\\Models\\Snapshot\:
+				replaced by HasUuidAsId$#
+			'''
+			identifier: traitUse.deprecated
+			count: 1
+			path: app/Models/Snapshot.php
+
+		-
+			message: '#^Class App\\Models\\SnapshotApproval uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/SnapshotApproval.php
+
+		-
+			message: '''
+				#^Usage of deprecated trait App\\Models\\Concerns\\HasUuidAsKey in class App\\Models\\SnapshotApproval\:
+				replaced by HasUuidAsId$#
+			'''
+			identifier: traitUse.deprecated
+			count: 1
+			path: app/Models/SnapshotApproval.php
+
+		-
+			message: '#^Class App\\Models\\SnapshotApprovalLog has PHPDoc tag @property for property \$message with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Models/SnapshotApprovalLog.php
+
+		-
+			message: '#^Class App\\Models\\SnapshotApprovalLog uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/SnapshotApprovalLog.php
+
+		-
+			message: '''
+				#^Usage of deprecated trait App\\Models\\Concerns\\HasUuidAsKey in class App\\Models\\SnapshotApprovalLog\:
+				replaced by HasUuidAsId$#
+			'''
+			identifier: traitUse.deprecated
+			count: 1
+			path: app/Models/SnapshotApprovalLog.php
+
+		-
+			message: '#^Class App\\Models\\SnapshotData has PHPDoc tag @property for property \$public_frontmatter with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Models/SnapshotData.php
+
+		-
+			message: '#^Class App\\Models\\SnapshotData uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/SnapshotData.php
+
+		-
+			message: '''
+				#^Usage of deprecated trait App\\Models\\Concerns\\HasUuidAsKey in class App\\Models\\SnapshotData\:
+				replaced by HasUuidAsId$#
+			'''
+			identifier: traitUse.deprecated
+			count: 1
+			path: app/Models/SnapshotData.php
+
+		-
+			message: '#^Class App\\Models\\SnapshotTransition uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/SnapshotTransition.php
+
+		-
+			message: '''
+				#^Usage of deprecated trait App\\Models\\Concerns\\HasUuidAsKey in class App\\Models\\SnapshotTransition\:
+				replaced by HasUuidAsId$#
+			'''
+			identifier: traitUse.deprecated
+			count: 1
+			path: app/Models/SnapshotTransition.php
+
+		-
+			message: '#^Class App\\Models\\Stakeholder uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Stakeholder.php
+
+		-
+			message: '''
+				#^Usage of deprecated trait App\\Models\\Concerns\\HasUuidAsKey in class App\\Models\\Stakeholder\:
+				replaced by HasUuidAsId$#
+			'''
+			identifier: traitUse.deprecated
+			count: 1
+			path: app/Models/Stakeholder.php
+
+		-
+			message: '#^Class App\\Models\\StakeholderDataItem uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/StakeholderDataItem.php
+
+		-
+			message: '''
+				#^Usage of deprecated trait App\\Models\\Concerns\\HasUuidAsKey in class App\\Models\\StakeholderDataItem\:
+				replaced by HasUuidAsId$#
+			'''
+			identifier: traitUse.deprecated
+			count: 1
+			path: app/Models/StakeholderDataItem.php
+
+		-
+			message: '#^Class App\\Models\\States\\SnapshotState extends generic class Spatie\\ModelStates\\State but does not specify its types\: TModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/States/SnapshotState.php
+
+		-
+			message: '#^Method App\\Models\\States\\SnapshotState\:\:toLivewire\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Models/States/SnapshotState.php
+
+		-
+			message: '#^Cannot call method get\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Models/System.php
+
+		-
+			message: '#^Class App\\Models\\System uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/System.php
+
+		-
+			message: '''
+				#^Usage of deprecated trait App\\Models\\Concerns\\HasUuidAsKey in class App\\Models\\System\:
+				replaced by HasUuidAsId$#
+			'''
+			identifier: traitUse.deprecated
+			count: 1
+			path: app/Models/System.php
+
+		-
+			message: '#^Variable method call on \$this\(App\\Models\\System\)\.$#'
+			identifier: method.dynamicName
+			count: 1
+			path: app/Models/System.php
+
+		-
+			message: '#^Class App\\Models\\Tag has PHPDoc tag @property for property \$name with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Models/Tag.php
+
+		-
+			message: '#^Class App\\Models\\Tag has PHPDoc tag @property for property \$slug with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Models/Tag.php
+
+		-
+			message: '#^Class App\\Models\\Tag uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Tag.php
+
+		-
+			message: '#^PHPDoc type array\<int, string\> of property App\\Models\\Tag\:\:\$fillable is not the same as PHPDoc type list\<string\> of overridden property Illuminate\\Database\\Eloquent\\Model\:\:\$fillable\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: app/Models/Tag.php
+
+		-
+			message: '#^Class App\\Models\\User uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^PHPDoc type array\<int, string\> of property App\\Models\\User\:\:\$fillable is not the same as PHPDoc type list\<string\> of overridden property Illuminate\\Database\\Eloquent\\Model\:\:\$fillable\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^PHPDoc type array\<int, string\> of property App\\Models\\User\:\:\$hidden is not the same as PHPDoc type list\<string\> of overridden property Illuminate\\Database\\Eloquent\\Model\:\:\$hidden\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '''
+				#^Usage of deprecated trait App\\Models\\Concerns\\HasUuidAsKey in class App\\Models\\User\:
+				replaced by HasUuidAsId$#
+			'''
+			identifier: traitUse.deprecated
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '''
+				#^Usage of deprecated trait App\\Models\\Concerns\\HasUuidAsKey in class App\\Models\\UserGlobalRole\:
+				replaced by HasUuidAsId$#
+			'''
+			identifier: traitUse.deprecated
+			count: 1
+			path: app/Models/UserGlobalRole.php
+
+		-
+			message: '#^Class App\\Models\\UserLoginToken uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/UserLoginToken.php
+
+		-
+			message: '''
+				#^Usage of deprecated trait App\\Models\\Concerns\\HasUuidAsKey in class App\\Models\\UserOrganisationRole\:
+				replaced by HasUuidAsId$#
+			'''
+			identifier: traitUse.deprecated
+			count: 1
+			path: app/Models/UserOrganisationRole.php
+
+		-
+			message: '#^Class App\\Models\\Wpg\\WpgGoal uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Wpg/WpgGoal.php
+
+		-
+			message: '''
+				#^Usage of deprecated trait App\\Models\\Concerns\\HasUuidAsKey in class App\\Models\\Wpg\\WpgGoal\:
+				replaced by HasUuidAsId$#
+			'''
+			identifier: traitUse.deprecated
+			count: 1
+			path: app/Models/Wpg/WpgGoal.php
+
+		-
+			message: '#^Cannot call method get\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Models/Wpg/WpgProcessingRecord.php
+
+		-
+			message: '#^Class App\\Models\\Wpg\\WpgProcessingRecord uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Wpg/WpgProcessingRecord.php
+
+		-
+			message: '''
+				#^Usage of deprecated trait App\\Models\\Concerns\\HasUuidAsKey in class App\\Models\\Wpg\\WpgProcessingRecord\:
+				replaced by HasUuidAsId$#
+			'''
+			identifier: traitUse.deprecated
+			count: 1
+			path: app/Models/Wpg/WpgProcessingRecord.php
+
+		-
+			message: '#^Variable method call on \$this\(App\\Models\\Wpg\\WpgProcessingRecord\)\.$#'
+			identifier: method.dynamicName
+			count: 1
+			path: app/Models/Wpg/WpgProcessingRecord.php
+
+		-
+			message: '#^Class App\\Models\\Wpg\\WpgProcessingRecordService uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Wpg/WpgProcessingRecordService.php
+
+		-
+			message: '''
+				#^Usage of deprecated trait App\\Models\\Concerns\\HasUuidAsKey in class App\\Models\\Wpg\\WpgProcessingRecordService\:
+				replaced by HasUuidAsId$#
+			'''
+			identifier: traitUse.deprecated
+			count: 1
+			path: app/Models/Wpg/WpgProcessingRecordService.php
+
+		-
+			message: '#^Property App\\Observers\\MediaObserver\:\:\$triggerGroups type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Observers/MediaObserver.php
+
+		-
+			message: '#^Only booleans are allowed in a negated boolean, int\|false given\.$#'
+			identifier: booleanNot.exprNotBoolean
+			count: 1
+			path: app/Providers/AppServiceProvider.php
+
+		-
+			message: '#^PHPDoc type array\<class\-string, array\<int, class\-string\>\> of property App\\Providers\\EventServiceProvider\:\:\$listen is not the same as PHPDoc type array\<string, array\<int, string\>\> of overridden property Illuminate\\Foundation\\Support\\Providers\\EventServiceProvider\:\:\$listen\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: app/Providers/EventServiceProvider.php
+
+		-
+			message: '#^Short ternary operator is not allowed\. Use null coalesce operator if applicable or consider using long ternary\.$#'
+			identifier: ternary.shortNotAllowed
+			count: 1
+			path: app/Providers/RouteServiceProvider.php
+
+		-
+			message: '#^Cannot access offset ''Illuminate\\\\Contracts\\\\Events\\\\Dispatcher'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Providers/SqlGeneratorServiceProvider.php
+
+		-
+			message: '#^Cannot access offset ''db'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Providers/SqlGeneratorServiceProvider.php
+
+		-
+			message: '#^Cannot access offset ''events'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Providers/SqlGeneratorServiceProvider.php
+
+		-
+			message: '#^Cannot access offset ''files'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Providers/SqlGeneratorServiceProvider.php
+
+		-
+			message: '#^Cannot access offset ''migration\.repository'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Providers/SqlGeneratorServiceProvider.php
+
+		-
+			message: '#^Cannot access offset ''migrator'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Providers/SqlGeneratorServiceProvider.php
+
+		-
+			message: '#^Parameter \#1 \$migrator of class App\\Console\\Commands\\SqlGenerate constructor expects Illuminate\\Database\\Migrations\\Migrator, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Providers/SqlGeneratorServiceProvider.php
+
+		-
+			message: '#^Parameter \#1 \$repository of class App\\Services\\SqlExport\\Migrator constructor expects Illuminate\\Database\\Migrations\\MigrationRepositoryInterface, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Providers/SqlGeneratorServiceProvider.php
+
+		-
+			message: '#^Parameter \#2 \$dispatcher of class App\\Console\\Commands\\SqlGenerate constructor expects Illuminate\\Contracts\\Events\\Dispatcher, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Providers/SqlGeneratorServiceProvider.php
+
+		-
+			message: '#^Parameter \#2 \$resolver of class App\\Services\\SqlExport\\Migrator constructor expects Illuminate\\Database\\ConnectionResolverInterface, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Providers/SqlGeneratorServiceProvider.php
+
+		-
+			message: '#^Parameter \#3 \$files of class App\\Services\\SqlExport\\Migrator constructor expects Illuminate\\Filesystem\\Filesystem, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Providers/SqlGeneratorServiceProvider.php
+
+		-
+			message: '#^Parameter \#4 \$dispatcher of class App\\Services\\SqlExport\\Migrator constructor expects Illuminate\\Contracts\\Events\\Dispatcher\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Providers/SqlGeneratorServiceProvider.php
+
+		-
+			message: '#^Parameter \#1 \$fallback \(string\|false\) of method App\\Routing\\UrlGenerator\:\:previous\(\) should be contravariant with parameter \$fallback \(mixed\) of method Illuminate\\Contracts\\Routing\\UrlGenerator\:\:previous\(\)$#'
+			identifier: method.childParameterType
+			count: 1
+			path: app/Routing/UrlGenerator.php
+
+		-
+			message: '#^Parameter \#1 \$fallback \(string\|false\) of method App\\Routing\\UrlGenerator\:\:previous\(\) should be contravariant with parameter \$fallback \(mixed\) of method Illuminate\\Routing\\UrlGenerator\:\:previous\(\)$#'
+			identifier: method.childParameterType
+			count: 1
+			path: app/Routing/UrlGenerator.php
+
+		-
+			message: '#^Parameter \#1 \$code \(non\-empty\-string\) of method App\\Services\\OneTimePassword\\FakeOneTimePassword\:\:isCodeValid\(\) should be contravariant with parameter \$code \(string\) of method App\\Services\\OneTimePassword\\OneTimePassword\:\:isCodeValid\(\)$#'
+			identifier: method.childParameterType
+			count: 1
+			path: app/Services/OneTimePassword/FakeOneTimePassword.php
+
+		-
+			message: '#^Only numeric types are allowed in \+, int\<0, max\>\|false given on the left side\.$#'
+			identifier: plus.leftNonNumeric
+			count: 1
+			path: app/Services/OneTimePassword/TimedOneTimePassword.php
+
+		-
+			message: '#^Parameter \#1 \$code \(non\-empty\-string\) of method App\\Services\\OneTimePassword\\TimedOneTimePassword\:\:isCodeValid\(\) should be contravariant with parameter \$code \(string\) of method App\\Services\\OneTimePassword\\OneTimePassword\:\:isCodeValid\(\)$#'
+			identifier: method.childParameterType
+			count: 1
+			path: app/Services/OneTimePassword/TimedOneTimePassword.php
+
+		-
+			message: '#^Parameter \#1 \$label \(non\-empty\-string\) of method App\\Services\\OneTimePassword\\TimedOneTimePassword\:\:generateQRCodeInline\(\) should be contravariant with parameter \$company \(string\) of method App\\Services\\OneTimePassword\\OneTimePassword\:\:generateQRCodeInline\(\)$#'
+			identifier: method.childParameterType
+			count: 1
+			path: app/Services/OneTimePassword/TimedOneTimePassword.php
+
+		-
+			message: '#^Parameter \#2 \$secret \(non\-empty\-string\) of method App\\Services\\OneTimePassword\\TimedOneTimePassword\:\:generateQRCodeInline\(\) should be contravariant with parameter \$secret \(string\) of method App\\Services\\OneTimePassword\\OneTimePassword\:\:generateQRCodeInline\(\)$#'
+			identifier: method.childParameterType
+			count: 1
+			path: app/Services/OneTimePassword/TimedOneTimePassword.php
+
+		-
+			message: '#^Parameter \#2 \$resource of method App\\Services\\PublicWebsite\\PublicWebsiteFilesystem\:\:writeStream\(\) expects resource, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/PublicWebsite/Content/OrganisationGenerator.php
+
+		-
+			message: '#^Parameter \#1 \$data of method App\\Services\\PublicWebsite\\Generator\:\:convertToFrontmatter\(\) expects array\<string, mixed\>, array given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/PublicWebsite/Content/PublishableGenerator.php
+
+		-
+			message: '#^Cannot cast mixed to string\.$#'
+			identifier: cast.string
+			count: 1
+			path: app/Services/Snapshot/SnapshotDataMarkdownRenderer.php
+
+		-
+			message: '#^Variable property access on App\\Models\\SnapshotData\.$#'
+			identifier: property.dynamicName
+			count: 1
+			path: app/Services/Snapshot/SnapshotDataMarkdownRenderer.php
+
+		-
+			message: '#^Binary operation "\+" between mixed and 1 results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: app/Services/Snapshot/SnapshotFactory.php
+
+		-
+			message: '#^Method App\\Services\\Snapshot\\SnapshotSource\\AvgProcessorProcessingRecordDataFactory\:\:generatePublicFrontmatter\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/Snapshot/SnapshotSource/AvgProcessorProcessingRecordDataFactory.php
+
+		-
+			message: '#^Call to static method Webmozart\\Assert\\Assert\:\:isInstanceOf\(\) with App\\Models\\Avg\\AvgResponsibleProcessingRecord and ''App\\\\Models\\\\Avg\\\\AvgResponsibleProcessingRecord'' will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: app/Services/Snapshot/SnapshotSource/AvgResponsibleProcessingRecordDataFactory.php
+
+		-
+			message: '#^Method App\\Services\\Snapshot\\SnapshotSource\\AvgResponsibleProcessingRecordDataFactory\:\:generatePublicFrontmatter\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/Snapshot/SnapshotSource/AvgResponsibleProcessingRecordDataFactory.php
+
+		-
+			message: '#^Method App\\Services\\Snapshot\\SnapshotSource\\DataFactory\:\:generatePublicFrontmatter\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/Snapshot/SnapshotSource/DataFactory.php
+
+		-
+			message: '#^Method App\\Services\\Snapshot\\SnapshotSource\\WpgProcessingRecordDataFactory\:\:generatePublicFrontmatter\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/Snapshot/SnapshotSource/WpgProcessingRecordDataFactory.php
+
+		-
+			message: '#^Method App\\Services\\Snapshot\\SnapshotSourceDataFactory\:\:generatePublicFrontmatter\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Services/Snapshot/SnapshotSourceDataFactory.php
+
+		-
+			message: '#^Call to static method Webmozart\\Assert\\Assert\:\:isInstanceOf\(\) with App\\Models\\Contracts\\SnapshotSource&Illuminate\\Database\\Eloquent\\Model and ''App\\\\Models\\\\Contracts\\\\SnapshotSource'' will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: app/Services/Snapshot/SnapshotStateTransitionService.php
+
+		-
+			message: '#^Cannot access offset ''query'' on mixed\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: app/Services/SqlExport/Migrator.php
+
+		-
+			message: '#^Parameter \#2 \.\.\.\$values of function sprintf expects bool\|float\|int\|string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/SqlExport/Migrator.php
+
+		-
+			message: '#^Property App\\Services\\SqlExport\\SqlFileGenerator\:\:\$existingSqlFiles \(array\<string\>\) does not accept array\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: app/Services/SqlExport/SqlFileGenerator.php
+
+		-
+			message: '#^Class App\\Vendor\\MediaLibrary\\Media has PHPDoc tag @property for property \$custom_properties with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Vendor/MediaLibrary/Media.php
+
+		-
+			message: '#^Class App\\Vendor\\MediaLibrary\\Media has PHPDoc tag @property for property \$generated_conversions with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Vendor/MediaLibrary/Media.php
+
+		-
+			message: '#^Class App\\Vendor\\MediaLibrary\\Media has PHPDoc tag @property for property \$manipulations with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Vendor/MediaLibrary/Media.php
+
+		-
+			message: '#^Class App\\Vendor\\MediaLibrary\\Media has PHPDoc tag @property for property \$responsive_images with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: app/Vendor/MediaLibrary/Media.php
+
+		-
+			message: '#^Class App\\Vendor\\MediaLibrary\\Media uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Vendor/MediaLibrary/Media.php

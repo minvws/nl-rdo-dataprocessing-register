@@ -1,0 +1,54 @@
+
+name: Database lint
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - src/cms/database/sql/**
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - src/cms/database/sql/**
+  workflow_dispatch:
+
+jobs:
+  build:
+
+    runs-on: ubuntu-22.04
+
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: dpr_db
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install required packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install libecpg-dev postgresql-client
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pgsanity
+      - name: Run tests SQL scripts
+        run: find ./src/cms/database/sql/v* -type f -name '*.sql' | sort -V | xargs -I % sh -c "echo %; sed -e 's/\\\\c */-- \\\\c /g' % | pgsanity"
+      - name: Combine all SQL
+        run: find ./src/cms/database/sql/v* -type f -name '*.sql' | sort -V | xargs cat > dpr_db.merged.sql
+      - name: Import dpr_db.merged.sql
+        run: PGPASSWORD=postgres psql -U postgres -d dpr_db -h 127.0.0.1 < dpr_db.merged.sql 2>&1 | tee dpr_db.log
+      - name: Show and count ERRORs
+        run: |
+          if [ `grep -c ERROR dpr_db.log` -ne 0 ]; then grep ERROR dpr_db.log; fi
+          exit `grep -c ERROR dpr_db.log`

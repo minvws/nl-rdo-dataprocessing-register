@@ -1,0 +1,34 @@
+{{ define "main" }}
+{{ partial "debug/mark-start" "layouts/processing-record/single"  }}
+
+<section class="processing-record-list centered">
+  <div>
+
+    <ul class="list-reset">
+        {{- range (.Paginator 10).Pages }}
+        <li>
+          <a href="{{ .RelPermalink }}" >
+            <div class="card" role="group" aria-label="Voorbeeldkaart">
+                <h3>{{.Params.record.title}}</h3>
+                <p>{{.Params.record.description}}</p>
+
+                <p class="processing-record-list__details">
+                  {{/*  organisatie: {{.Params.organisation}}<br>  */}}
+                  Verwerkingsnummer: {{.Params.record.reference}}<br>
+                  {{/*  Type: {{.Params.type}}<br>  */}}
+                </p>
+            </div>
+          </a>
+        </li>
+        {{- end }}
+    </ul>
+
+    <div class="hugo-pagination centered">
+      {{ template "_internal/pagination.html" . }}
+    </div>
+
+  </div>
+</section>
+
+{{ partial "debug/mark-end" }}
+{{ end }}

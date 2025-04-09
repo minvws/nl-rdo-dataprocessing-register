@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         colors="true"
+         cacheDirectory="/tmp/phpunit"
+         executionOrder="random"
+>
+    <testsuites>
+        <testsuite name="Unit">
+            <directory>tests/Unit</directory>
+        </testsuite>
+        <testsuite name="Feature">
+            <directory>tests/Feature</directory>
+        </testsuite>
+    </testsuites>
+    <source>
+        <include>
+            <directory>./app</directory>
+        </include>
+        <exclude>
+            <directory suffix="blade.php">./app/Console/Commands</directory>
+        </exclude>
+    </source>
+    <php>
+        <env name="APP_ENV" value="testing"/>
+        <env name="BCRYPT_ROUNDS" value="4"/>
+        <env name="CACHE_DRIVER" value="array"/>
+        <env name="DB_DATABASE" value="testing"/>
+        <env name="MAIL_MAILER" value="array"/>
+        <env name="ONE_TIME_PASSWORD_DRIVER" value="timed"/>
+        <env name="OUTBOX_SMTP_FROM" value="hello@example.com"/>
+        <env name="PUBLIC_WEBSITE_FILESYSTEM" value="fake"/>
+        <env name="PUBLIC_WEBSITE_GENERATOR" value="fake"/>
+        <env name="QUEUE_CONNECTION" value="sync"/>
+        <env name="SESSION_DRIVER" value="array"/>
+        <env name="VIRUSSCANNER_DEFAULT" value="fake"/>
+    </php>
+</phpunit>

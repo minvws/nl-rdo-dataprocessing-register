@@ -1,0 +1,13 @@
+{{- $.Scratch.Delete "records" -}}
+{{- $.Scratch.Add "records" slice -}}
+{{- range .RegularPages -}}
+    {{- if eq .Type "processing-record" -}}
+      {{- $.Scratch.Add "records" (dict 
+        "type" .Type 
+        "title" .Params.data.search.title 
+        "contents" .Params.data.search.description 
+        "permalink" .Permalink) 
+        -}}
+    {{- end -}}
+{{- end -}}
+{{- $.Scratch.Get "records" | jsonify (dict "indent" "  ") -}}

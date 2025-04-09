@@ -1,0 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.related-record {
+    @apply ring-1 ring-gray-950/5;
+}

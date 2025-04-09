@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+set -eo pipefail
+
+BASE_PATH=$(dirname "$0")/..
+RED="\033[31m"
+NC="\033[0m"
+NON_UNIQUE_MIGRATION_NAMES=$(ls -1 "$BASE_PATH/database/migrations" | xargs -I{} basename {} | cut -c 19- | awk '{print substr($0, 0, length($0)-4)}' | sort | uniq -d)
+
+if [[ -n $NON_UNIQUE_MIGRATION_NAMES ]]; then
+    echo -e "${RED}ERROR: The following migrations have non-unique names: ${NON_UNIQUE_MIGRATION_NAMES}${NC}"
+    exit 1
+else
+    echo "✓ ok"
+fi

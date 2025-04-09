@@ -1,0 +1,14 @@
+/*---------------------------------------------------------------*/
+/*---------------- article-content-wrapper.scss -----------------*/
+/*---------------------------------------------------------------*/
+@use "article-content-wrapper-variables";
+@use "mixins/content-wrapper";
+
+main article div {
+  @include content-wrapper.nested("article");
+}
+
+main > article > div,
+main.sidemenu > div > article > div {
+  @include content-wrapper.styling("article");
+}

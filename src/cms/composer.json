@@ -1,0 +1,126 @@
+{
+    "name": "minvws/nl-rdo-dataprocessing-register-private",
+    "type": "project",
+    "description": "minvws/nl-rdo-dataprocessing-register",
+    "keywords": [
+        "minvws",
+        "dataprocessing",
+        "verwerkingsregister"
+    ],
+    "license": "MIT",
+    "require": {
+        "php": "^8.2",
+        "ext-fileinfo": "*",
+        "ext-pdo": "*",
+        "ext-zip": "*",
+        "bacon/bacon-qr-code": "^3.0",
+        "barryvdh/laravel-dompdf": "^3.1",
+        "bkwld/cloner": "^3.13",
+        "filament/filament": "^3.2",
+        "filament/spatie-laravel-media-library-plugin": "^3.0-stable",
+        "guzzlehttp/guzzle": "^7.2",
+        "laravel/framework": "^11.33",
+        "laravel/tinker": "^2.8",
+        "livewire/livewire": "^3.4",
+        "minvws/laravel-logging": "*@dev",
+        "mlocati/ip-lib": "^1.18",
+        "owen-it/laravel-auditing": "^13.5",
+        "solution-forest/filament-tree": "^2.1",
+        "spatie/laravel-csp": "^2.8",
+        "spatie/laravel-model-states": "^2.6",
+        "spomky-labs/otphp": "^11.2",
+        "tapp/filament-auditing": "^3.0",
+        "webmozart/assert": "^1.11",
+        "xenolope/quahog": "^3.0"
+    },
+    "require-dev": {
+        "barryvdh/laravel-debugbar": "^3.9",
+        "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+        "doctrine/sql-formatter": "^1.5",
+        "fakerphp/faker": "^1.9.1",
+        "larastan/larastan": "^3.0",
+        "laravel/sail": "^1.18",
+        "mockery/mockery": "^1.4.4",
+        "nunomaduro/collision": "^8.0",
+        "pestphp/pest": "^3.5",
+        "pestphp/pest-plugin-faker": "^3.0",
+        "pestphp/pest-plugin-laravel": "^3.0",
+        "pestphp/pest-plugin-livewire": "^3.0",
+        "phpmd/phpmd": "^2.14",
+        "phpstan/extension-installer": "^1.4",
+        "phpstan/phpstan": "^2.1",
+        "phpstan/phpstan-deprecation-rules": "^2.0",
+        "phpstan/phpstan-phpunit": "^2.0",
+        "phpstan/phpstan-strict-rules": "^2.0",
+        "phpstan/phpstan-webmozart-assert": "^2.0",
+        "phpunit/phpunit": "^11.0",
+        "slevomat/coding-standard": "^8.15",
+        "spatie/laravel-ignition": "^2.0",
+        "squizlabs/php_codesniffer": "^3.9",
+        "swisnl/phpstan-faker": "^1.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/",
+            "Database\\Factories\\": "database/factories/",
+            "Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "packages/nl-rdo-laravel-logging"
+        }
+    ],
+    "scripts": {
+        "post-autoload-dump": [
+            "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
+            "@php artisan package:discover --ansi",
+            "@php artisan filament:upgrade",
+            "@php artisan optimize:clear"
+        ],
+        "post-update-cmd": [
+            "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
+        ],
+        "post-root-package-install": [
+            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+        ],
+        "post-create-project-cmd": [
+            "@php artisan key:generate --ansi"
+        ],
+        "phpcbf": "vendor/bin/phpcbf -n",
+        "phpcs": "vendor/bin/phpcs -n",
+        "phpmd": "vendor/bin/phpmd app github ./phpmd.xml",
+        "phpmd-baseline": "vendor/bin/phpmd app github ./phpmd.xml --generate-baseline",
+        "phpstan": "vendor/bin/phpstan --memory-limit=-1",
+        "phpstan-reset": "php artisan optimize:clear && rm -rf /tmp/phpstan && vendor/bin/phpstan analyze --memory-limit=-1",
+        "phpstan-baseline": "vendor/bin/phpstan --memory-limit=-1 --generate-baseline",
+        "public-check": "php artisan public-website:check",
+        "public-refresh": "php artisan public-website:refresh --delete-existing",
+        "reset": "composer install && composer reset-db && npm i && npm run build && composer reset-public",
+        "reset-db": "php artisan migrate:fresh --step --seed",
+        "reset-public": "composer public-refresh && composer public-check",
+        "reset-test-db": "DB_DATABASE=testing php artisan migrate:fresh",
+        "test": "php artisan test --parallel --coverage --compact",
+        "test-reset": "php artisan test --parallel --recreate-databases",
+        "test-report": "php artisan test --coverage-html strorage/phpunit"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "php-http/discovery": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "phpstan/extension-installer": true
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

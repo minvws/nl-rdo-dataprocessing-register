@@ -1,0 +1,37 @@
+{{ partial "debug/mark-start" "layouts/partials/header"  }}
+<header>
+   {{ partial "logo"  }}
+
+        <nav aria-label="Hoofdnavigatie">
+            <div>
+                <ul>
+                    {{ $homeSvg := resources.Get "images/home.svg" }}
+                    <li><a href="{{ $.Site.BaseURL }}/" aria-current="page"><img src="{{ $homeSvg.Permalink }}" class="home">Home</a></li>
+                    <li><a href="{{ $.Site.BaseURL }}/alle-categorie%C3%ABn">Zoek door alle publicaties</a></li>
+                    <li><a href="{{ $.Site.BaseURL }}/thema/covid-19">Thema COVID-19</a></li>
+                    <li><a href="{{ $.Site.BaseURL }}/bestuursorganen">Bekijk per bestuursorgaan</a></li>
+                </ul>
+            </div>
+        </nav>
+    {{ if not .IsHome }}
+        <nav aria-label="Kruimelpad" class="breadcrumb-bar">
+
+            <div>
+                <ul>
+                    {{- range .Ancestors.Reverse }}
+                        {{ if .IsHome }}
+                        <li><a href="{{ $.Site.BaseURL }}">Home</a></li>
+                        {{ else if .Title }}
+                            <li><a href="{{ .RelPermalink }}">{{ .Title }}</a></li>
+                        {{ end }}
+                    {{- end }}
+                    <li><span aria-current="page">{{ .Title }}</span></li>
+                </ul>
+            </div>
+        </nav>
+        {{- end -}}
+</header>
+
+{{ partial "menu.html" (dict "menuID" "main" "page" .) }}
+
+{{ partial "debug/mark-end"  }}

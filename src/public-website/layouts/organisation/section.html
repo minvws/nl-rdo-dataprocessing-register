@@ -1,0 +1,35 @@
+{{ define "main" }}
+{{ partial "debug/mark-start" "layouts/organisation/section"  }}
+
+<section class="hero">
+  {{- with or (.Resources.Get "poster.jpeg") (resources.Get "images/organisation-fallback.jpeg") }}
+    {{- with .Fill "1920x480 webp" }}
+      <img src="{{ .Permalink }}" alt="{{ .Title }}" width="{{ .Width }}" height="{{ .Height }}" loading="lazy"/>
+    {{- end }}
+  {{- end }}
+
+  {{ partial "hero-links" }}
+</section>
+
+<section class="organisation__navigation background-color-offset">
+  <div>
+    <nav aria-label="Navigatie voorbeeldlijst">
+      <ul>
+          {{- range .Pages }}
+            <li><a href="{{ .RelPermalink }}">{{ .Title }}</a></li>
+          {{- end }}
+      </ul>
+    </nav>
+  </div>
+</section>
+
+<section>
+  <div>
+    
+    {{ .Content }}
+
+  </div>
+</section>
+
+{{ partial "debug/mark-end" }}
+{{ end }}

@@ -1,0 +1,21 @@
+/node_modules
+/public/build
+/public/hot
+/public/public-website
+/storage/*.key
+/storage/phpunit
+/vendor
+.env
+.env.backup
+.env.production
+phpcs.xml
+phpstan.neon
+phpunit.xml
+Homestead.json
+Homestead.yaml
+auth.json
+npm-debug.log
+yarn-error.log
+# php pest coverage-html output
+/coverage
+/reports
