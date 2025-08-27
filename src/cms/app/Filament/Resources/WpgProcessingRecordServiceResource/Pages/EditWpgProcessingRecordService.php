@@ -15,10 +15,7 @@ class EditWpgProcessingRecordService extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            DeleteActionWithRelationChecks::make()
-                ->relations([
-                    'wpgProcessingRecords',
-                ]),
+            DeleteActionWithRelationChecks::make(),
         ];
     }
 }

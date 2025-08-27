@@ -5,19 +5,20 @@ declare(strict_types=1);
 namespace App\Filament\Pages;
 
 use App\Enums\Authorization\Permission;
+use App\Events;
 use App\Facades\Authentication;
 use App\Facades\Authorization;
 use App\Filament\NavigationGroups\NavigationGroup;
 use App\Import\ImportFailedException;
 use App\Import\ZipImporter;
 use App\Rules\Virusscanner;
+use App\Services\BuildContextService;
 use Filament\Forms;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
-use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\Facades\Log;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Webmozart\Assert\Assert;
@@ -65,7 +66,7 @@ class Import extends Page implements HasForms
         ]);
     }
 
-    public function submit(ZipImporter $zipImporter): void
+    public function submit(BuildContextService $buildContextService, ZipImporter $zipImporter): void
     {
         $form = $this->getForm('form');
         $formState = $form?->getState();
@@ -75,10 +76,11 @@ class Import extends Page implements HasForms
         Assert::allIsInstanceOf($formState['files'], TemporaryUploadedFile::class);
 
         Log::info('Import started');
+        $buildContextService->disableBuild();
 
         try {
-            $zipImporter->importFiles($formState['files'], Authentication::user()->id, Authentication::organisation()->id);
-        } catch (FileNotFoundException | ImportFailedException $exception) {
+            $zipImporter->importFiles($formState['files'], Authentication::user()->id, Authentication::organisation()->id->toString());
+        } catch (ImportFailedException $exception) {
             Log::error('Import failed', ['message' => $exception->getMessage()]);
 
             Notification::make()
@@ -87,6 +89,14 @@ class Import extends Page implements HasForms
                 ->danger()
                 ->send();
         }
+
+        Log::info('Import success');
+
+        $buildContextService->enableBuild();
+
+        Log::debug('build event triggered by organisation observer');
+        Events\PublicWebsite\BuildEvent::dispatch();
+        Events\StaticWebsite\BuildEvent::dispatch();
 
         Notification::make()
             ->title(__('import.upload_success'))

@@ -12,6 +12,7 @@ use App\Filament\Actions\OneTimePassword\DisableAction;
 use App\Filament\Actions\OneTimePassword\EnableAction;
 use App\Filament\Actions\OneTimePassword\RegenerateCodesAction;
 use App\Models\User;
+use App\ValueObjects\OneTimePassword\Secret;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
@@ -67,6 +68,9 @@ class OneTimePassword extends Component implements HasActions, HasForms
         $otpSecret = $this->user->otp_secret;
         Assert::string($otpSecret);
 
-        return Otp::generateQRCodeInline($otpSecret, sprintf('%s (%s)', Config::string('app.name'), $this->user->email));
+        return Otp::generateQRCodeInline(
+            Secret::fromString($otpSecret),
+            sprintf('%s (%s)', Config::string('app.name'), $this->user->email),
+        );
     }
 }

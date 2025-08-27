@@ -19,7 +19,6 @@ class StakeholderDataItemFactory extends Factory
     public function definition(): array
     {
         return [
-            'id' => $this->faker->uuid(),
             'organisation_id' => Organisation::factory(),
             'import_id' => $this->faker->optional()->importId(),
             'description' => $this->faker->text(),

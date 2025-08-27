@@ -4,42 +4,41 @@ declare(strict_types=1);
 
 namespace App\Models\Avg;
 
+use App\Collections\Avg\AvgGoalCollection;
+use App\Collections\Avg\AvgProcessorProcessingRecordCollection;
+use App\Collections\Avg\AvgResponsibleProcessingRecordCollection;
 use App\Models\Concerns\HasOrganisation;
-use App\Models\Concerns\HasUuidAsKey;
+use App\Models\Concerns\HasSoftDeletes;
+use App\Models\Concerns\HasTimestamps;
+use App\Models\Concerns\HasUuidAsId;
 use App\Models\Concerns\IsSortable;
-use Carbon\CarbonImmutable;
-use Illuminate\Database\Eloquent\Collection;
+use App\Models\Contracts\TenantAware;
+use Database\Factories\Avg\AvgGoalFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * @property string $id
  * @property string $goal
- * @property CarbonImmutable|null $created_at
- * @property CarbonImmutable|null $updated_at
  * @property string|null $import_id
  * @property string|null $avg_goal_legal_base
- * @property CarbonImmutable|null $deleted_at
  * @property string|null $remarks
  * @property int $sort
  *
- * @property-read Collection<int, AvgProcessorProcessingRecord> $avgProcessorProcessingRecords
- * @property-read Collection<int, AvgResponsibleProcessingRecord> $avgResponsibleProcessingRecords
+ * @property-read AvgProcessorProcessingRecordCollection $avgProcessorProcessingRecords
+ * @property-read AvgResponsibleProcessingRecordCollection $avgResponsibleProcessingRecords
  */
-class AvgGoal extends Model
+class AvgGoal extends Model implements TenantAware
 {
+    /** @use HasFactory<AvgGoalFactory> */
     use HasFactory;
     use HasOrganisation;
-    use HasUuidAsKey;
+    use HasSoftDeletes;
+    use HasTimestamps;
+    use HasUuidAsId;
     use IsSortable;
-    use SoftDeletes;
 
-    protected $casts = [
-        'id' => 'string',
-    ];
-
+    protected static string $collectionClass = AvgGoalCollection::class;
     protected $fillable = [
         'avg_goal_legal_base',
 

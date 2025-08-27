@@ -58,6 +58,9 @@ return [
     'geb_pia' => 'GEB (DPIA)',
     'number' => 'Nummer',
     'has_systems' => 'Heeft systemen / applicaties',
+    'has_processors' => 'Heeft verwerkers',
+    'third_parties' => 'Derden',
+    'third_parties_description' => 'Toelichting derden',
 
     'direct_access_personnel_under_responsibility' => 'Personeel onder verantwoordelijkheid',
     'direct_access_personnel_under_processor' => 'Personeel onder verwerker',

@@ -4,44 +4,58 @@ declare(strict_types=1);
 
 use App\Livewire\User\Profile\OneTimePassword;
 use App\Services\OtpService;
-use Mockery\MockInterface;
-
-use function Pest\Livewire\livewire;
+use Tests\Helpers\Model\UserTestHelper;
 
 it('can mount the component', function (): void {
-    livewire(OneTimePassword::class, [
-        'user' => $this->user,
-    ])->assertSee(__('user.profile.one_time_password.title'));
+    $user = UserTestHelper::create();
+
+    $this->asFilamentUser($user)
+        ->createLivewireTestable(OneTimePassword::class, [
+            'user' => $user,
+        ])
+        ->assertSee(__('user.profile.one_time_password.title'));
 });
 
 it('can enable', function (): void {
-    livewire(OneTimePassword::class, [
-        'user' => $this->user,
-    ])
+    $user = UserTestHelper::create();
+
+    $this->asFilamentUser($user)
+        ->createLivewireTestable(OneTimePassword::class, [
+            'user' => $user,
+        ])
         ->callAction('enable')
         ->assertNotified(__('user.profile.one_time_password.enabled.notify'));
 });
 
 it('can disable', function (): void {
-    livewire(OneTimePassword::class, [
-        'user' => $this->user,
-    ])
+    $user = UserTestHelper::create();
+
+    $this->asFilamentUser($user)
+        ->createLivewireTestable(OneTimePassword::class, [
+            'user' => $user,
+        ])
         ->callAction('disable')
         ->assertNotified(__('user.profile.one_time_password.disabling.notify'));
 });
 
 it('can confirm', function (): void {
-    $user = $this->user;
+    $user = UserTestHelper::create();
 
-    $this->mock(OtpService::class, static function (MockInterface $mock): void {
-        $mock->shouldReceive('hasOtpEnabled')->andReturn(true);
-        $mock->shouldReceive('hasOtpConfirmed')->andReturn(true);
-        $mock->shouldReceive('verifyCode')->andReturn(true);
-    });
+    $this->mock(OtpService::class)
+        ->shouldReceive('hasOtpEnabled')
+        ->times(4)
+        ->andReturn(true)
+        ->shouldReceive('hasOtpConfirmed')
+        ->times(4)
+        ->andReturn(true)
+        ->shouldReceive('verifyCode')
+        ->once()
+        ->andReturn(true);
 
-    livewire(OneTimePassword::class, [
-        'user' => $user,
-    ])
+    $this->asFilamentUser($user)
+        ->createLivewireTestable(OneTimePassword::class, [
+            'user' => $user,
+        ])
         ->callAction('confirm', [
             'code' => fake()->word(),
         ])
@@ -49,17 +63,23 @@ it('can confirm', function (): void {
 });
 
 it('cannot confirm with an invalid code', function (): void {
-    $user = $this->user;
+    $user = UserTestHelper::create();
 
-    $this->mock(OtpService::class, static function (MockInterface $mock): void {
-        $mock->shouldReceive('hasOtpEnabled')->andReturn(true);
-        $mock->shouldReceive('hasOtpConfirmed')->andReturn(true);
-        $mock->shouldReceive('verifyCode')->andReturn(false);
-    });
+    $this->mock(OtpService::class)
+        ->shouldReceive('hasOtpEnabled')
+        ->times(4)
+        ->andReturn(true)
+        ->shouldReceive('hasOtpConfirmed')
+        ->times(4)
+        ->andReturn(true)
+        ->shouldReceive('verifyCode')
+        ->once()
+        ->andReturn(false);
 
-    livewire(OneTimePassword::class, [
-        'user' => $user,
-    ])
+    $this->asFilamentUser($user)
+        ->createLivewireTestable(OneTimePassword::class, [
+            'user' => $user,
+        ])
         ->callAction('confirm', [
             'code' => fake()->word(),
         ])
@@ -67,17 +87,27 @@ it('cannot confirm with an invalid code', function (): void {
 });
 
 it('can regenerate codes', function (): void {
-    $this->mock(OtpService::class, static function (MockInterface $mock): void {
-        $mock->shouldReceive('hasOtpEnabled')->andReturn(true);
-        $mock->shouldReceive('hasOtpConfirmed')->andReturn(false);
-        $mock->shouldReceive('generateQRCOdeInline')->andReturn('<img>');
-        $mock->shouldReceive('disable');
-        $mock->shouldReceive('enable');
-    });
+    $user = UserTestHelper::create();
 
-    livewire(OneTimePassword::class, [
-        'user' => $this->user,
-    ])
+    $this->mock(OtpService::class)
+        ->shouldReceive('hasOtpEnabled')
+        ->times(3)
+        ->andReturn(true)
+        ->shouldReceive('hasOtpConfirmed')
+        ->times(3)
+        ->andReturn(false)
+        ->shouldReceive('generateQRCOdeInline')
+        ->times(3)
+        ->andReturn('<img>')
+        ->shouldReceive('disable')
+        ->once()
+        ->shouldReceive('enable')
+        ->once();
+
+    $this->asFilamentUser($user)
+        ->createLivewireTestable(OneTimePassword::class, [
+            'user' => $user,
+        ])
         ->callAction('regenerateCodes')
         ->assertNotified(__('user.profile.one_time_password.regenerate_codes.notify'));
 });
@@ -85,15 +115,23 @@ it('can regenerate codes', function (): void {
 it('can get the qr code', function (): void {
     $image = fake()->uuid();
 
-    $this->mock(OtpService::class, static function (MockInterface $mock) use ($image): void {
-        $mock->shouldReceive('hasOtpEnabled')->andReturn(true);
-        $mock->shouldReceive('hasOtpConfirmed')->andReturn(true);
-        $mock->shouldReceive('generateQRCodeInline')->andReturn($image);
-    });
+    $user = UserTestHelper::create();
 
-    livewire(OneTimePassword::class, [
-        'user' => $this->user,
-    ])
+    $this->mock(OtpService::class)
+        ->shouldReceive('hasOtpEnabled')
+        ->times(2)
+        ->andReturn(true)
+        ->shouldReceive('hasOtpConfirmed')
+        ->times(2)
+        ->andReturn(true)
+        ->shouldReceive('generateQRCodeInline')
+        ->once()
+        ->andReturn($image);
+
+    $this->asFilamentUser($user)
+        ->createLivewireTestable(OneTimePassword::class, [
+            'user' => $user,
+        ])
         ->call('getQrCode')
         ->assertReturned($image);
 });

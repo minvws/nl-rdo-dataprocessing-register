@@ -6,6 +6,8 @@ namespace App\Services\Virusscanner;
 
 interface Virusscanner
 {
+    public function isHealthy(): bool;
+
     /**
      * @param resource $stream
      */

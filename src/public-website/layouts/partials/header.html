@@ -6,10 +6,10 @@
             <div>
                 <ul>
                     {{ $homeSvg := resources.Get "images/home.svg" }}
-                    <li><a href="{{ $.Site.BaseURL }}/" aria-current="page"><img src="{{ $homeSvg.Permalink }}" class="home">Home</a></li>
-                    <li><a href="{{ $.Site.BaseURL }}/alle-categorie%C3%ABn">Zoek door alle publicaties</a></li>
-                    <li><a href="{{ $.Site.BaseURL }}/thema/covid-19">Thema COVID-19</a></li>
-                    <li><a href="{{ $.Site.BaseURL }}/bestuursorganen">Bekijk per bestuursorgaan</a></li>
+                    <li><a href="/" aria-current="page"><img src="{{ $homeSvg.Permalink }}" class="home">Home</a></li>
+                    <li><a href="/alle-categorie%C3%ABn">Zoek door alle publicaties</a></li>
+                    <li><a href="/thema/covid-19">Thema COVID-19</a></li>
+                    <li><a href="/bestuursorganen">Bekijk per bestuursorgaan</a></li>
                 </ul>
             </div>
         </nav>

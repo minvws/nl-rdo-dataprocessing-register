@@ -1,6 +1,5 @@
 @php
-    /** @formatter:off */
     /** @var App\Models\System $record */
 @endphp
 
-{{ $record->description }}
+{!! single_line_escaped_markdown($record->description) !!}

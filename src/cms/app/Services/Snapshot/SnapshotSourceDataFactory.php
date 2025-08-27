@@ -10,6 +10,9 @@ interface SnapshotSourceDataFactory
 {
     public function generatePrivateMarkdown(Snapshot $snapshot): ?string;
 
+    /**
+     * @return array<string, string|array<string, string>>
+     */
     public function generatePublicFrontmatter(Snapshot $snapshot): array;
 
     public function generatePublicMarkdown(Snapshot $snapshot): ?string;

@@ -8,8 +8,6 @@ use App\Models\Organisation;
 use App\Models\User;
 use Filament\Tables\Actions\DetachAction;
 
-use function Pest\Livewire\livewire;
-
 it('loads the table', function (): void {
     $user = User::factory()
         ->create();
@@ -17,10 +15,12 @@ it('loads the table', function (): void {
         ->hasAttached($user)
         ->create();
 
-    livewire(UsersRelationManager::class, [
-        'ownerRecord' => $organisation,
-        'pageClass' => EditOrganisation::class,
-    ])->assertCanSeeTableRecords([$user]);
+    $this->asFilamentUser()
+        ->createLivewireTestable(UsersRelationManager::class, [
+            'ownerRecord' => $organisation,
+            'pageClass' => EditOrganisation::class,
+        ])
+        ->assertCanSeeTableRecords([$user]);
 });
 
 it('does not delete the user if no longer attached to an organisation', function (): void {
@@ -30,10 +30,11 @@ it('does not delete the user if no longer attached to an organisation', function
         ->hasAttached($user)
         ->create();
 
-    livewire(UsersRelationManager::class, [
-        'ownerRecord' => $organisation,
-        'pageClass' => EditOrganisation::class,
-    ])
+    $this->asFilamentUser()
+        ->createLivewireTestable(UsersRelationManager::class, [
+            'ownerRecord' => $organisation,
+            'pageClass' => EditOrganisation::class,
+        ])
         ->callTableAction(DetachAction::getDefaultName(), $user);
 
     $user->refresh();
@@ -52,10 +53,11 @@ it('also does not delete the user if still attached to another organisation', fu
         ->hasAttached($user)
         ->create();
 
-    livewire(UsersRelationManager::class, [
-        'ownerRecord' => $organisation,
-        'pageClass' => EditOrganisation::class,
-    ])
+    $this->asFilamentUser()
+        ->createLivewireTestable(UsersRelationManager::class, [
+            'ownerRecord' => $organisation,
+            'pageClass' => EditOrganisation::class,
+        ])
         ->callTableAction(DetachAction::getDefaultName(), $user);
 
     $user->refresh();

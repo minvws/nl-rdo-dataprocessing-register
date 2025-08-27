@@ -7,21 +7,24 @@ use App\Filament\Resources\DocumentResource\Pages\CreateDocument;
 use App\Models\Document;
 use App\Models\DocumentType;
 use Carbon\CarbonImmutable;
-
-use function Pest\Livewire\livewire;
+use Tests\Helpers\Model\OrganisationTestHelper;
 
 it('loads the create page', function (): void {
-    $this->get(DocumentResource::getUrl('create'))
+    $this->asFilamentUser()
+        ->get(DocumentResource::getUrl('create'))
         ->assertSuccessful();
 });
 
 it('can create an entry', function (): void {
     $name = fake()->word();
+
+    $organisation = OrganisationTestHelper::create();
     $documentType = DocumentType::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
 
-    livewire(CreateDocument::class)
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(CreateDocument::class)
         ->fillForm([
             'name' => $name,
             'document_type_id' => $documentType->id,
@@ -39,11 +42,13 @@ it('can use the notify_at_expires_at action', function (): void {
     $name = fake()->word();
     $expiresAt = CarbonImmutable::instance(fake()->dateTime());
 
+    $organisation = OrganisationTestHelper::create();
     $documentType = DocumentType::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
 
-    livewire(CreateDocument::class)
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(CreateDocument::class)
         ->fillForm([
             'name' => $name,
             'expires_at' => $expiresAt->format('Y-m-d H:i:s'),
@@ -64,11 +69,13 @@ it('can use the notify_at_expires_at action', function (): void {
 it('can use the notify_at_expires_at action if expires_at not set', function (): void {
     $name = fake()->word();
 
+    $organisation = OrganisationTestHelper::create();
     $documentType = DocumentType::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
 
-    livewire(CreateDocument::class)
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(CreateDocument::class)
         ->fillForm([
             'name' => $name,
             'expires_at' => null,
@@ -90,11 +97,13 @@ it('can use the notify_at_1_month_before action', function (): void {
     $name = fake()->word();
     $expiresAt = CarbonImmutable::instance(fake()->dateTime());
 
+    $organisation = OrganisationTestHelper::create();
     $documentType = DocumentType::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
 
-    livewire(CreateDocument::class)
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(CreateDocument::class)
         ->fillForm([
             'name' => $name,
             'expires_at' => $expiresAt->format('Y-m-d H:i:s'),
@@ -115,11 +124,13 @@ it('can use the notify_at_1_month_before action', function (): void {
 it('can use the notify_at_1_month_before action if expires_at not set', function (): void {
     $name = fake()->word();
 
+    $organisation = OrganisationTestHelper::create();
     $documentType = DocumentType::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
 
-    livewire(CreateDocument::class)
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(CreateDocument::class)
         ->fillForm([
             'name' => $name,
             'expires_at' => null,
@@ -141,11 +152,13 @@ it('can use the notify_at_3_months_before action', function (): void {
     $name = fake()->word();
     $expiresAt = CarbonImmutable::instance(fake()->dateTime());
 
+    $organisation = OrganisationTestHelper::create();
     $documentType = DocumentType::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
 
-    livewire(CreateDocument::class)
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(CreateDocument::class)
         ->fillForm([
             'name' => $name,
             'expires_at' => $expiresAt->format('Y-m-d H:i:s'),
@@ -166,11 +179,13 @@ it('can use the notify_at_3_months_before action', function (): void {
 it('can use the notify_at_3_months_before action if expires_at not set', function (): void {
     $name = fake()->word();
 
+    $organisation = OrganisationTestHelper::create();
     $documentType = DocumentType::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
 
-    livewire(CreateDocument::class)
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(CreateDocument::class)
         ->fillForm([
             'name' => $name,
             'expires_at' => null,

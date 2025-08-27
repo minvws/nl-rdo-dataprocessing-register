@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\UserResource\Pages;
 
+use App\Components\Uuid\Uuid;
 use App\Enums\Authorization\Permission;
 use App\Enums\Authorization\Role;
 use App\Facades\Authorization;
 use App\Filament\Actions\User\OtpDisableAction;
 use App\Filament\Resources\UserResource;
 use App\Filament\Resources\UserResource\UserResourceForm;
+use App\Models\OrganisationUserRole;
 use App\Models\User;
 use App\Models\UserGlobalRole;
-use App\Models\UserOrganisationRole;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Support\Facades\DB;
@@ -82,25 +83,25 @@ class EditUser extends EditRecord
             $user->organisationRoles()->delete();
 
             Assert::isArray($this->data);
-            Assert::keyExists($this->data, UserResourceForm::FIELD_USER_ORGANISATION_ROLES);
-            $userOrganisationRoles = $this->data[UserResourceForm::FIELD_USER_ORGANISATION_ROLES];
-            Assert::isArray($userOrganisationRoles);
+            Assert::keyExists($this->data, UserResourceForm::FIELD_ORGANISATION_USER_ROLES);
+            $organisationUserRoles = $this->data[UserResourceForm::FIELD_ORGANISATION_USER_ROLES];
+            Assert::isArray($organisationUserRoles);
 
-            foreach ($userOrganisationRoles as $organisation) {
+            foreach ($organisationUserRoles as $organisation) {
                 Assert::isArray($organisation);
-                Assert::isArray($organisation[UserResourceForm::FIELD_USER_ORGANISATION_ROLES]);
+                Assert::isArray($organisation[UserResourceForm::FIELD_ORGANISATION_USER_ROLES]);
 
-                foreach ($organisation[UserResourceForm::FIELD_USER_ORGANISATION_ROLES] as $role => $value) {
+                foreach ($organisation[UserResourceForm::FIELD_ORGANISATION_USER_ROLES] as $role => $value) {
                     if ($value !== true) {
                         continue;
                     }
 
                     Assert::string($organisation['organisation_id']);
 
-                    $userOrganisationRole = new UserOrganisationRole();
-                    $userOrganisationRole->role = Role::from($role);
-                    $userOrganisationRole->organisation_id = $organisation['organisation_id'];
-                    $user->organisationRoles()->save($userOrganisationRole);
+                    $organisationUserRole = new OrganisationUserRole();
+                    $organisationUserRole->role = Role::from($role);
+                    $organisationUserRole->organisation_id = Uuid::fromString($organisation['organisation_id']);
+                    $user->organisationRoles()->save($organisationUserRole);
                 }
             }
         });

@@ -12,4 +12,9 @@ interface Cloneable
      * @param array<string> $except
      */
     public function clone(array $except = []): Model;
+
+    /**
+     * @param array<string> $cloneableRelations
+     */
+    public function addCloneableRelations(array $cloneableRelations): static;
 }

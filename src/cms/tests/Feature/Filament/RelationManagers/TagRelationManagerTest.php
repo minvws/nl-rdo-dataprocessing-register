@@ -7,8 +7,6 @@ use App\Filament\Resources\AvgResponsibleProcessingRecordResource\Pages\EditAvgR
 use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\Tag;
 
-use function Pest\Livewire\livewire;
-
 it('loads the table', function (): void {
     $tag = Tag::factory()
         ->create();
@@ -16,8 +14,10 @@ it('loads the table', function (): void {
         ->hasAttached($tag)
         ->create();
 
-    livewire(TagRelationManager::class, [
-        'ownerRecord' => $avgResponsibleProcessingRecord,
-        'pageClass' => EditAvgResponsibleProcessingRecord::class,
-    ])->assertCanSeeTableRecords([$tag]);
+    $this->asFilamentUser()
+        ->createLivewireTestable(TagRelationManager::class, [
+            'ownerRecord' => $avgResponsibleProcessingRecord,
+            'pageClass' => EditAvgResponsibleProcessingRecord::class,
+        ])
+        ->assertCanSeeTableRecords([$tag]);
 });

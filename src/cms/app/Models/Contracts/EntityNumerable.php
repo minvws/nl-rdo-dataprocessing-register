@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models\Contracts;
 
+use App\Components\Uuid\UuidInterface;
 use App\Models\EntityNumber;
 use App\Models\Organisation;
 use Illuminate\Database\Eloquent\Model;
@@ -20,7 +21,7 @@ interface EntityNumerable
 
     public function getOrganisation(): Organisation;
 
-    public function getEntityNumberId(): ?string;
+    public function getEntityNumberId(): ?UuidInterface;
 
-    public function setEntityNumberId(string $id): void;
+    public function setEntityNumberId(UuidInterface $id): void;
 }

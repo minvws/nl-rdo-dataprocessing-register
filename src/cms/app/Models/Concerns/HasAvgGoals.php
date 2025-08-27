@@ -4,23 +4,27 @@ declare(strict_types=1);
 
 namespace App\Models\Concerns;
 
+use App\Collections\Avg\AvgGoalCollection;
 use App\Models\Avg\AvgGoal;
+use App\Models\Contracts\Cloneable;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Webmozart\Assert\Assert;
 
+/**
+ * @property-read AvgGoalCollection $avgGoals
+ */
 trait HasAvgGoals
 {
-    public function initializeHasAvgGoals(): void
+    final public function initializeHasAvgGoals(): void
     {
-        Assert::methodExists($this, 'addCloneableRelations');
-
-        $this->addCloneableRelations(['avgGoals']);
+        if ($this instanceof Cloneable) {
+            $this->addCloneableRelations(['avgGoals']);
+        }
     }
 
     /**
      * @return MorphToMany<AvgGoal, $this>
      */
-    public function avgGoals(): MorphToMany
+    final public function avgGoals(): MorphToMany
     {
         return $this->morphToMany(AvgGoal::class, 'avg_goal_relatable')->withTimestamps();
     }

@@ -1,5 +1,4 @@
 @php
-    /** @formatter:off */
     /** @var App\Models\Snapshot $snapshot */
 @endphp
 @if($snapshots->count() > 0)
@@ -7,7 +6,7 @@
 @foreach ($snapshots as $snapshot)
 <div class="related-record">
 
-{!! $snapshot->snapshotData->public_markdown !!}
+{!! $snapshot->snapshotData->public_markdown?->toHtml() !!}
 </div>
 @endforeach
 </div>

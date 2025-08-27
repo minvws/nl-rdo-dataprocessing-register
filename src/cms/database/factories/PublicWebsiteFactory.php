@@ -18,8 +18,6 @@ class PublicWebsiteFactory extends Factory
     public function definition(): array
     {
         return [
-            'id' => $this->faker->uuid(),
-
             'home_content' => $this->faker->optional()->sentence(),
         ];
     }

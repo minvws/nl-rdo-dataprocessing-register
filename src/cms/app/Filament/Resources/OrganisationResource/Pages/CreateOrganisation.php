@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrganisationResource\Pages;
 
+use App\Components\Uuid\UuidInterface;
 use App\Enums\EntityNumberType;
 use App\Filament\Pages\CreateRecord;
 use App\Filament\Resources\OrganisationResource;
@@ -54,7 +55,7 @@ class CreateOrganisation extends CreateRecord
                                 ->label(__('organisation.register_entity_number_prefix'))
                                 ->required()
                                 ->rules(['alpha'])
-                                ->dehydrateStateUsing(static function (string $state): string {
+                                ->dehydrateStateUsing(static function (string $state): UuidInterface {
                                     $entityNumberCounter = EntityNumberCounter::create([
                                         'type' => EntityNumberType::REGISTER,
                                         'prefix' => $state,
@@ -69,7 +70,7 @@ class CreateOrganisation extends CreateRecord
                                 ->label(__('organisation.databreach_entity_number_prefix'))
                                 ->required()
                                 ->rules(['alpha'])
-                                ->dehydrateStateUsing(static function (string $state): string {
+                                ->dehydrateStateUsing(static function (string $state): UuidInterface {
                                     $entityNumberCounter = EntityNumberCounter::create([
                                         'type' => EntityNumberType::DATABREACH,
                                         'prefix' => $state,

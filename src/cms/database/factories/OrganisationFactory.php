@@ -14,6 +14,7 @@ use App\Models\Document;
 use App\Models\EntityNumberCounter;
 use App\Models\Organisation;
 use App\Models\ResponsibleLegalEntity;
+use App\Models\User;
 use App\Models\Wpg\WpgProcessingRecord;
 use App\Vendor\MediaLibrary\Media;
 use Illuminate\Contracts\Filesystem\Filesystem;
@@ -38,9 +39,13 @@ class OrganisationFactory extends Factory
      */
     public function definition(): array
     {
-        return [
-            'id' => $this->faker->uuid(),
+        $allowedEmailDomains = [
+            $this->faker->domainName(),
+            $this->faker->domainName(),
+            $this->faker->domainName(),
+        ];
 
+        return [
             'name' => $this->faker->company(),
             'slug' => $this->faker->unique()->slug(),
             'allowed_ips' => '*.*.*.*',
@@ -50,12 +55,14 @@ class OrganisationFactory extends Factory
             'register_entity_number_counter_id' => EntityNumberCounter::factory(),
             'databreach_entity_number_counter_id' => EntityNumberCounter::factory(),
             'public_from' => $this->faker->optional()->anyDate(),
+            'allowed_email_domains' => $this->faker->randomElements($allowedEmailDomains, $this->faker->numberBetween(0, 3)),
         ];
     }
 
     public function withAllRelatedEntities(): self
     {
-        return self::withAlgorithmRecords()
+        return self::withUsers()
+            ->withAlgorithmRecords()
             ->withAvgProcessorProcessingRecords()
             ->withAvgResponsibleProcessingRecords()
             ->withDataBreachRecords()
@@ -69,9 +76,9 @@ class OrganisationFactory extends Factory
         return $this->afterCreating(function (Organisation $organisation) use ($count): void {
             AlgorithmRecord::factory()
                 ->for($organisation)
+                ->recycle($organisation)
                 ->withAllRelatedEntities()
                 ->count($count ?? $this->faker->randomDigitNotNull())
-                ->recycle($organisation)
                 ->create();
         });
     }
@@ -155,6 +162,17 @@ class OrganisationFactory extends Factory
 
             $filesystem->put($storagePath, $imageContents);
             $organisation->media()->save($posterImage);
+        });
+    }
+
+    public function withUsers(?int $count = null): self
+    {
+        return $this->afterCreating(function (Organisation $organisation) use ($count): void {
+            User::factory()
+                ->hasAttached($organisation)
+                ->recycle($organisation)
+                ->count($count ?? $this->faker->randomDigitNotNull())
+                ->create();
         });
     }
 

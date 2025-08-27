@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Services\Snapshot;
 
-use App\Enums\MarkdownField;
+use App\Enums\Snapshot\SnapshotDataSection;
 use App\Models\Contracts\SnapshotSource;
 use App\Models\RelatedSnapshotSource;
 use App\Models\Snapshot;
-use App\Models\SnapshotData;
 use App\Models\States\Snapshot\Established;
+use App\ValueObjects\Markdown;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -20,7 +20,7 @@ use function sprintf;
 readonly class SnapshotDataMarkdownRenderer
 {
     /**
-     * @param array<string, string> $renderTemplates
+     * @param array<string, array<string, string>> $renderTemplates
      */
     public function __construct(
         private Factory $view,
@@ -28,11 +28,14 @@ readonly class SnapshotDataMarkdownRenderer
     ) {
     }
 
-    public function fromSnapshotData(SnapshotData $snapshotData, MarkdownField $field): string
+    public function fromSnapshotMarkdown(Snapshot $snapshot, ?Markdown $markdown, SnapshotDataSection $snapshotDataSection): string
     {
-        $markdown = Str::of((string) $snapshotData->{$field->value});
+        $markdown = Str::of((string) $markdown?->toString());
 
-        foreach ($this->renderTemplates as $model => $viewTemplate) {
+        Assert::keyExists($this->renderTemplates, $snapshotDataSection->value);
+        $templates = $this->renderTemplates[$snapshotDataSection->value];
+
+        foreach ($templates as $model => $viewTemplate) {
             Assert::subclassOf($model, SnapshotSource::class);
             $templateTag = sprintf('<!--- #%s# --->', $model);
 
@@ -40,7 +43,7 @@ readonly class SnapshotDataMarkdownRenderer
                 continue;
             }
 
-            $relatedSnapshots = $this->getRelatedSnapshots($snapshotData->snapshot, $model);
+            $relatedSnapshots = $this->getRelatedSnapshots($snapshot, $model);
             $relatedSnapshotsMarkdown = $this->view->make($viewTemplate, ['snapshots' => $relatedSnapshots])->render();
 
             $markdown = $markdown->replace($templateTag, $relatedSnapshotsMarkdown);

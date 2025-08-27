@@ -7,6 +7,7 @@ use App\Mail\Authentication\PasswordLessLoginLink;
 use App\Models\User;
 use App\Models\UserLoginToken;
 use App\Services\UserLoginToken\UserLoginService;
+use Illuminate\Support\Facades\Mail;
 
 it('will store a token for a user', function (): void {
     $user = User::factory()->create();
@@ -14,7 +15,7 @@ it('will store a token for a user', function (): void {
     /** @var UserLoginService $userLoginService */
     $userLoginService = $this->app->get(UserLoginService::class);
 
-    $userLoginService->sendLoginLink($user, '/');
+    $userLoginService->sendPasswordLessLoginLink($user, '/');
 
     $this->assertDatabaseCount(UserLoginToken::class, 1);
 });
@@ -27,7 +28,7 @@ it('will queue the correct mail to the correct mailaddress and on the correct qu
     /** @var UserLoginService $userLoginService */
     $userLoginService = $this->app->get(UserLoginService::class);
 
-    $userLoginService->sendLoginLink($user, '/');
+    $userLoginService->sendPasswordLessLoginLink($user, '/');
 
     Mail::assertQueued(PasswordLessLoginLink::class, static function (PasswordLessLoginLink $mail) use ($user): bool {
         return $mail->hasTo($user->email) && $mail->queue === Queue::HIGH->value;
@@ -40,8 +41,8 @@ it('will only store one token for a single user', function (): void {
     /** @var UserLoginService $userLoginService */
     $userLoginService = $this->app->get(UserLoginService::class);
 
-    $userLoginService->sendLoginLink($user, '/');
-    $userLoginService->sendLoginLink($user, '/');
+    $userLoginService->sendPasswordLessLoginLink($user, '/');
+    $userLoginService->sendPasswordLessLoginLink($user, '/');
 
     $this->assertDatabaseCount(UserLoginToken::class, 1);
 });
@@ -53,8 +54,8 @@ it('can handle multiple tokens for multiple users', function (): void {
     /** @var UserLoginService $userLoginService */
     $userLoginService = $this->app->get(UserLoginService::class);
 
-    $userLoginService->sendLoginLink($user1, '/');
-    $userLoginService->sendLoginLink($user2, '/');
+    $userLoginService->sendPasswordLessLoginLink($user1, '/');
+    $userLoginService->sendPasswordLessLoginLink($user2, '/');
 
     $this->assertDatabaseCount(UserLoginToken::class, 2);
 });

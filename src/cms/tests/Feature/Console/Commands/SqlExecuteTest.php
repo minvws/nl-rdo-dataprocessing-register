@@ -2,12 +2,14 @@
 
 declare(strict_types=1);
 
+use Illuminate\Database\DatabaseManager;
 use Illuminate\Support\Facades\Storage;
-use Tests\Helpers\ConfigHelper;
+use Tests\Helpers\ConfigTestHelper;
 
 it('can run the artisan sql-execute command', function (): void {
-    $this->artisan('db:wipe')
-        ->assertSuccessful();
+    $this->mock(DatabaseManager::class)
+        ->shouldReceive('unprepared')
+        ->times(166);
 
     $this->artisan('sql-execute')
         ->assertSuccessful();
@@ -18,11 +20,15 @@ it('can run the artisan sql-execute command with a version', function (): void {
 
     $storage = Storage::fake();
     Storage::shouldReceive('disk')
-        ->with(ConfigHelper::get('sql-generator.filesystem_disk'))
+        ->with(ConfigTestHelper::get('sql-generator.filesystem_disk'))
         ->andReturn($storage);
     Storage::shouldReceive('allFiles')
         ->with($version)
         ->andReturn([]);
+
+    $this->mock(DatabaseManager::class)
+        ->shouldReceive('unprepared')
+        ->times(0);
 
     $this->artisan(sprintf('sql-execute %s', $version))
         ->assertSuccessful();

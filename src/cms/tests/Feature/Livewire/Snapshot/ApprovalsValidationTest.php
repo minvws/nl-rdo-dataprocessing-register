@@ -6,12 +6,12 @@ use App\Enums\Snapshot\SnapshotApprovalStatus;
 use App\Livewire\Snapshot\ApprovalsValidation;
 use App\Models\Snapshot;
 use App\Models\SnapshotApproval;
-
-use function Pest\Livewire\livewire;
+use Tests\Helpers\Model\OrganisationTestHelper;
 
 it('can load the table', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $snapshot = Snapshot::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
     SnapshotApproval::factory()
         ->for($snapshot)
@@ -19,9 +19,10 @@ it('can load the table', function (): void {
             'status' => fake()->randomElement([SnapshotApprovalStatus::DECLINED, SnapshotApprovalStatus::UNKNOWN]),
         ]);
 
-    livewire(ApprovalsValidation::class, [
-        'snapshot' => $snapshot,
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ApprovalsValidation::class, [
+            'snapshot' => $snapshot,
+        ])
         ->loadTable()
         ->assertCountTableRecords(1);
 });

@@ -7,12 +7,17 @@ use App\Models\Snapshot;
 use App\Services\Snapshot\SnapshotSource\ReceiverDataFactory;
 
 it('can generate private markdown', function (): void {
+    $receiver = Receiver::factory()
+        ->create([
+            'description' => 'Voluptas magni commodi omnis dolor facilis sed.',
+        ]);
     $snapshot = Snapshot::factory()
+        ->for($receiver, 'snapshotSource')
         ->create();
 
     $receiverDataFactory = new ReceiverDataFactory();
     expect($receiverDataFactory->generatePrivateMarkdown($snapshot))
-        ->toBeNull();
+        ->toMatchSnapshot();
 });
 
 it('can generate public frontmatter', function (): void {

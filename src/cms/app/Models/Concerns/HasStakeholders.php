@@ -4,23 +4,27 @@ declare(strict_types=1);
 
 namespace App\Models\Concerns;
 
+use App\Collections\StakeholderCollection;
+use App\Models\Contracts\Cloneable;
 use App\Models\Stakeholder;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Webmozart\Assert\Assert;
 
+/**
+ * @property-read StakeholderCollection $stakeholders
+ */
 trait HasStakeholders
 {
-    public function initializeHasStakeholders(): void
+    final public function initializeHasStakeholders(): void
     {
-        Assert::methodExists($this, 'addCloneableRelations');
-
-        $this->addCloneableRelations(['stakeholders']);
+        if ($this instanceof Cloneable) {
+            $this->addCloneableRelations(['stakeholders']);
+        }
     }
 
     /**
      * @return MorphToMany<Stakeholder, $this>
      */
-    public function stakeholders(): MorphToMany
+    final public function stakeholders(): MorphToMany
     {
         return $this->morphToMany(Stakeholder::class, 'stakeholder_relatable')->withTimestamps();
     }

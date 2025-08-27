@@ -4,19 +4,28 @@ declare(strict_types=1);
 
 namespace App\Import\Factories\Avg;
 
-use App\Components\Uuid\Uuid;
-use App\Import\Factories\AbstractFactory;
+use App\Components\Uuid\UuidInterface;
+use App\Import\Factories\Concerns\DataConverters;
 use App\Import\Factory;
 use App\Models\Avg\AvgGoal;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Webmozart\Assert\Assert;
 
 use function __;
 
-class AvgGoalFactory extends AbstractFactory implements Factory
+/**
+ * @implements Factory<AvgGoal>
+ */
+class AvgGoalFactory implements Factory
 {
-    public function create(array $data, string $organisationId): ?Model
+    use DataConverters;
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    public function create(array $data, UuidInterface $organisationId): ?AvgGoal
     {
+        /** @var AvgGoal $avgGoal */
         $avgGoal = AvgGoal::firstOrNew([
             'import_id' => $data['Id'],
             'organisation_id' => $organisationId,
@@ -26,13 +35,10 @@ class AvgGoalFactory extends AbstractFactory implements Factory
             return $avgGoal;
         }
 
-        $avgGoal->id = Uuid::generate()->toString();
         $avgGoal->organisation_id = $organisationId;
-        $avgGoal->import_id = $this->toStringOrNull($data['Id']);
-
-        $avgGoal->goal = $this->toString($data['Doel']);
-        $avgGoal = $this->setAvgGoalLegalBaseAndRemarks($avgGoal, $data['Rechtsgrond']);
-
+        $avgGoal->import_id = $this->toStringOrNull($data, 'Id');
+        $avgGoal->goal = $this->toString($data, 'Doel');
+        $avgGoal = $this->setAvgGoalLegalBaseAndRemarks($avgGoal, $this->toStringOrNull($data, 'Rechtsgrond'));
         $avgGoal->save();
 
         return $avgGoal;
@@ -47,7 +53,9 @@ class AvgGoalFactory extends AbstractFactory implements Factory
             return $avgGoal;
         }
 
-        $avgGoalLegalBase = self::getDescriptionFromOptions(__('avg_goal_legal_base.options'), $inputRechtsgrond);
+        $avgGoalLegalBaseOptions = __('avg_goal_legal_base.options');
+        Assert::allString($avgGoalLegalBaseOptions);
+        $avgGoalLegalBase = self::getDescriptionFromOptions($avgGoalLegalBaseOptions, $inputRechtsgrond);
         if ($avgGoalLegalBase !== null) {
             $avgGoal->avg_goal_legal_base = $avgGoalLegalBase;
 
@@ -62,10 +70,7 @@ class AvgGoalFactory extends AbstractFactory implements Factory
             return $avgGoal;
         }
 
-        $avgGoalLegalBase = self::getDescriptionFromOptions(
-            __('avg_goal_legal_base.options'),
-            $inputRechtsgrondStringable->before(':')->toString(),
-        );
+        $avgGoalLegalBase = self::getDescriptionFromOptions($avgGoalLegalBaseOptions, $inputRechtsgrondStringable->before(':')->toString());
 
         if ($avgGoalLegalBase !== null) {
             $avgGoal->avg_goal_legal_base = $avgGoalLegalBase;

@@ -28,7 +28,7 @@ class HomeGenerator extends Generator
 
         $contents = $this->viewFactory->make('public-website.home', [
             'frontmatter' => $this->convertToFrontmatter([
-                'id' => $publicWebsite->id,
+                'id' => $publicWebsite->id->toString(),
                 'title' => __('public_website.content.home_title'),
             ]),
             'content' => $this->convertMarkdownToHtml($publicWebsite->home_content),

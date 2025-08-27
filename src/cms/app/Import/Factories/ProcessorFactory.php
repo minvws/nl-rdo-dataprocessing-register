@@ -4,20 +4,29 @@ declare(strict_types=1);
 
 namespace App\Import\Factories;
 
-use App\Components\Uuid\Uuid;
+use App\Components\Uuid\UuidInterface;
+use App\Import\Factories\Concerns\DataConverters;
 use App\Import\Factory;
 use App\Models\Processor;
-use Illuminate\Database\Eloquent\Model;
 
-class ProcessorFactory extends AbstractFactory implements Factory
+/**
+ * @implements Factory<Processor>
+ */
+class ProcessorFactory implements Factory
 {
+    use DataConverters;
+
     public function __construct(
         private readonly AddressFactory $addressFactory,
     ) {
     }
 
-    public function create(array $data, string $organisationId): ?Model
+    /**
+     * @param array<string, mixed> $data
+     */
+    public function create(array $data, UuidInterface $organisationId): Processor
     {
+        /** @var Processor $processor */
         $processor = Processor::firstOrNew([
             'import_id' => $data['Id'],
             'organisation_id' => $organisationId,
@@ -27,14 +36,11 @@ class ProcessorFactory extends AbstractFactory implements Factory
             return $processor;
         }
 
-        $processor->id = Uuid::generate()->toString();
         $processor->organisation_id = $organisationId;
-        $processor->import_id = $this->toStringOrNull($data['Id']);
-
-        $processor->name = $this->toString($data['Naam']);
-        $processor->email = $this->toString($data['Email']);
-        $processor->phone = $this->toString($data['Telefoon']);
-
+        $processor->import_id = $this->toStringOrNull($data, 'Id');
+        $processor->name = $this->toString($data, 'Naam');
+        $processor->email = $this->toString($data, 'Email');
+        $processor->phone = $this->toString($data, 'Telefoon');
         $processor->save();
 
         $address = $this->addressFactory->create($data, $organisationId);

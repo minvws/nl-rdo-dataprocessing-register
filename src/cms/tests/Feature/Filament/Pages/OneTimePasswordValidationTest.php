@@ -5,47 +5,53 @@ declare(strict_types=1);
 use App\Filament\Pages\OneTimePasswordValidation;
 use App\Services\OtpService;
 use Illuminate\Support\Facades\RateLimiter;
-use Tests\Helpers\ConfigHelper;
-
-use function Pest\Livewire\livewire;
+use Tests\Helpers\ConfigTestHelper;
+use Tests\Helpers\Model\OrganisationTestHelper;
+use Tests\Helpers\SessionTestHelper;
 
 it('loads the page', function (): void {
-    setOtpValidSessionValue(false);
+    $organisation = OrganisationTestHelper::create();
+    $this->asFilamentOrganisationUser($organisation);
 
-    $this->get(sprintf('%s/two-factor-authentication', $this->organisation->slug))
+    SessionTestHelper::setOtpInvalid();
+
+    $this->get(sprintf('%s/two-factor-authentication', $organisation->slug))
         ->assertSee(__('user.one_time_password.description'));
 });
 
 it('redirects user to home on valid session', function (): void {
-    setOtpValidSessionValue(true);
+    $organisation = OrganisationTestHelper::create();
 
-    $this->get(sprintf('%s/two-factor-authentication', $this->organisation->slug))
-        ->assertRedirect(sprintf('%s/avg-responsible-processing-records', $this->organisation->slug));
+    $this->asFilamentOrganisationUser($organisation)
+        ->get(sprintf('%s/two-factor-authentication', $organisation->slug))
+        ->assertRedirect(sprintf('%s/avg-responsible-processing-records', $organisation->slug));
 });
 
 it('redirects with a valid code', function (): void {
-    setOtpValidSessionValue(true);
+    $this->mock(OtpService::class)
+        ->shouldReceive('hasValidSession')
+        ->andReturn(false)
+        ->shouldReceive('verifyCode')
+        ->once()
+        ->andReturn(true);
 
-    $this->mock(OtpService::class, static function ($mock): void {
-        $mock->shouldReceive('hasValidSession')
-            ->andReturn(false);
-        $mock->shouldReceive('verifyCode')
-            ->andReturn(true);
-    });
-
-    livewire(OneTimePasswordValidation::class)
+    $organisation = OrganisationTestHelper::create();
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(OneTimePasswordValidation::class)
         ->fillForm([
             'code' => fake()->unique()->randomNumber(6),
         ])
         ->call('authenticate')
         ->assertHasNoFormErrors()
-        ->assertRedirect(sprintf('%s/avg-responsible-processing-records', $this->organisation->slug));
+        ->assertRedirect(sprintf('%s/avg-responsible-processing-records', $organisation->slug));
 });
 
 it('fails with a invalid code', function (): void {
-    setOtpValidSessionValue(false);
+    $this->asFilamentUser();
 
-    livewire(OneTimePasswordValidation::class)
+    SessionTestHelper::setOtpInvalid();
+
+    $this->createLivewireTestable(OneTimePasswordValidation::class)
         ->fillForm([
             'code' => fake()->unique()->randomNumber(6),
         ])
@@ -54,9 +60,8 @@ it('fails with a invalid code', function (): void {
 });
 
 it('fails if rate limit reached', function (): void {
-    setOtpValidSessionValue(false);
-    ConfigHelper::set('auth.one_time_password.validation_rate_limit.max_attempts', 1);
-    ConfigHelper::set('auth.one_time_password.validation_rate_limit.decay_in_seconds', 60);
+    ConfigTestHelper::set('auth.one_time_password.validation_rate_limit.max_attempts', 1);
+    ConfigTestHelper::set('auth.one_time_password.validation_rate_limit.decay_in_seconds', 60);
 
     RateLimiter::shouldReceive('availableIn')
         ->once()
@@ -65,10 +70,18 @@ it('fails if rate limit reached', function (): void {
         ->once()
         ->andReturn(true);
 
-    livewire(OneTimePasswordValidation::class)
+    $this->asFilamentUser();
+    SessionTestHelper::setOtpInvalid();
+
+    $this->createLivewireTestable(OneTimePasswordValidation::class)
         ->fillForm([
             'code' => fake()->unique()->randomNumber(6),
         ])
         ->call('authenticate')
         ->assertHasFormErrors(['code' => __('user.profile.one_time_password.confirmation.too_many_requests', ['seconds' => 60])]);
+});
+
+it('fails if no user', function (): void {
+    $this->createLivewireTestable(OneTimePasswordValidation::class)
+        ->assertRedirect('logout');
 });

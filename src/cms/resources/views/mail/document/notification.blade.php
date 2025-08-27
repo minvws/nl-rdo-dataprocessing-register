@@ -1,5 +1,4 @@
 @php
-    /** @formatter:off */
     /** @var App\Models\Document $document */
     use App\Facades\DateFormat;
 @endphp

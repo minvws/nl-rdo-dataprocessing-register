@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\LookupListResource;
 
+use App\Filament\Actions\DeleteBulkActionWithRelationChecks;
 use App\Filament\Tables\Columns\CreatedAtColumn;
 use App\Filament\Tables\Columns\UpdatedAtColumn;
-use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -43,7 +43,7 @@ class LookupListResourceTable
                     ->label(''),
             ])
             ->bulkActions([
-                DeleteBulkAction::make(),
+                DeleteBulkActionWithRelationChecks::make(),
             ]);
     }
 }

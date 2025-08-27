@@ -2,37 +2,44 @@
 
 declare(strict_types=1);
 
+use App\Enums\RegisterLayout;
 use App\Filament\Resources\AvgProcessorProcessingRecordResource;
 use App\Filament\Resources\AvgProcessorProcessingRecordResource\Pages\EditAvgProcessorProcessingRecord;
 use App\Models\Avg\AvgProcessorProcessingRecord;
 use App\Models\EntityNumber;
 use App\Services\EntityNumberService;
-use Mockery\MockInterface;
+use Tests\Helpers\Model\OrganisationTestHelper;
+use Tests\Helpers\Model\UserTestHelper;
 
-use function Pest\Livewire\livewire;
+it('loads the edit page with all layouts', function (RegisterLayout $registerLayout): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisation($organisation, ['register_layout' => $registerLayout]);
 
-it('loads the edit page', function (): void {
     $avgProcessorProcessingRecord = AvgProcessorProcessingRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
 
-    $this->get(
-        AvgProcessorProcessingRecordResource::getUrl('edit', ['record' => $avgProcessorProcessingRecord->id]),
-    )->assertSuccessful();
-});
+    $this->asFilamentUser($user)
+        ->get(AvgProcessorProcessingRecordResource::getUrl('edit', [
+            'record' => $avgProcessorProcessingRecord,
+        ]))
+        ->assertSuccessful();
+})->with(RegisterLayout::cases());
 
 it('can be saved', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $avgProcessorProcessingRecord = AvgProcessorProcessingRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->withValidState()
         ->create([
             'has_systems' => false,
         ]);
     $name = fake()->uuid();
 
-    livewire(EditAvgProcessorProcessingRecord::class, [
-        'record' => $avgProcessorProcessingRecord->getRouteKey(),
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditAvgProcessorProcessingRecord::class, [
+            'record' => $avgProcessorProcessingRecord->getRouteKey(),
+        ])
         ->fillForm([
             'name' => $name,
         ])
@@ -45,22 +52,23 @@ it('can be saved', function (): void {
 });
 
 it('can be cloned', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $avgProcessorProcessingRecord = AvgProcessorProcessingRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->withAllRelatedEntities()
         ->create();
-
     $entityNumber = EntityNumber::factory()
         ->create();
 
-    $this->mock(EntityNumberService::class, static function (MockInterface $mock) use ($entityNumber): void {
-        $mock->expects('generate')
-            ->andReturn($entityNumber);
-    });
+    $this->mock(EntityNumberService::class)
+        ->shouldReceive('generate')
+        ->once()
+        ->andReturn($entityNumber);
 
-    livewire(EditAvgProcessorProcessingRecord::class, [
-        'record' => $avgProcessorProcessingRecord->getRouteKey(),
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditAvgProcessorProcessingRecord::class, [
+            'record' => $avgProcessorProcessingRecord->getRouteKey(),
+        ])
         ->callAction('clone')
         ->assertRedirect();
 
@@ -76,32 +84,32 @@ it('can be cloned', function (): void {
     expect($avgProcessorProcessingRecordClone->snapshots)->toBeEmpty();
 
     expect($avgProcessorProcessingRecordClone->avgGoals->pluck('id')->toArray())
-        ->toBe($avgProcessorProcessingRecord->avgGoals->pluck('id')->toArray());
+        ->toEqual($avgProcessorProcessingRecord->avgGoals->pluck('id')->toArray());
 
     expect($avgProcessorProcessingRecordClone->contactPersons->pluck('id')->toArray())
-        ->toBe($avgProcessorProcessingRecord->contactPersons->pluck('id')->toArray());
+        ->toEqual($avgProcessorProcessingRecord->contactPersons->pluck('id')->toArray());
 
     expect($avgProcessorProcessingRecordClone->dataBreachRecords->pluck('id')->toArray())
-        ->toBe($avgProcessorProcessingRecord->dataBreachRecords->pluck('id')->toArray());
+        ->toEqual($avgProcessorProcessingRecord->dataBreachRecords->pluck('id')->toArray());
 
-    expect($avgProcessorProcessingRecordClone->documents->pluck('id')->toArray())
-        ->toBe($avgProcessorProcessingRecord->documents->pluck('id')->toArray());
+    expect($avgProcessorProcessingRecordClone->documents->pluck('id'))
+        ->toEqual($avgProcessorProcessingRecord->documents->pluck('id'));
 
     expect($avgProcessorProcessingRecordClone->processors->pluck('id')->toArray())
-        ->toBe($avgProcessorProcessingRecord->processors->pluck('id')->toArray());
+        ->toEqual($avgProcessorProcessingRecord->processors->pluck('id')->toArray());
 
     expect($avgProcessorProcessingRecordClone->receivers->pluck('id')->toArray())
-        ->toBe($avgProcessorProcessingRecord->receivers->pluck('id')->toArray());
+        ->toEqual($avgProcessorProcessingRecord->receivers->pluck('id')->toArray());
 
     expect($avgProcessorProcessingRecordClone->remarks->pluck('body')->toArray())
         ->toBe($avgProcessorProcessingRecord->remarks->pluck('body')->toArray());
 
     expect($avgProcessorProcessingRecordClone->responsibles->pluck('id')->toArray())
-        ->toBe($avgProcessorProcessingRecord->responsibles->pluck('id')->toArray());
+        ->toEqual($avgProcessorProcessingRecord->responsibles->pluck('id')->toArray());
 
     expect($avgProcessorProcessingRecordClone->stakeholders->pluck('id')->toArray())
-        ->toBe($avgProcessorProcessingRecord->stakeholders->pluck('id')->toArray());
+        ->toEqual($avgProcessorProcessingRecord->stakeholders->pluck('id')->toArray());
 
     expect($avgProcessorProcessingRecordClone->systems->pluck('id')->toArray())
-        ->toBe($avgProcessorProcessingRecord->systems->pluck('id')->toArray());
+        ->toEqual($avgProcessorProcessingRecord->systems->pluck('id')->toArray());
 });

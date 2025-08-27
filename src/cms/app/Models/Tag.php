@@ -4,35 +4,34 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Collections\Avg\AvgResponsibleProcessingRecordCollection;
+use App\Collections\TagCollection;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\Concerns\HasOrganisation;
+use App\Models\Concerns\HasSoftDeletes;
+use App\Models\Concerns\HasTimestamps;
 use App\Models\Concerns\HasUuidAsId;
-use Carbon\CarbonImmutable;
-use Illuminate\Database\Eloquent\Collection;
+use App\Models\Contracts\TenantAware;
+use Database\Factories\TagFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * @property array $name
- * @property array $slug
- * @property int|null $order_column
- * @property CarbonImmutable|null $created_at
- * @property CarbonImmutable|null $updated_at
- * @property CarbonImmutable|null $deleted_at
+ * @property string $name
  *
- * @property-read mixed $translations
- * @property-read Collection<int, AvgResponsibleProcessingRecord> $avgResponsibleProcessingRecords
+ * @property-read AvgResponsibleProcessingRecordCollection $avgResponsibleProcessingRecords
  */
-class Tag extends Model
+class Tag extends Model implements TenantAware
 {
+    /** @use HasFactory<TagFactory> */
     use HasFactory;
     use HasOrganisation;
+    use HasSoftDeletes;
+    use HasTimestamps;
     use HasUuidAsId;
-    use SoftDeletes;
 
-    /** @var array<int, string> $fillable */
+    protected static string $collectionClass = TagCollection::class;
     protected $fillable = [
         'name',
     ];

@@ -3,13 +3,17 @@
 declare(strict_types=1);
 
 use App\Jobs\PublicWebsite\HugoWebsiteGeneratorJob;
+use App\Repositories\AdminLogRepository;
 use App\Services\PublicWebsite\HugoPublicWebsiteGenerator;
 
 it('can run the job', function (): void {
-    $hugoWebsiteGenerator = $this->createMock(HugoPublicWebsiteGenerator::class);
-    $hugoWebsiteGenerator->expects($this->once())
-        ->method('generate');
+    $adminLogRepository = $this->app->get(AdminLogRepository::class);
+
+    $hugoWebsiteGenerator = $this->mock(HugoPublicWebsiteGenerator::class)
+        ->shouldReceive('generate')
+        ->once()
+        ->getMock();
 
     $hugoWebsiteGeneratorJob = new HugoWebsiteGeneratorJob();
-    $hugoWebsiteGeneratorJob->handle($hugoWebsiteGenerator);
+    $hugoWebsiteGeneratorJob->handle($adminLogRepository, $hugoWebsiteGenerator);
 });

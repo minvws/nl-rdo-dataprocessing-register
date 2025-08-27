@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 use App\Filament\Resources\ResponsibleResource\Pages\ListResponsibles;
 use App\Models\Responsible;
-
-use function Pest\Livewire\livewire;
+use Tests\Helpers\Model\OrganisationTestHelper;
 
 it('loads the list page', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $responsibles = Responsible::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->count(5)
         ->create();
 
-    livewire(ListResponsibles::class)
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ListResponsibles::class)
         ->assertCanSeeTableRecords($responsibles);
 });

@@ -3,25 +3,28 @@
 declare(strict_types=1);
 
 use App\Models\User;
-use Filament\Facades\Filament;
+use Tests\Helpers\Model\OrganisationTestHelper;
 
 it('loads the page', function (): void {
-    $this->get(sprintf('%s/profile', $this->organisation->slug))
+    $organisation = OrganisationTestHelper::create();
+    $this->asFilamentOrganisationUser($organisation)
+        ->get(sprintf('%s/profile', $organisation->slug))
         ->assertSee(__('user.profile.my_profile'));
 });
 
 it('returns 404 on tenant/profile if no organisation attached', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $user = User::factory()->create();
 
-    $this->actingAs($user)
-        ->get(sprintf('%s/profile', $this->organisation->slug))
+    $this->asFilamentUser($user)
+        ->get(sprintf('%s/profile', $organisation->slug))
         ->assertNotFound();
 });
 
 it('returns 404 on /profile if no organisation attached', function (): void {
-    Filament::setTenant(null);
+    $user = User::factory()->create();
 
-    $this->actingAs($this->user)
+    $this->be($user)
         ->get('/profile')
         ->assertNotFound();
 });

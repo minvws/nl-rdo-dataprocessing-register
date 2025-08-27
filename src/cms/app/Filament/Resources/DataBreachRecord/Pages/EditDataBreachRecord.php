@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DataBreachRecord\Pages;
 
-use App\Filament\Actions\CloneAction;
 use App\Filament\Pages\ProcessingRecordEditRecord;
 use App\Filament\Resources\DataBreachRecordResource;
 use App\Models\DataBreachRecord;
@@ -22,17 +21,16 @@ class EditDataBreachRecord extends ProcessingRecordEditRecord
     protected function getHeaderActions(): array
     {
         return [
-            CloneAction::make(),
             DeleteAction::make(),
         ];
     }
 
     public function getTitle(): string
     {
-        /** @var DataBreachRecord $record */
         $record = $this->getRecord();
+        Assert::isInstanceOf($record, DataBreachRecord::class);
 
-        return sprintf('%s (%s)', $record->name, $record->number);
+        return sprintf('%s (%s)', $record->name, $record->getNumber());
     }
 
     protected function beforeSave(): void
@@ -53,7 +51,6 @@ class EditDataBreachRecord extends ProcessingRecordEditRecord
 
         /** @var DataBreachNotificationService $dataBreachNotificationService */
         $dataBreachNotificationService = App::get(DataBreachNotificationService::class);
-
         $dataBreachNotificationService->sendNotifications($dataBreachRecord);
     }
 }

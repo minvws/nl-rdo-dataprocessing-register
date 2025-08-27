@@ -2,46 +2,31 @@
 
 declare(strict_types=1);
 
-use App\Enums\Authorization\Role;
+use App\Components\Uuid\Uuid;
+use App\Filament\Resources\AvgResponsibleProcessingRecordResource;
 use App\Import\Factories\Avg\AvgResponsibleProcessingRecordFactory;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\ContactPerson;
-use App\Models\Organisation;
 use App\Models\Snapshot;
 use App\Models\States\Snapshot\Approved;
 use App\Models\States\Snapshot\Established;
 use App\Models\States\Snapshot\InReview;
 use App\Models\States\Snapshot\Obsolete;
-use App\Models\User;
+use App\ValueObjects\CalendarDate;
 use Carbon\CarbonImmutable;
-use Filament\Facades\Filament;
-use Tests\Helpers\ConfigHelper;
-
-beforeEach(function (): void {
-    $user = User::factory()
-        ->withOrganisation()
-        ->withValidOtpRegistration()
-        ->create();
-    /** @var Organisation $organisation */
-    $organisation = $user->organisations()->firstOrFail();
-
-    $user->assignGlobalRole(Role::FUNCTIONAL_MANAGER);
-    $user->assignOrganisationRole(Role::INPUT_PROCESSOR, $organisation);
-
-    $this->be($user);
-    Filament::setTenant($organisation);
-
-    $this->organisation = $organisation;
-    setOtpValidSessionValue(true);
-});
+use Tests\Helpers\ConfigTestHelper;
+use Tests\Helpers\Model\OrganisationTestHelper;
 
 it('imports the model & related models, with snapshots in the correct state', function (): void {
     $name = fake()->word();
     $importId = fake()->slug(1);
     $status = fake()->word();
+//    $lastChangeDate = fake()->date('Y-m-d\TH:i:s.v');
+    $lastChangeDate = '1990-01-08T00:50:41.000';
 
-    ConfigHelper::set('import.value_converters.snapshot_state', [$status => Established::class]);
+    ConfigTestHelper::set('import.value_converters.snapshot_state', [$status => Established::class]);
 
+    $organisation = OrganisationTestHelper::create();
     $avgResponsibleProcessingRecordCount = AvgResponsibleProcessingRecord::query()
         ->where(['import_id' => $importId])
         ->count();
@@ -49,17 +34,16 @@ it('imports the model & related models, with snapshots in the correct state', fu
     expect($avgResponsibleProcessingRecordCount)
         ->toBe(0);
 
-    $data = getAvgResponsibleProcessingRecordFactoryImportData($importId, $name, $status);
+    $data = getAvgResponsibleProcessingRecordFactoryImportData($importId, $name, $status, $lastChangeDate);
 
-    /** @var AvgResponsibleProcessingRecordFactory $avgResponsibleProcessingRecordFactory */
     $avgResponsibleProcessingRecordFactory = $this->app->get(AvgResponsibleProcessingRecordFactory::class);
-    /** @var AvgResponsibleProcessingRecord $avgResponsibleProcessingRecord */
-    $avgResponsibleProcessingRecord = $avgResponsibleProcessingRecordFactory->create($data, $this->organisation->id);
+    $avgResponsibleProcessingRecord = $avgResponsibleProcessingRecordFactory->create($data, $organisation->id);
 
     $avgResponsibleProcessingRecordCount = AvgResponsibleProcessingRecord::query()
         ->where(['import_id' => $importId])
         ->count();
-    $expectedReviewAt = CarbonImmutable::now()->floorDay()->addMonths($this->organisation->review_at_default_in_months);
+    $expectedReviewAt = CalendarDate::parse($lastChangeDate)
+        ->addMonths($organisation->review_at_default_in_months);
 
     $avgResponsibleProcessingRecordSnapshots = $avgResponsibleProcessingRecord->snapshots;
     $avgResponsibleProcessingRecordContacts = $avgResponsibleProcessingRecord->contactPersons();
@@ -73,25 +57,25 @@ it('imports the model & related models, with snapshots in the correct state', fu
         ->and($avgResponsibleProcessingRecordContactSnapshots->count())->toBe(1)
         ->and($avgResponsibleProcessingRecordContactSnapshots->first()->state)->toBeInstanceOf(Established::class);
 
-    /** @var TestResponse $response */
-    $response = $this->get(route('filament.admin.resources.avg-responsible-processing-records.edit', [
-        'tenant' => $this->organisation,
-        'record' => $avgResponsibleProcessingRecord->id,
-    ]));
-    $response->assertOk();
+    $this->asFilamentOrganisationUser($organisation)
+        ->get(AvgResponsibleProcessingRecordResource::getUrl('edit', [
+            'tenant' => $organisation,
+            'record' => $avgResponsibleProcessingRecord,
+        ]))
+        ->assertOk();
 });
 
 it('skips the import when model with specified state to skip', function (): void {
-    $organisation = Organisation::factory()->create();
+    $organisation = OrganisationTestHelper::create();
     $importId = fake()->slug();
     $status = fake()->word();
+    $lastChangeDate = fake()->date('Y-m-d\TH:i:s.v');
 
-    ConfigHelper::set('import.states_to_skip_import', [$status]);
+    ConfigTestHelper::set('import.states_to_skip_import', [$status]);
 
-    $data = getAvgResponsibleProcessingRecordFactoryImportData($importId, fake()->word(), $status);
+    $data = getAvgResponsibleProcessingRecordFactoryImportData($importId, fake()->word(), $status, $lastChangeDate);
     $data['Status'] = $status;
 
-    /** @var AvgResponsibleProcessingRecordFactory $avgResponsibleProcessingRecordFactory */
     $avgResponsibleProcessingRecordFactory = $this->app->get(AvgResponsibleProcessingRecordFactory::class);
     $avgResponsibleProcessingRecordFactory->create($data, $organisation->id);
 
@@ -104,27 +88,27 @@ it('imports the model & related models, but does not create a new snapshot for t
     $name = fake()->word();
     $importId = fake()->slug(1);
     $status = fake()->word();
-    $contactPersonSnapshotId = fake()->uuid();
+    $contactPersonSnapshotId = Uuid::fromString(fake()->uuid());
+    $lastChangeDate = fake()->date('Y-m-d\TH:i:s.v');
 
-    ConfigHelper::set('import.value_converters.snapshot_state', [$status => Established::class]);
+    ConfigTestHelper::set('import.value_converters.snapshot_state', [$status => Established::class]);
 
+    $organisation = OrganisationTestHelper::create();
     $contactPerson = ContactPerson::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create(['import_id' => $importId]);
     Snapshot::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->for($contactPerson, 'snapshotSource')
         ->create([
             'id' => $contactPersonSnapshotId,
             'state' => Established::class,
         ]);
 
-    $data = getAvgResponsibleProcessingRecordFactoryImportData($importId, $name, $status);
+    $data = getAvgResponsibleProcessingRecordFactoryImportData($importId, $name, $status, $lastChangeDate);
 
-    /** @var AvgResponsibleProcessingRecordFactory $avgResponsibleProcessingRecordFactory */
     $avgResponsibleProcessingRecordFactory = $this->app->get(AvgResponsibleProcessingRecordFactory::class);
-    /** @var AvgResponsibleProcessingRecord $avgResponsibleProcessingRecord */
-    $avgResponsibleProcessingRecord = $avgResponsibleProcessingRecordFactory->create($data, $this->organisation->id);
+    $avgResponsibleProcessingRecord = $avgResponsibleProcessingRecordFactory->create($data, $organisation->id);
 
     $avgResponsibleProcessingRecordContactSnapshots = $avgResponsibleProcessingRecord->contactPersons->first()->snapshots;
 
@@ -136,27 +120,25 @@ it('imports the model & related models, and creates a new snapshot for the relat
     $name = fake()->word();
     $importId = fake()->slug(1);
     $status = fake()->word();
-    $contactPersonSnapshotId = fake()->uuid();
+    $lastChangeDate = fake()->date('Y-m-d\TH:i:s.v');
 
-    ConfigHelper::set('import.value_converters.snapshot_state', [$status => Established::class]);
+    ConfigTestHelper::set('import.value_converters.snapshot_state', [$status => Established::class]);
 
+    $organisation = OrganisationTestHelper::create();
     $contactPerson = ContactPerson::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create(['import_id' => $importId]);
     Snapshot::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->for($contactPerson, 'snapshotSource')
         ->create([
-            'id' => $contactPersonSnapshotId,
             'state' => Approved::class,
         ]);
 
-    $data = getAvgResponsibleProcessingRecordFactoryImportData($importId, $name, $status);
+    $data = getAvgResponsibleProcessingRecordFactoryImportData($importId, $name, $status, $lastChangeDate);
 
-    /** @var AvgResponsibleProcessingRecordFactory $avgResponsibleProcessingRecordFactory */
     $avgResponsibleProcessingRecordFactory = $this->app->get(AvgResponsibleProcessingRecordFactory::class);
-    /** @var AvgResponsibleProcessingRecord $avgResponsibleProcessingRecord */
-    $avgResponsibleProcessingRecord = $avgResponsibleProcessingRecordFactory->create($data, $this->organisation->id);
+    $avgResponsibleProcessingRecord = $avgResponsibleProcessingRecordFactory->create($data, $organisation->id);
 
     $contactPersonSnapshots = $avgResponsibleProcessingRecord->contactPersons
         ->first()
@@ -174,27 +156,26 @@ it('imports the model & related models, and creates a new snapshot for the relat
 ): void {
     $importId = fake()->slug(1);
     $status = fake()->word();
+    $lastChangeDate = fake()->date('Y-m-d\TH:i:s.v');
 
-    ConfigHelper::set('import.value_converters.snapshot_state', [$status => $importState]);
+    ConfigTestHelper::set('import.value_converters.snapshot_state', [$status => $importState]);
 
+    $organisation = OrganisationTestHelper::create();
     $contactPerson = ContactPerson::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create(['import_id' => $importId]);
     Snapshot::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->for($contactPerson, 'snapshotSource')
         ->create([
-            'id' => fake()->uuid(),
             'state' => $relatedEntitySnapshotState,
             'created_at' => CarbonImmutable::now()->subDay(),
         ]);
 
-    $data = getAvgResponsibleProcessingRecordFactoryImportData($importId, fake()->word(), $status);
+    $data = getAvgResponsibleProcessingRecordFactoryImportData($importId, fake()->word(), $status, $lastChangeDate);
 
-    /** @var AvgResponsibleProcessingRecordFactory $avgResponsibleProcessingRecordFactory */
     $avgResponsibleProcessingRecordFactory = $this->app->get(AvgResponsibleProcessingRecordFactory::class);
-    /** @var AvgResponsibleProcessingRecord $avgResponsibleProcessingRecord */
-    $avgResponsibleProcessingRecord = $avgResponsibleProcessingRecordFactory->create($data, $this->organisation->id);
+    $avgResponsibleProcessingRecord = $avgResponsibleProcessingRecordFactory->create($data, $organisation->id);
 
     $contactPersonSnapshots = $avgResponsibleProcessingRecord->contactPersons
         ->first()
@@ -223,7 +204,6 @@ it('skips the import when model with import_id exists', function (): void {
             'name' => $name,
         ]);
 
-    /** @var AvgResponsibleProcessingRecordFactory $avgResponsibleProcessingRecordFactory */
     $avgResponsibleProcessingRecordFactory = $this->app->get(AvgResponsibleProcessingRecordFactory::class);
     $avgResponsibleProcessingRecordFactory->create([
         'Id' => $importId, // same import_id
@@ -234,12 +214,16 @@ it('skips the import when model with import_id exists', function (): void {
     expect($avgResponsibleProcessingRecord->name)->toBe($name);
 });
 
-function getAvgResponsibleProcessingRecordFactoryImportData(string $importId, string $name, string $status): array
-{
+function getAvgResponsibleProcessingRecordFactoryImportData(
+    string $importId,
+    string $name,
+    string $status,
+    string $lastChangeDate,
+): array {
     return [
         'Id' => $importId,
         'AanmaakDatum' => fake()->date('Y-m-d\TH:i:s.v'),
-        'LaatsteWijzigDatum' => fake()->date('Y-m-d\TH:i:s.v'),
+        'LaatsteWijzigDatum' => $lastChangeDate,
         'Naam' => $name,
         'Nummer' => fake()->word(),
         'Dienst' => fake()->word(),

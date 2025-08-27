@@ -6,17 +6,17 @@ use App\Filament\Resources\ProcessorResource;
 use App\Filament\Resources\ProcessorResource\Pages\CreateProcessor;
 use App\Models\Processor;
 
-use function Pest\Livewire\livewire;
-
 it('loads the create page', function (): void {
-    $this->get(ProcessorResource::getUrl('create'))
+    $this->asFilamentUser()
+        ->get(ProcessorResource::getUrl('create'))
         ->assertSuccessful();
 });
 
 it('can create an entry', function (): void {
     $name = fake()->uuid();
 
-    livewire(CreateProcessor::class)
+    $this->asFilamentUser()
+        ->createLivewireTestable(CreateProcessor::class)
         ->fillForm([
             'name' => $name,
             'email' => fake()->safeEmail(),

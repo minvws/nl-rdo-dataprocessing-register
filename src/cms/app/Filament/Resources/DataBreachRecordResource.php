@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Enums\RegisterLayout;
+use App\Facades\Authentication;
 use App\Filament\NavigationGroups\NavigationGroup;
 use App\Filament\RelationManagers\AvgProcessorProcessingRecordRelationManager;
 use App\Filament\RelationManagers\AvgResponsibleProcessingRecordRelationManager;
@@ -35,12 +37,18 @@ class DataBreachRecordResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return DataBreachRecordResourceForm::form($form);
+        return match (Authentication::user()->register_layout) {
+            RegisterLayout::STEPS => DataBreachRecordResourceForm::stepsForm($form),
+            RegisterLayout::ONE_PAGE => DataBreachRecordResourceForm::onePageForm($form),
+        };
     }
 
     public static function infolist(Infolist $infolist): Infolist
     {
-        return DataBreachRecordResourceInfolist::infolist($infolist);
+        return match (Authentication::user()->register_layout) {
+            RegisterLayout::STEPS => DataBreachRecordResourceInfolist::stepsInfolist($infolist),
+            RegisterLayout::ONE_PAGE => DataBreachRecordResourceInfolist::onePageInfolist($infolist),
+        };
     }
 
     public static function table(Table $table): Table
@@ -51,11 +59,11 @@ class DataBreachRecordResource extends Resource
     public static function getRelations(): array
     {
         return [
+            DocumentRelationManager::make(),
             ResponsibleRelationManager::make(),
             AvgResponsibleProcessingRecordRelationManager::make(),
             AvgProcessorProcessingRecordRelationManager::make(),
             WpgProcessingRecordRelationManager::make(),
-            DocumentRelationManager::make(),
         ];
     }
 

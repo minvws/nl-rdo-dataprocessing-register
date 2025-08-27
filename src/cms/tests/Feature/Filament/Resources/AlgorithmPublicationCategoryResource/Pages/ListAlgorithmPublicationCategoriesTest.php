@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 use App\Filament\Resources\AlgorithmPublicationCategoryResource\Pages\ListAlgorithmPublicationCategories;
 use App\Models\Algorithm\AlgorithmPublicationCategory;
-
-use function Pest\Livewire\livewire;
+use Tests\Helpers\Model\OrganisationTestHelper;
 
 it('can load the list resource page', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $records = AlgorithmPublicationCategory::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->count(5)
         ->create();
 
-    livewire(ListAlgorithmPublicationCategories::class)
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ListAlgorithmPublicationCategories::class)
         ->assertCanSeeTableRecords($records);
 });

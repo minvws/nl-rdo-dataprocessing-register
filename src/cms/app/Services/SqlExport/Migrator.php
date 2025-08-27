@@ -6,6 +6,7 @@ namespace App\Services\SqlExport;
 
 use Illuminate\Database\Migrations\Migrator as IlluminateMigrator;
 use Illuminate\Support\Collection;
+use Webmozart\Assert\Assert;
 
 use function collect;
 use function sprintf;
@@ -17,11 +18,17 @@ class Migrator extends IlluminateMigrator
      */
     public function getMigratorQueries(string $migrationFile, string $method): Collection
     {
-        $queries = $this->getQueries($this->resolvePath($migrationFile), $method);
+        $migrationQueries = $this->getQueries($this->resolvePath($migrationFile), $method);
 
-        return collect($queries)
-            ->map(static function ($query) {
-                return sprintf('%s;', $query['query']);
+        return collect($migrationQueries)
+            ->map(static function ($migratorQuery): string {
+                Assert::isArray($migratorQuery);
+                Assert::keyExists($migratorQuery, 'query');
+
+                $query = $migratorQuery['query'];
+                Assert::string($query);
+
+                return sprintf('%s;', $query);
             });
     }
 }

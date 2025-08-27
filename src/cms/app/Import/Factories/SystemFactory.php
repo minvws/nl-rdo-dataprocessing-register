@@ -4,15 +4,24 @@ declare(strict_types=1);
 
 namespace App\Import\Factories;
 
-use App\Components\Uuid\Uuid;
+use App\Components\Uuid\UuidInterface;
+use App\Import\Factories\Concerns\DataConverters;
 use App\Import\Factory;
 use App\Models\System;
-use Illuminate\Database\Eloquent\Model;
 
-class SystemFactory extends AbstractFactory implements Factory
+/**
+ * @implements Factory<System>
+ */
+class SystemFactory implements Factory
 {
-    public function create(array $data, string $organisationId): ?Model
+    use DataConverters;
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    public function create(array $data, UuidInterface $organisationId): System
     {
+        /** @var System $system */
         $system = System::firstOrNew([
             'description' => $data['Omschrijving'],
             'organisation_id' => $organisationId,
@@ -22,11 +31,8 @@ class SystemFactory extends AbstractFactory implements Factory
             return $system;
         }
 
-        $system->id = Uuid::generate()->toString();
         $system->organisation_id = $organisationId;
-
-        $system->description = $data['Omschrijving'];
-
+        $system->description = $this->toStringOrNull($data, 'Omschrijving');
         $system->save();
 
         return $system;

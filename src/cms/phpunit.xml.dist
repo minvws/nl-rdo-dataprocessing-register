@@ -4,7 +4,6 @@
          bootstrap="vendor/autoload.php"
          colors="true"
          cacheDirectory="/tmp/phpunit"
-         executionOrder="random"
 >
     <testsuites>
         <testsuite name="Unit">
@@ -32,6 +31,8 @@
         <env name="OUTBOX_SMTP_FROM" value="hello@example.com"/>
         <env name="PUBLIC_WEBSITE_FILESYSTEM" value="fake"/>
         <env name="PUBLIC_WEBSITE_GENERATOR" value="fake"/>
+        <env name="STATIC_WEBSITE_FILESYSTEM" value="fake"/>
+        <env name="STATIC_WEBSITE_GENERATOR" value="fake"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="VIRUSSCANNER_DEFAULT" value="fake"/>

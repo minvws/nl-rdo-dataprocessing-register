@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Unit\Models\Casts;
+namespace Tests\Feature\Models\Casts;
 
 use App\Components\Uuid\Uuid;
 use App\Components\Uuid\UuidInterface;

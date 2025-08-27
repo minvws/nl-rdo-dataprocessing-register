@@ -5,6 +5,7 @@
     <arg name="colors"/>
     <arg name="cache" value="/tmp/.phpcs.cache"/>
     <arg name="extensions" value="php"/>
+    <arg name="parallel" value="4"/>
 
     <file>.</file>
     <exclude-pattern type="relative">^bootstrap/cache</exclude-pattern>
@@ -92,6 +93,44 @@
             <property name="tabIndent" value="false"/>
         </properties>
     </rule>
+
+    <!-- PHPCSExtra -->
+    <rule ref="Universal.Classes.DisallowAnonClassParentheses"/>
+    <rule ref="Universal.Classes.ModifierKeywordOrder"/>
+    <rule ref="Universal.CodeAnalysis.ConstructorDestructorReturn"/>
+    <rule ref="Universal.CodeAnalysis.ForeachUniqueAssignment"/>
+    <rule ref="Universal.CodeAnalysis.NoDoubleNegative"/>
+    <rule ref="Universal.CodeAnalysis.StaticInFinalClass"/>
+    <rule ref="Universal.Constants.LowercaseClassResolutionKeyword"/>
+    <rule ref="Universal.Constants.ModifierKeywordOrder"/>
+    <rule ref="Universal.Constants.UppercaseMagicConstants"/>
+    <rule ref="Universal.ControlStructures.DisallowAlternativeSyntax"/>
+    <rule ref="Universal.ControlStructures.DisallowLonelyIf"/>
+    <rule ref="Universal.ControlStructures.IfElseDeclaration"/>
+    <rule ref="Universal.Files.SeparateFunctionsFromOO"/>
+    <rule ref="Universal.FunctionDeclarations.RequireFinalMethodsInTraits"/>
+    <rule ref="Universal.Lists.DisallowLongListSyntax"/>
+    <rule ref="Universal.Lists.DisallowShortListSyntax"/>
+    <rule ref="Universal.Namespaces.DisallowDeclarationWithoutName"/>
+    <rule ref="Universal.Namespaces.DisallowCurlyBraceSyntax"/>
+    <rule ref="Universal.Namespaces.OneDeclarationPerFile"/>
+    <rule ref="Universal.NamingConventions.NoReservedKeywordParameterNames"/>
+    <rule ref="Universal.OOStructures.AlphabeticExtendsImplements"/>
+    <rule ref="Universal.Operators.ConcatPosition"/>
+    <rule ref="Universal.Operators.DisallowLogicalAndOr"/>
+    <rule ref="Universal.Operators.StrictComparisons"/>
+    <rule ref="Universal.Operators.TypeSeparatorSpacing"/>
+    <rule ref="Universal.PHP.LowercasePHPTag"/>
+    <rule ref="Universal.PHP.NoFQNTrueFalseNull"/>
+    <rule ref="Universal.UseStatements.DisallowMixedGroupUse"/>
+    <rule ref="Universal.UseStatements.KeywordSpacing"/>
+    <rule ref="Universal.UseStatements.LowercaseFunctionConst"/>
+    <rule ref="Universal.UseStatements.NoLeadingBackslash"/>
+    <rule ref="Universal.UseStatements.NoUselessAliases"/>
+    <rule ref="Universal.WhiteSpace.AnonClassKeywordSpacing"/>
+    <rule ref="Universal.WhiteSpace.CommaSpacing"/>
+    <rule ref="Universal.WhiteSpace.DisallowInlineTabs"/>
+    <rule ref="Universal.WhiteSpace.PrecisionAlignment"/>
 
     <!-- PEAR -->
     <rule ref="PEAR.Classes.ClassDeclaration"/>
@@ -334,9 +373,7 @@
     <rule ref="SlevomatCodingStandard.TypeHints.NullableTypeForNullDefaultValue"/>
     <rule ref="SlevomatCodingStandard.TypeHints.NullTypeHintOnLastPosition"/>
     <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint"/>
-    <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingTraversableTypeHintSpecification">
-        <exclude-pattern>./app/Import/</exclude-pattern>
-    </rule>
+    <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingTraversableTypeHintSpecification"/>
     <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHintSpacing"/>
     <rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint">
         <exclude name="SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingTraversableTypeHintSpecification"/>

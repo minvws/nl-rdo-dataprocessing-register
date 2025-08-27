@@ -1,5 +1,4 @@
 @php
-    /** @formatter:off */
     /** @var App\Models\User $user */
     use App\Facades\Otp;
 @endphp

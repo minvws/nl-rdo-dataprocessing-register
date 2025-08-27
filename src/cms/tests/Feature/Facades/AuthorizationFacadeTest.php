@@ -13,8 +13,8 @@ it('has permission if user with permission given', function (): void {
     $organisation = Organisation::factory()->create();
     $user = User::factory()
         ->hasAttached($organisation)
+        ->hasOrganisationRole(Role::INPUT_PROCESSOR, $organisation)
         ->create();
-    $user->assignOrganisationRole(Role::INPUT_PROCESSOR, $organisation);
     $this->be($user);
     Filament::setTenant($user->organisations->firstOrFail());
 
@@ -39,8 +39,9 @@ it('has no permission if no user given', function (): void {
 it('has global role', function (): void {
     $role = fake()->randomElement(Role::class);
 
-    $user = User::factory()->create();
-    $user->assignGlobalRole($role);
+    $user = User::factory()
+        ->hasGlobalRole($role)
+        ->create();
     $this->be($user);
 
     expect(Authorization::hasRole($role))
@@ -61,8 +62,8 @@ it('has organisation role', function (): void {
     $organisation = Organisation::factory()->create();
     $user = User::factory()
         ->hasAttached($organisation)
+        ->hasOrganisationRole($role, $organisation)
         ->create();
-    $user->assignOrganisationRole($role, $organisation);
     $this->be($user);
     Filament::setTenant($user->organisations->firstOrFail());
 

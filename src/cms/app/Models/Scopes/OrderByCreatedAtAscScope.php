@@ -10,8 +10,8 @@ use Illuminate\Database\Eloquent\Scope;
 
 class OrderByCreatedAtAscScope implements Scope
 {
-    public function apply(Builder $builder, Model $model): Builder
+    public function apply(Builder $builder, Model $model): void
     {
-        return $builder->orderBy('created_at');
+        $builder->orderBy('created_at');
     }
 }

@@ -10,8 +10,6 @@ use App\Filament\Tables\Columns\SnapshotSourceTypeColumn;
 use App\Filament\Tables\Columns\SnapshotStateColumn;
 use App\Models\Scopes\OrderByCreatedAtAscScope;
 use App\Models\Snapshot;
-use App\Models\States\Snapshot\Approved;
-use App\Models\States\Snapshot\InReview;
 use App\Models\States\SnapshotState;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -56,23 +54,17 @@ class OrganisationSnapshotApprovalResourceTable
                     ->label(__('snapshot.snapshot_source_type'))
                     ->multiple()
                     ->options(static function (): array {
-                        $models = Snapshot::withoutGlobalScope(OrderByCreatedAtAscScope::class)
+                        return Snapshot::withoutGlobalScope(OrderByCreatedAtAscScope::class)
                             ->distinct('snapshot_source_type')
                             ->get()
                             ->keyBy('snapshot_source_type')
                             ->map(static function (Snapshot $snapshot): string {
                                 return __(sprintf('%s.model_singular', Str::snake(class_basename($snapshot->snapshot_source_type))));
-                            });
-
-                        return $models->toArray();
+                            })->toArray();
                     }),
                 SelectFilter::make('state')
                     ->label(__('snapshot.state'))
                     ->multiple()
-                    ->default([
-                        Approved::$name,
-                        InReview::$name,
-                    ])
                     ->options(static function (): array {
                         return collect(SnapshotState::all())
                             ->map(static function ($value, $key): string {

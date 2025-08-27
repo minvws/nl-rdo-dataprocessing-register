@@ -8,7 +8,10 @@ use Illuminate\Queue\Middleware\SkipIfBatchCancelled;
 
 trait SkipBatchIfCancelledMiddleware
 {
-    public function middleware(): array
+    /**
+     * @return array<object>
+     */
+    final public function middleware(): array
     {
         return [new SkipIfBatchCancelled()];
     }

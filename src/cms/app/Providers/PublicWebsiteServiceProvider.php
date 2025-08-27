@@ -68,12 +68,13 @@ class PublicWebsiteServiceProvider extends ServiceProvider
             ->needs('$publicWebsiteFolder')
             ->giveConfig('public-website.public_website_folder');
 
+        $this->app->when([PublicWebsiteCheckService::class])
+            ->needs('$baseUrl')
+            ->giveConfig('public-website.check_base_url');
+
         $this->app->when(AfterBuildHandler::class)
             ->needs('$afterBuildHook')
             ->giveConfig('public-website.build_after_hook');
-        $this->app->when(AfterBuildHandler::class)
-            ->needs('$buildDebounceSeconds')
-            ->giveConfig('public-website.build_debounce_seconds');
         $this->app->when(AfterBuildHandler::class)
             ->needs('$planCheckJobDelays')
             ->giveConfig('public-website.plan-check-job-delays');

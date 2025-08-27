@@ -60,11 +60,11 @@ class DocumentResource extends Resource
     public static function getRelations(): array
     {
         return [
-            AlgorithmRecordRelationManager::make(),
-            AvgProcessorProcessingRecordRelationManager::make(),
             AvgResponsibleProcessingRecordRelationManager::make(),
-            DataBreachRecordRelationManager::make(),
+            AvgProcessorProcessingRecordRelationManager::make(),
             WpgProcessingRecordRelationManager::make(),
+            AlgorithmRecordRelationManager::make(),
+            DataBreachRecordRelationManager::make(),
         ];
     }
 

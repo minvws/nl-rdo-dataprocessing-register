@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DocumentResource;
 
+use App\Enums\Authorization\Permission;
+use App\Facades\Authorization;
 use App\Filament\Forms\Components\DatePicker\DatePicker;
 use App\Filament\Forms\Components\Select\SelectSingleWithLookup;
 use App\Filament\Forms\Components\SelectMultipleWithLookup;
@@ -129,6 +131,7 @@ class DocumentResourceForm
                     'name',
                 )
                     ->label(__('avg_responsible_processing_record.model_plural'))
+                    ->visible(Authorization::hasPermission(Permission::CORE_ENTITY_VIEW))
                     ->columnSpan(2),
                 SelectMultipleWithLookup::makeForRelationship(
                     'avg_processor_processing_record_id',
@@ -136,13 +139,7 @@ class DocumentResourceForm
                     'name',
                 )
                     ->label(__('avg_processor_processing_record.model_plural'))
-                    ->columnSpan(2),
-                SelectMultipleWithLookup::makeForRelationship(
-                    'data_breach_record_id',
-                    'DataBreachRecords',
-                    'name',
-                )
-                    ->label(__('data_breach_record.model_plural'))
+                    ->visible(Authorization::hasPermission(Permission::CORE_ENTITY_VIEW))
                     ->columnSpan(2),
                 SelectMultipleWithLookup::makeForRelationship(
                     'wpg_processing_record_id',
@@ -150,6 +147,23 @@ class DocumentResourceForm
                     'name',
                 )
                     ->label(__('wpg_processing_record.model_plural'))
+                    ->visible(Authorization::hasPermission(Permission::CORE_ENTITY_VIEW))
+                    ->columnSpan(2),
+                SelectMultipleWithLookup::makeForRelationship(
+                    'algorithm_record_id',
+                    'AlgorithmRecords',
+                    'name',
+                )
+                    ->label(__('algorithm_record.model_plural'))
+                    ->visible(Authorization::hasPermission(Permission::CORE_ENTITY_VIEW))
+                    ->columnSpan(2),
+                SelectMultipleWithLookup::makeForRelationship(
+                    'data_breach_record_id',
+                    'DataBreachRecords',
+                    'name',
+                )
+                    ->label(__('data_breach_record.model_plural'))
+                    ->visible(Authorization::hasPermission(Permission::DATA_BREACH_RECORD_VIEW))
                     ->columnSpan(2),
             ]);
     }

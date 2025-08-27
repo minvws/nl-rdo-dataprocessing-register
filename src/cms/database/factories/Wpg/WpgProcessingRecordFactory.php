@@ -33,7 +33,6 @@ class WpgProcessingRecordFactory extends Factory
     public function definition(): array
     {
         return [
-            'id' => $this->faker->uuid(),
             'organisation_id' => Organisation::factory(),
             'import_id' => $this->faker->optional()->importId(),
 
@@ -87,7 +86,7 @@ class WpgProcessingRecordFactory extends Factory
             ]),
             'entity_number_id' => EntityNumber::factory(state: ['type' => EntityNumberType::REGISTER]),
 
-            'review_at' => $this->faker->anyDate(),
+            'review_at' => $this->faker->optional()->calendarDate(),
             'public_from' => $this->faker->optional()->anyDate(),
         ];
     }

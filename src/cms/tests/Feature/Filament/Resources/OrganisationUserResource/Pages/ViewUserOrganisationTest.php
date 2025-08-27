@@ -2,12 +2,20 @@
 
 declare(strict_types=1);
 
-use App\Enums\Authorization\Role;
-use App\Filament\Resources\UserOrganisationResource;
+use App\Filament\Resources\OrganisationUserResource;
+use App\Models\User;
+use Tests\Helpers\Model\OrganisationTestHelper;
+use Tests\Helpers\Model\UserTestHelper;
 
 it('loads the view page', function (): void {
-    $this->user->assignGlobalRole(Role::FUNCTIONAL_MANAGER);
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisation($organisation);
 
-    $this->get(UserOrganisationResource::getUrl('view', ['record' => $this->user->id]))
+    $record = User::factory()
+        ->hasAttached($organisation)
+        ->create();
+
+    $this->asFilamentUser($user)
+        ->get(OrganisationUserResource::getUrl('view', ['record' => $record]))
         ->assertSuccessful();
 });

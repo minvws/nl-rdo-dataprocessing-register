@@ -9,14 +9,14 @@ namespace App\Policies;
  */
 abstract class BasePolicy
 {
-    public function viewAny(): bool
-    {
-        return $this->view();
-    }
-
     public function view(): bool
     {
         return false;
+    }
+
+    public function viewAny(): bool
+    {
+        return $this->view();
     }
 
     public function create(): bool
@@ -34,13 +34,28 @@ abstract class BasePolicy
         return false;
     }
 
+    public function deleteAny(): bool
+    {
+        return $this->delete();
+    }
+
+    public function forceDelete(): bool
+    {
+        return $this->delete();
+    }
+
+    public function forceDeleteAny(): bool
+    {
+        return $this->delete();
+    }
+
     public function restore(): bool
     {
         return false;
     }
 
-    public function forceDelete(): bool
+    public function restoreAny(): bool
     {
-        return false;
+        return $this->restore();
     }
 }

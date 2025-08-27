@@ -24,7 +24,6 @@ class ContactPersonFactory extends Factory
     public function definition(): array
     {
         return [
-            'id' => $this->faker->uuid(),
             'organisation_id' => Organisation::factory(),
 
             'name' => $this->faker->name(),

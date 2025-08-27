@@ -39,7 +39,7 @@ jobs:
       - name: Install PHP
         uses: shivammathur/setup-php@master
         with:
-          php-version: 8.2
+          php-version: 8.4
 
       - name: Composer install
         env:
@@ -63,12 +63,18 @@ jobs:
           cp cms/public/version.json public-website/static/version.json
           mv public-website/ cms/
 
+      - name: Move static website hugo template to the app
+        working-directory: ./src
+        run: |
+          cp cms/public/version.json static-website/static/version.json
+          mv static-website/ cms/
+
       - name: Copy .db_requirements
         working-directory: ./
         run: cp .db_requirements ./src/cms
 
       - name: Create tar
-        run: tar -czf ${{ github.workspace }}/dataprocessing-register-cms_${{ env.RELEASE_VERSION }}.tar.gz ./app ./bootstrap/app.php ./config ./database ./public ./packages ./resources ./routes ./vendor ./artisan ./composer.json ./public-website ./.db_requirements
+        run: tar -czf ${{ github.workspace }}/dataprocessing-register-cms_${{ env.RELEASE_VERSION }}.tar.gz ./app ./bootstrap/app.php ./config ./database ./public ./packages ./resources ./routes ./vendor ./artisan ./composer.json ./public-website ./static-website ./.db_requirements
 
       - name: Upload release tar
         uses: actions/upload-artifact@v4

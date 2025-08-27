@@ -15,6 +15,6 @@ readonly class FakePublicWebsiteGenerator implements PublicWebsiteGenerator
 
     public function generate(): void
     {
-        $this->logger->debug('Fake website generated');
+        $this->logger->debug('Fake public website generated');
     }
 }

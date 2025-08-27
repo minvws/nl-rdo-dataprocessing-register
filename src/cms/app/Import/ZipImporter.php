@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace App\Import;
 
 use App\Components\Uuid\Uuid;
-use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use App\Components\Uuid\UuidInterface;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
@@ -26,7 +27,7 @@ class ZipImporter
     private const BYTES_IN_A_MEGABYTE = 1_024 * 1_024;
 
     /**
-     * @param array<class-string<Factory>> $factories
+     * @param array<class-string<Factory<Model>>> $factories
      * @param array<class-string<Importer>> $importers
      */
     public function __construct(
@@ -41,10 +42,9 @@ class ZipImporter
     /**
      * @param array<TemporaryUploadedFile> $files
      *
-     * @throws FileNotFoundException
      * @throws ImportFailedException
      */
-    public function importFiles(array $files, string $userId, string $organisationId): void
+    public function importFiles(array $files, UuidInterface $userId, string $organisationId): void
     {
         Log::info('import files', ['file_count' => count($files)]);
 
@@ -54,10 +54,9 @@ class ZipImporter
     }
 
     /**
-     * @throws FileNotFoundException
      * @throws ImportFailedException
      */
-    private function import(string $zipPath, string $userId, string $organisationId): void
+    private function import(string $zipPath, UuidInterface $userId, string $organisationId): void
     {
         Log::info('starting import of zip-file', ['filepath' => $zipPath]);
 
@@ -111,7 +110,7 @@ class ZipImporter
     }
 
     /**
-     * @return ?class-string<Factory>
+     * @return ?class-string<Factory<Model>>
      */
     private function getFactoryClass(string $filePath): ?string
     {
@@ -156,10 +155,8 @@ class ZipImporter
     {
         $statIndex = $zipArchive->statIndex($i);
         Assert::isArray($statIndex);
-        Assert::keyExists($statIndex, 'size');
 
         $size = $statIndex['size'];
-        Assert::integer($size);
 
         if ($size > $this->getMaxZippedFilesizeInBytes()) {
             throw new ImportFailedException('filesize too large in zip');

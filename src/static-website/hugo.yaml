@@ -1,0 +1,13 @@
+languageCode: nl-NL
+title: Verwerkingsregister
+theme: manon
+markup:
+  goldmark:
+    renderer:
+      unsafe: false
+outputs:
+  home:
+    - HTML
+    - JSON
+params:
+  debug: false

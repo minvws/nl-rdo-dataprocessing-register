@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\NavigationGroups\NavigationGroup;
-use App\Filament\Resources\PublicWebsiteTreeResource\Pages\ListTree;
+use App\Filament\Resources\PublicWebsiteTreeResource\Pages\ListPublicWebsiteTrees;
 use App\Filament\Resources\PublicWebsiteTreeResource\PublicWebsiteTreeResourceForm;
 use App\Models\PublicWebsiteTree;
 use Filament\Forms\Form;
@@ -34,7 +34,7 @@ class PublicWebsiteTreeResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListTree::route('/'),
+            'index' => ListPublicWebsiteTrees::route('/'),
         ];
     }
 

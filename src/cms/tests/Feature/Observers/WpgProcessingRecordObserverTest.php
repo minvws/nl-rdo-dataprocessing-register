@@ -4,17 +4,13 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Observers;
 
-use App\Events\Models\PublishableEvent;
 use App\Models\Wpg\WpgProcessingRecord;
-use Illuminate\Support\Facades\Event;
 
 use function expect;
 use function fake;
 use function it;
 
 it('resets processor data on save', function (): void {
-    Event::fake(PublishableEvent::class);
-
     $wpgProcessingRecord = WpgProcessingRecord::factory()
         ->withProcessors()
         ->create([
@@ -30,8 +26,6 @@ it('resets processor data on save', function (): void {
 });
 
 it('resets receiver data on save', function (): void {
-    Event::fake(PublishableEvent::class);
-
     $wpgProcessingRecord = WpgProcessingRecord::factory()
         ->withProcessors()
         ->create([
@@ -47,8 +41,6 @@ it('resets receiver data on save', function (): void {
 });
 
 it('resets decision making data on save', function (): void {
-    Event::fake(PublishableEvent::class);
-
     $wpgProcessingRecord = WpgProcessingRecord::factory()
         ->withProcessors()
         ->create([
@@ -66,8 +58,6 @@ it('resets decision making data on save', function (): void {
 });
 
 it('resets systems data on save', function (): void {
-    Event::fake(PublishableEvent::class);
-
     $wpgProcessingRecord = WpgProcessingRecord::factory()
         ->withSystems()
         ->create([
@@ -83,8 +73,6 @@ it('resets systems data on save', function (): void {
 });
 
 it('resets security data on save', function (): void {
-    Event::fake(PublishableEvent::class);
-
     $wpgProcessingRecord = WpgProcessingRecord::factory()
         ->create([
             'has_security' => true,
@@ -107,8 +95,6 @@ it('resets security data on save', function (): void {
 });
 
 it('resets categories involved data on save', function (): void {
-    Event::fake(PublishableEvent::class);
-
     $wpgProcessingRecord = WpgProcessingRecord::factory()
         ->withProcessors()
         ->create([

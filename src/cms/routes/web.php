@@ -2,23 +2,34 @@
 
 declare(strict_types=1);
 
+use App\Enums\RouteName;
 use App\Filament\Pages\OneTimePasswordValidation;
 use App\Http\Controllers\Authentication\PasswordlessLoginController;
+use App\Http\Controllers\Authentication\SnapshotSignLoginController;
 use App\Http\Controllers\PrivateMediaController;
 use App\Http\Controllers\RedirectToTenantController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', RedirectToTenantController::class);
+Route::get('/', RedirectToTenantController::class)->name(RouteName::HOME);
+
+Route::prefix('/login/consume')->middleware('signed')->group(static function (): void {
+    Route::get('/', [PasswordlessLoginController::class, 'consume'])->name(RouteName::PASSWORDLESS_LOGIN_VALIDATE_CONSUME);
+    Route::post('/', [PasswordlessLoginController::class, 'confirm'])->name(RouteName::PASSWORDLESS_LOGIN_VALIDATE_CONFIRM);
+});
 
 Route::get('/media/{media}', PrivateMediaController::class)
-    ->name('media.private');
+    ->name(RouteName::MEDIA_PRIVATE);
 
-Route::get('/login/consume', [PasswordlessLoginController::class, 'consume'])
-    ->middleware('signed')
-    ->name('passwordless-login.validate');
-Route::post('/login/consume', [PasswordlessLoginController::class, 'confirm'])
-    ->middleware('signed')
-    ->name('passwordless-login.validate');
+Route::prefix('/snapshot/sign')->middleware('signed')->group(static function (): void {
+    Route::prefix('/batch')->group(static function (): void {
+        Route::get('/', [SnapshotSignLoginController::class, 'openBatch'])->name(RouteName::SNAPSHOT_SIGN_LOGIN_BATCH_OPEN);
+        Route::post('/', [SnapshotSignLoginController::class, 'loginBatch'])->name(RouteName::SNAPSHOT_SIGN_LOGIN_BATCH_LOGIN);
+    });
+    Route::prefix('/single')->group(static function (): void {
+        Route::get('/', [SnapshotSignLoginController::class, 'openSingle'])->name(RouteName::SNAPSHOT_SIGN_LOGIN_SINGLE_OPEN);
+        Route::post('/', [SnapshotSignLoginController::class, 'loginSingle'])->name(RouteName::SNAPSHOT_SIGN_LOGIN_SINGLE_LOGIN);
+    });
+});
 
 Route::get('/{tenant}/two-factor-authentication', OneTimePasswordValidation::class)
-    ->name('two-factor-authentication');
+    ->name(RouteName::TWO_FACTOR_AUTHENTICATION_REQUEST);

@@ -1,5 +1,4 @@
 @php
-    /** @formatter:off */
     /** @var App\Models\Snapshot $snapshot */
 @endphp
 
@@ -8,7 +7,7 @@
 <p>Gegevens worden verstrekt aan onderstaande 'ontvangers'.</p>
 <ul>
 @foreach ($snapshots as $snapshot)
-<li><span class="related-record">{!! $snapshot->snapshotData->public_markdown !!}</span></li>
+<li><span class="related-record">{!! $snapshot->snapshotData->public_markdown?->toHtml() !!}</span></li>
 @endforeach
 </ul>
 @endif

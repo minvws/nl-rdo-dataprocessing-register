@@ -4,34 +4,35 @@ declare(strict_types=1);
 
 use App\Enums\Authorization\Role;
 use App\Models\Organisation;
+use App\Models\OrganisationUserRole;
 use App\Models\User;
-use App\Models\UserOrganisationRole;
 
 it('stores the user organisation role', function (): void {
-    $user = User::factory()->create();
     $organisation = Organisation::factory()->create();
+    $user = User::factory()
+        ->hasOrganisationRole(Role::INPUT_PROCESSOR, $organisation)
+        ->create();
 
-    $user->assignOrganisationRole(Role::INPUT_PROCESSOR, $organisation);
-
-    $this->assertDatabaseHas(UserOrganisationRole::class, [
+    $this->assertDatabaseHas(OrganisationUserRole::class, [
         'user_id' => $user->id,
         'organisation_id' => $organisation->id,
     ]);
 });
 
 it('can retrieve the user from the user organisation role', function (): void {
-    $user = User::factory()->create();
-    $organisation = Organisation::factory()->create();
+    $organisation = Organisation::factory()
+        ->create();
+    $user = User::factory()
+        ->hasOrganisationRole(Role::INPUT_PROCESSOR, $organisation)
+        ->create();
 
-    $user->assignOrganisationRole(Role::INPUT_PROCESSOR, $organisation);
-
-    $userOrganisationRole = UserOrganisationRole::query()
+    $organisationUserRole = OrganisationUserRole::query()
         ->where([
             'user_id' => $user->id,
             'organisation_id' => $organisation->id,
         ])
         ->firstOrFail();
 
-    expect($userOrganisationRole->user->id)
+    expect($organisationUserRole->user->id)
         ->toBe($user->id);
 });

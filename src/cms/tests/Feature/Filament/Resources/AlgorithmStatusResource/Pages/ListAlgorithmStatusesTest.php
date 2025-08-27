@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 use App\Filament\Resources\AlgorithmStatusResource\Pages\ListAlgorithmStatuses;
 use App\Models\Algorithm\AlgorithmStatus;
-
-use function Pest\Livewire\livewire;
+use Tests\Helpers\Model\OrganisationTestHelper;
 
 it('can load the list resource page', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $records = AlgorithmStatus::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->count(5)
         ->create();
 
-    livewire(ListAlgorithmStatuses::class)
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ListAlgorithmStatuses::class)
         ->assertCanSeeTableRecords($records);
 });

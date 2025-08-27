@@ -6,17 +6,17 @@ use App\Filament\Resources\ReceiverResource;
 use App\Filament\Resources\ReceiverResource\Pages\CreateReceiver;
 use App\Models\Receiver;
 
-use function Pest\Livewire\livewire;
-
 it('loads the create page', function (): void {
-    $this->get(ReceiverResource::getUrl('create'))
+    $this->asFilamentUser()
+        ->get(ReceiverResource::getUrl('create'))
         ->assertSuccessful();
 });
 
 it('can create an entry', function (): void {
     $description = fake()->uuid();
 
-    livewire(CreateReceiver::class)
+    $this->asFilamentUser()
+        ->createLivewireTestable(CreateReceiver::class)
         ->fillForm([
             'description' => $description,
         ])

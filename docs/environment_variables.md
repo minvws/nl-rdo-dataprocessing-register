@@ -13,6 +13,7 @@ The following variables are required to be set before the application will run.
 - `DB_USERNAME` username for database access
 - `DB_PASSWORD` database password for the database user
 - `PUBLIC_WEBSITE_BASE_URL` base-url for the public-website
+- `STATIC_WEBSITE_BASE_URL` base-url for the static-website
 
 ### Commonly used, but not required
 
@@ -25,6 +26,7 @@ not set.
 - `LOG_LEVEL` log level, (default: `debug`)
 - `OUTBOX_SMTP_FROM` from-address for sending e-mail, (default is not set)
 - `FILESYSTEM_PUBLIC_WEBSITE_ROOT` root-folder for the public-website (default: `<laravel-storage-path>/app`)
+- `FILESYSTEM_STATIC_WEBSITE_ROOT` root-folder for the static-website (default: `<laravel-storage-path>/app`)
 - `FILESYSTEM_SHARED_STORAGE_PATH` root-folder for shared storage (default: `<laravel-storage-path>/app/shared-storage`)
 - `VIRUSSCANNER_DEFAULT` default virus-scanner (default: `clamav`)
 - `VIRUSSCANNER_SOCKET` socket for the virus-scanner (default: `unix:///var/run/clamav/clamd.ctl`)
@@ -90,6 +92,7 @@ The following environment variables are used to configure the application in `sr
 
 - `FILESYSTEM_SHARED_STORAGE_PATH` (default: `app/shared-storage`)
 - `FILESYSTEM_PUBLIC_WEBSITE_ROOT` (default: `app/public-website`)
+- `FILESYSTEM_STATIC_WEBSITE_ROOT` (default: `app/static-website`)
 
 **LOGGING:**
 
@@ -114,9 +117,13 @@ The following environment variables are used to configure the application in `sr
 
 **PUBLIC:**
 
-- `PUBLIC_WEBSITE_BUILD_DEBOUNCE_SECONDS` (default: `60`)
 - `PUBLIC_WEBSITE_BASE_URL`
 - `PUBLIC_WEBSITE_BUILD_AFTER_HOOK`
+
+**STATIC:**
+
+- `STATIC_WEBSITE_BASE_URL`
+- `STATIC_WEBSITE_BUILD_AFTER_HOOK`
 
 **QUEUE:**
 

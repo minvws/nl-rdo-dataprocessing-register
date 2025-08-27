@@ -6,12 +6,11 @@ use App\Services\PublicWebsite\Content\SitemapGenerator;
 use App\Services\PublicWebsite\PublicWebsiteFilesystem;
 
 it('will generate the index', function (): void {
-    $publicWebsiteFilesystem = $this->createMock(PublicWebsiteFilesystem::class);
-    $publicWebsiteFilesystem->expects($this->once())
-        ->method('write')
-        ->with('sitemap.html');
+    $this->mock(PublicWebsiteFilesystem::class)
+        ->shouldReceive('write')
+        ->once()
+        ->withSomeOfArgs('sitemap.html');
 
-    /** @var SitemapGenerator $sitemapGenerator */
-    $sitemapGenerator = $this->app->make(SitemapGenerator::class, ['publicWebsiteFilesystem' => $publicWebsiteFilesystem]);
+    $sitemapGenerator = $this->app->get(SitemapGenerator::class);
     $sitemapGenerator->generate();
 });

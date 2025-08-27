@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\DataBreachRecord\Pages;
 
 use App\Filament\Resources\DataBreachRecordResource;
-use App\Filament\Widgets\ProcessingRecordHeaderWidget;
+use App\Filament\Widgets\FgRemarksWidget;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\ViewRecord;
 
@@ -23,7 +23,7 @@ class ViewDataBreachRecord extends ViewRecord
     protected function getHeaderWidgets(): array
     {
         return [
-            ProcessingRecordHeaderWidget::class,
+            FgRemarksWidget::class,
         ];
     }
 }

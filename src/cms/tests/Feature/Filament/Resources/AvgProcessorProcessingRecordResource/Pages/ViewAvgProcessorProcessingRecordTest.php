@@ -2,14 +2,23 @@
 
 declare(strict_types=1);
 
+use App\Enums\RegisterLayout;
 use App\Filament\Resources\AvgProcessorProcessingRecordResource;
 use App\Models\Avg\AvgProcessorProcessingRecord;
+use Tests\Helpers\Model\OrganisationTestHelper;
+use Tests\Helpers\Model\UserTestHelper;
 
-it('can load the ViewAvgResponsibleProcessingRecord page', function (): void {
+it('can load the page with all layouts', function (RegisterLayout $registerLayout): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisation($organisation, ['register_layout' => $registerLayout]);
+
     $avgProcessorProcessingRecord = AvgProcessorProcessingRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
 
-    $this->get(AvgProcessorProcessingRecordResource::getUrl('view', ['record' => $avgProcessorProcessingRecord->id]))
+    $this->asFilamentUser($user)
+        ->get(AvgProcessorProcessingRecordResource::getUrl('view', [
+            'record' => $avgProcessorProcessingRecord,
+        ]))
         ->assertSuccessful();
-});
+})->with(RegisterLayout::cases());

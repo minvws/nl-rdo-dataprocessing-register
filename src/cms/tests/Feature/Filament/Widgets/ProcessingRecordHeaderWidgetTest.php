@@ -3,31 +3,31 @@
 declare(strict_types=1);
 
 use App\Enums\Authorization\Role;
-use App\Filament\Widgets\ProcessingRecordHeaderWidget;
+use App\Filament\Widgets\FgRemarksWidget;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\Principal;
 use App\Services\AuthenticationService;
-use Livewire\Livewire;
-use Mockery\MockInterface;
-
-use function Pest\Livewire\livewire;
+use Tests\Helpers\Model\OrganisationTestHelper;
 
 it('shows the form field', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
 
-    livewire(ProcessingRecordHeaderWidget::class, ['record' => $avgResponsibleProcessingRecord])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(FgRemarksWidget::class, ['record' => $avgResponsibleProcessingRecord])
         ->assertSee(__('general.fg_remarks'));
 });
 
 it('cannot view without correct role', function (array $roles, bool $expectedResult): void {
-    $this->mock(AuthenticationService::class, static function (MockInterface $mock) use ($roles): void {
-        $mock->expects('getPrincipal')
-            ->andReturn(new Principal($roles));
-    });
+    $this->mock(AuthenticationService::class)
+        ->shouldReceive('principal')
+        ->once()
+        ->andReturn(new Principal($roles));
 
-    expect(ProcessingRecordHeaderWidget::canView())->toBe($expectedResult);
+    expect(FgRemarksWidget::canView())
+        ->toBe($expectedResult);
 })->with([
     [[], false],
     [[Role::COUNSELOR], false],
@@ -37,7 +37,6 @@ it('cannot view without correct role', function (array $roles, bool $expectedRes
 
 it('handles submit', function (): void {
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
-        ->recycle($this->organisation)
         ->create();
 
     expect($avgResponsibleProcessingRecord->fgRemark)
@@ -45,7 +44,7 @@ it('handles submit', function (): void {
 
     $body = fake()->sentence();
 
-    Livewire::test(ProcessingRecordHeaderWidget::class, ['record' => $avgResponsibleProcessingRecord])
+    $this->createLivewireTestable(FgRemarksWidget::class, ['record' => $avgResponsibleProcessingRecord])
         ->set('data', ['body' => $body])
         ->call('submit');
 

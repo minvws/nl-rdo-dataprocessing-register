@@ -18,7 +18,7 @@ Een versie heeft altijd een status uit de volgende lijst:
 
 ## Versie aanmaken en Mandaathouders koppelen
 
-**Beschikbaar voor**: Invoerder, Privacy Officer
+**Beschikbaar voor**: Invoerder, (Chief) Privacy Officer
 
 Voor alle entiteiten in de registers en voor alle gerelateerde entiteiten is het mogelijk om een versie aan te maken.
 
@@ -56,14 +56,6 @@ De filter kan ingesteld worden rechtsboven in de tabel (Figuur \ref{fig:versie_o
 
 Is eenmaal een versie geselecteerd, dan kan een versie met de status "In review" goedgekeurd worden met de knop "Goedkeuren" rechtsbovenin het scherm. Dit geeft aan dat deze versie is goedgekeurd door een Privacy Officer en mag worden aangeboden aan Mandaathouders voor akkoord.
 
-## Mandaathouders uitnodigen voor ondertekening
-
-**Beschikbaar voor**: Privacy Officer
-
-![Mandaathouders uitnodigen\label{fig:mandaathouders_uitnodigen}](./imgs/03_goedkeuringsproces/06_snapshots_mandaathouders_uitnodigen.png)
-
-Op de detailpagina op het tabblad "Ondertekeningen" (Figuur \ref{fig:mandaathouders_uitnodigen}) zijn Mandaathouders selecteerbaar met het vinkje ervoor. Zijn er Mandaathouders geselecteerd, dan verschijnt de knop "Notificatie versturen". Eenmaal bevestigd, zullen er emails naar de Mandaathouders gestuurd worden met een direct link naar deze versie.
-
 ## Akkoord geven
 
 **Beschikbaar voor**: Mandaathouders
@@ -71,6 +63,8 @@ Op de detailpagina op het tabblad "Ondertekeningen" (Figuur \ref{fig:mandaathoud
 ![Akkoord geven\label{fig:akkoord_geven}](./imgs/03_goedkeuringsproces/07_personal-snapshot-approvals_akkoord_geven.png)
 
 Een Mandaathouder kan akkoord geven op een versie door op de versie detailpagina onderaan op "Akkoord" te klikken (Figuur \ref{fig:akkoord_geven}). De Mandaathouder kan hier ook op "Niet akkoord" drukken, wat de mogelijkheid biedt om een notitie achter te laten.
+
+> **Hint**: Mandaathouders kunnen op hun profielpagina hun voorkeuren aangeven voor email notificaties. Het is mogelijk om een notificatie te krijgen bij iedere versie waarvoor de Mandaathouder is uitgenodigd en welke is goedgekeurd door een Privacy Officer. Dit kan een hoop emails opleveren indien er veel versies tegelijk ter akkoord worden aangeboden: het is daarom ook mogelijk om wekelijks 1 enkel overzicht te krijgen van alle versies waarvoor een akkoord gewenst is.
 
 ## Vaststellen
 

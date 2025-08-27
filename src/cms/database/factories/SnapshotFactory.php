@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Models\Algorithm\AlgorithmRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\Organisation;
+use App\Models\Processor;
+use App\Models\Receiver;
 use App\Models\Snapshot;
 use App\Models\SnapshotData;
 use App\Models\SnapshotTransition;
@@ -21,11 +24,18 @@ class SnapshotFactory extends Factory
      */
     public function definition(): array
     {
+        /** @var AvgResponsibleProcessingRecord|AlgorithmRecord|Processor|Receiver $snapshotSource */
+        $snapshotSource = $this->faker->randomElement([
+            AvgResponsibleProcessingRecord::class,
+            AlgorithmRecord::class,
+            Processor::class,
+            Receiver::class,
+        ]);
+
         return [
-            'id' => $this->faker->uuid(),
             'organisation_id' => Organisation::factory(),
-            'snapshot_source_id' => AvgResponsibleProcessingRecord::factory(),
-            'snapshot_source_type' => AvgResponsibleProcessingRecord::class,
+            'snapshot_source_id' => $snapshotSource::factory(),
+            'snapshot_source_type' => $snapshotSource,
 
             'name' => $this->faker->word(),
             'version' => $this->faker->unique()->randomNumber(),
@@ -40,6 +50,7 @@ class SnapshotFactory extends Factory
             SnapshotTransition::factory()
                 ->for($snapshot)
                 ->recycle($snapshot->organisation)
+                ->recycle($snapshot->organisation->users)
                 ->count($count ?? $this->faker->numberBetween(0, 3))
                 ->create();
         });

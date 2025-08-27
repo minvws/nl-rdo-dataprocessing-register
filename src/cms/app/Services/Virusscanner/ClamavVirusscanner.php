@@ -7,6 +7,7 @@ namespace App\Services\Virusscanner;
 use App\Config\Config;
 use Socket\Raw\Factory;
 use Xenolope\Quahog\Client;
+use Xenolope\Quahog\Exception\ConnectionException;
 
 use const PHP_NORMAL_READ;
 
@@ -16,15 +17,23 @@ use const PHP_NORMAL_READ;
  */
 class ClamavVirusscanner implements Virusscanner
 {
+    public function isHealthy(): bool
+    {
+        try {
+            return $this->getClient()->ping();
+        } catch (ConnectionException) {
+            return false;
+        }
+    }
+
     /**
      * @param resource $stream
      */
     public function isResourceClean($stream): bool
     {
-        $clamavClient = $this->getClient();
-        $result = $clamavClient->scanResourceStream($stream);
-
-         return $result->isOk();
+        return $this->getClient()
+            ->scanResourceStream($stream)
+            ->isOk();
     }
 
     private function getClient(): Client

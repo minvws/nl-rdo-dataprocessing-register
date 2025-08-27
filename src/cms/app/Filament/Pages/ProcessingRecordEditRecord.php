@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
-use App\Filament\Widgets\ProcessingRecordHeaderWidget;
+use App\Filament\Widgets\FgRemarksWidget;
 use App\Models\Contracts\EntityNumerable;
 use App\Models\Contracts\SnapshotSource;
 use Filament\Resources\Pages\EditRecord;
@@ -17,7 +17,7 @@ class ProcessingRecordEditRecord extends EditRecord
     protected function getHeaderWidgets(): array
     {
         return [
-            ProcessingRecordHeaderWidget::class,
+            FgRemarksWidget::class,
         ];
     }
 

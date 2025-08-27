@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Components\Uuid\UuidInterface;
 use App\Models\PublicWebsiteCheck;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Webmozart\Assert\Assert;
@@ -19,21 +20,19 @@ class PublicWebsiteCheckFactory extends Factory
     public function definition(): array
     {
         return [
-            'id' => $this->faker->uuid(),
-
             'build_date' => $this->faker->dateTime(),
             'content' => $this->createContent(),
         ];
     }
 
-    public function createForSnapshot(string $id): PublicWebsiteCheck
+    public function createForSnapshot(UuidInterface $id): PublicWebsiteCheck
     {
         /** @var PublicWebsiteCheck $publicWebsiteCheck */
         $publicWebsiteCheck = $this->create([
             'content' => [
                 'date' => $this->faker->dateTime()->format('Y-m-d H:i:s'),
                 'pages' => [
-                    'id' => $id,
+                    'id' => $id->toString(),
                     'permalink' => $this->faker->url(),
                     'type' => 'processing-record',
                 ],

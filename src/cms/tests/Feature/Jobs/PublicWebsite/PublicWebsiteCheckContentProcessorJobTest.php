@@ -16,7 +16,7 @@ it('reads the content and creates a public-website snapshot-entry', function ():
             'content' => [
                 'pages' => [
                     [
-                        'id' => $snapshot->id,
+                        'id' => $snapshot->id->toString(),
                         'permalink' => fake()->url(),
                         'type' => 'processing-record',
                     ],

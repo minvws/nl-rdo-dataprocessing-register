@@ -6,37 +6,20 @@ namespace App\Providers;
 
 use App\Config\Config;
 use App\Routing\UrlGenerator;
+use App\Services\Virusscanner\Virusscanner;
+use App\Services\Virusscanner\VirusscannerManager;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
-use Illuminate\Support\Facades\Lang;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
-
-use function implode;
-use function preg_match;
-use function sprintf;
+use Webmozart\Assert\Assert;
 
 class AppServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
         Date::use(CarbonImmutable::class);
-
-        Lang::handleMissingKeysUsing(static function (string $key): string {
-            // @codeCoverageIgnoreStart
-            $keyPrefixesToIgnore = [
-                "validation.custom",
-                "validation.values",
-                "\(and :count more error",
-            ];
-            if (!preg_match('/^(' . implode('|', $keyPrefixesToIgnore) . ')/', $key)) {
-                Log::debug(sprintf('Missing translation key [%s] detected.', $key));
-            }
-            // @codeCoverageIgnoreEnd
-            return $key;
-        });
     }
 
     public function register(): void
@@ -48,6 +31,15 @@ class AppServiceProvider extends ServiceProvider
             });
 
             return new UrlGenerator($app['router']->getRoutes(), $request, Config::stringOrNull('app.asset_url'));
+        });
+
+        $this->app->bind(Virusscanner::class, static function (Application $application): Virusscanner {
+            /** @var VirusscannerManager $virusscannerManager */
+            $virusscannerManager = $application->get(VirusscannerManager::class);
+            $virusscanner = $virusscannerManager->driver(Config::string('virusscanner.default'));
+            Assert::isInstanceOf($virusscanner, Virusscanner::class);
+
+            return $virusscanner;
         });
     }
 }

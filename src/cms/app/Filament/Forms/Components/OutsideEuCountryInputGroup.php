@@ -16,7 +16,7 @@ use function array_merge;
 
 class OutsideEuCountryInputGroup extends Group
 {
-    public static function make(array | Closure $schema = []): static
+    public static function make(array|Closure $schema = []): static
     {
         $countryOtherTranslation = __('general.country_other');
         Assert::string($countryOtherTranslation);

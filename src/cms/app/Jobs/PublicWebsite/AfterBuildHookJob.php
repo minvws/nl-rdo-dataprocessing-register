@@ -6,14 +6,13 @@ namespace App\Jobs\PublicWebsite;
 
 use App\Enums\Queue;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Process;
 use Psr\Log\LoggerInterface;
 
-class AfterBuildHookJob implements ShouldQueue, ShouldBeUnique
+class AfterBuildHookJob implements ShouldQueue
 {
     use Dispatchable;
     use InteractsWithQueue;

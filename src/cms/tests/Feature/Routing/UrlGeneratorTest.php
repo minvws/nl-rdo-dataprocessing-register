@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Repositories;
 
-use Tests\Helpers\ConfigHelper;
+use Tests\Helpers\ConfigTestHelper;
 
 use function expect;
 use function fake;
@@ -16,7 +16,7 @@ it('defaults to localhost if none given', function (): void {
     $previous = url()->previous();
 
     expect($previous)
-        ->toBe(ConfigHelper::get('app.url'));
+        ->toBe(ConfigTestHelper::get('app.url'));
 });
 
 it('returns to session if exists', function (): void {
@@ -25,7 +25,7 @@ it('returns to session if exists', function (): void {
     $previous = url()->previous();
 
     expect($previous)
-        ->toBe(sprintf('%s/%s', ConfigHelper::get('app.url'), $slug));
+        ->toBe(sprintf('%s/%s', ConfigTestHelper::get('app.url'), $slug));
 });
 
 it('returns to fallback if exists', function (): void {
@@ -33,5 +33,5 @@ it('returns to fallback if exists', function (): void {
     $previous = url()->previous($slug);
 
     expect($previous)
-        ->toBe(sprintf('%s/%s', ConfigHelper::get('app.url'), $slug));
+        ->toBe(sprintf('%s/%s', ConfigTestHelper::get('app.url'), $slug));
 });

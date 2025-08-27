@@ -6,6 +6,7 @@ namespace App\Filament\Pages;
 
 use App\Livewire\User\Profile\OneTimePassword;
 use App\Livewire\User\Profile\PersonalInfo;
+use App\Livewire\User\Profile\Settings;
 use App\Services\AuthenticationService;
 use Filament\Pages\Page;
 use Illuminate\Contracts\View\View;
@@ -57,6 +58,7 @@ class Profile extends Page
     {
         return [
             'personal_info' => PersonalInfo::class,
+            'settings' => Settings::class,
             'one_time_password' => OneTimePassword::class,
         ];
     }

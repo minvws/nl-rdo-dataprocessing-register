@@ -6,17 +6,17 @@ use App\Filament\Resources\AlgorithmMetaSchemaResource;
 use App\Filament\Resources\AlgorithmMetaSchemaResource\Pages\CreateAlgorithmMetaSchema;
 use App\Models\Algorithm\AlgorithmMetaSchema;
 
-use function Pest\Livewire\livewire;
-
 it('loads the create page', function (): void {
-    $this->get(AlgorithmMetaSchemaResource::getUrl('create'))
+    $this->asFilamentUser()
+        ->get(AlgorithmMetaSchemaResource::getUrl('create'))
         ->assertSuccessful();
 });
 
 it('can create an entry', function (): void {
     $name = fake()->uuid();
 
-    livewire(CreateAlgorithmMetaSchema::class)
+    $this->asFilamentUser()
+        ->createLivewireTestable(CreateAlgorithmMetaSchema::class)
         ->fillForm([
             'name' => $name,
         ])

@@ -15,7 +15,7 @@ it('can reset otp', function (): void {
     expect($user->otp_secret)
         ->toBe($otpSecret);
 
-    $this->artisan('app:user-disable-otp')
+    $this->artisan('user:disable-otp')
         ->expectsQuestion('Email address', $user->email)
         ->assertSuccessful();
 
@@ -25,7 +25,7 @@ it('can reset otp', function (): void {
 });
 
 it('fails with an unknown email address', function (): void {
-    $this->artisan('app:user-disable-otp')
+    $this->artisan('user:disable-otp')
         ->expectsQuestion('Email address', fake()->safeEmail())
         ->assertFailed();
 });

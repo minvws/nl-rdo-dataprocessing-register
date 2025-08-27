@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services\PublicWebsite\Content;
 
-use App\Events\Models\PublishableEvent;
 use App\Models\Organisation;
 use App\Services\OrganisationPublishableRecordsService;
 use App\Services\PublicWebsite\Generator;
@@ -14,12 +13,15 @@ use Carbon\CarbonImmutable;
 use Illuminate\Contracts\View\Factory;
 use JsonException;
 
+use function is_resource;
+
 class OrganisationGenerator extends Generator
 {
     public function __construct(
         private readonly OrganisationPublishableRecordsService $organisationPublishableRecordsService,
         private readonly PathGenerator $pathGenerator,
         private readonly PublicWebsiteFilesystem $publicWebsiteFilesystem,
+        private readonly PublishableGenerator $publishableGenerator,
         private readonly Factory $viewFactory,
     ) {
     }
@@ -46,18 +48,22 @@ class OrganisationGenerator extends Generator
 
         $publishableRecords = $this->organisationPublishableRecordsService->getPublishableRecords($organisation);
         foreach ($publishableRecords as $publishableRecord) {
-            PublishableEvent::dispatch($publishableRecord);
+            $this->publishableGenerator->generate($publishableRecord);
         }
     }
 
     private function copyPoster(Organisation $organisation): void
     {
         $posterImage = $organisation->getFilamentPoster();
-
-        if ($posterImage === null || $posterImage->stream() === null) {
+        if ($posterImage === null) {
             return;
         }
 
-        $this->publicWebsiteFilesystem->writeStream($this->pathGenerator->getOrganisationPosterPath($organisation), $posterImage->stream());
+        $posterImageStream = $posterImage->stream();
+        if (!is_resource($posterImageStream)) {
+            return;
+        }
+
+        $this->publicWebsiteFilesystem->writeStream($this->pathGenerator->getOrganisationPosterPath($organisation), $posterImageStream);
     }
 }

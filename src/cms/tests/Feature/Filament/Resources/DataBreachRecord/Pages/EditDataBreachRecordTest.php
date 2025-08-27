@@ -2,41 +2,44 @@
 
 declare(strict_types=1);
 
+use App\Enums\RegisterLayout;
 use App\Filament\Resources\DataBreachRecord\Pages\EditDataBreachRecord;
 use App\Filament\Resources\DataBreachRecordResource;
 use App\Models\Avg\AvgProcessorProcessingRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\DataBreachRecord;
 use App\Models\Document;
-use App\Models\EntityNumber;
 use App\Models\Wpg\WpgProcessingRecord;
-use App\Services\EntityNumberService;
 use App\Services\Notification\DataBreachNotificationService;
 use Filament\Forms\Components\Select;
-use Mockery\MockInterface;
+use Tests\Helpers\Model\OrganisationTestHelper;
+use Tests\Helpers\Model\UserTestHelper;
 
-use function Pest\Livewire\livewire;
+it('loads the edit page with all layouts', function (RegisterLayout $registerLayout): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisation($organisation, ['register_layout' => $registerLayout]);
 
-it('loads the edit page', function (): void {
     $dataBreachRecord = DataBreachRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
 
-    $this->get(
-        DataBreachRecordResource::getUrl('edit', ['record' => $dataBreachRecord->id]),
-    )->assertSuccessful();
-});
+    $this->asFilamentUser($user)
+        ->get(DataBreachRecordResource::getUrl('edit', ['record' => $dataBreachRecord]))
+        ->assertSuccessful();
+})->with(RegisterLayout::cases());
 
 it('can be saved', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $dataBreachRecord = DataBreachRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->withValidState()
         ->create();
     $name = fake()->uuid();
 
-    livewire(EditDataBreachRecord::class, [
-        'record' => $dataBreachRecord->getRouteKey(),
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditDataBreachRecord::class, [
+            'record' => $dataBreachRecord->getRouteKey(),
+        ])
         ->fillForm([
             'name' => $name,
         ])
@@ -49,21 +52,22 @@ it('can be saved', function (): void {
 });
 
 it('will send notifications if ap_reported', function (): void {
-    $this->mock(DataBreachNotificationService::class, static function (MockInterface $mock): void {
-        $mock->shouldReceive('sendNotifications')
-            ->once();
-    });
-
+    $organisation = OrganisationTestHelper::create();
     $dataBreachRecord = DataBreachRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->withValidState()
         ->create([
             'ap_reported' => false,
         ]);
 
-    livewire(EditDataBreachRecord::class, [
-        'record' => $dataBreachRecord->getRouteKey(),
-    ])
+    $this->mock(DataBreachNotificationService::class)
+        ->shouldReceive('sendNotifications')
+        ->once();
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditDataBreachRecord::class, [
+            'record' => $dataBreachRecord->getRouteKey(),
+        ])
         ->fillForm([
             'ap_reported' => true,
         ])
@@ -71,21 +75,22 @@ it('will send notifications if ap_reported', function (): void {
 });
 
 it('will not send notifications if not ap_reported or no change', function (bool $oldApReported, bool $newApReported): void {
-    $this->mock(DataBreachNotificationService::class, static function (MockInterface $mock): void {
-        $mock->shouldReceive('sendNotifications')
-            ->never();
-    });
-
+    $organisation = OrganisationTestHelper::create();
     $dataBreachRecord = DataBreachRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->withValidState()
         ->create([
             'ap_reported' => $oldApReported,
         ]);
 
-    livewire(EditDataBreachRecord::class, [
-        'record' => $dataBreachRecord->getRouteKey(),
-    ])
+    $this->mock(DataBreachNotificationService::class)
+        ->shouldReceive('sendNotifications')
+        ->never();
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditDataBreachRecord::class, [
+            'record' => $dataBreachRecord->getRouteKey(),
+        ])
         ->fillForm([
             'ap_reported' => $newApReported,
         ])
@@ -97,21 +102,24 @@ it('will not send notifications if not ap_reported or no change', function (bool
 ]);
 
 it('can be attached to a avgResponsibleProcessingRecord', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $dataBreachRecord = DataBreachRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->withValidState()
         ->create();
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
+
     expect($dataBreachRecord->avgResponsibleProcessingRecords->count())
         ->toBe(0);
 
-    livewire(EditDataBreachRecord::class, [
-        'record' => $dataBreachRecord->getRouteKey(),
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditDataBreachRecord::class, [
+            'record' => $dataBreachRecord->getRouteKey(),
+        ])
         ->fillForm([
-            'avgResponsibleProcessingRecords' => [$avgResponsibleProcessingRecord->id],
+            'avgResponsibleProcessingRecords' => [$avgResponsibleProcessingRecord->id->toString()],
         ])
         ->call('save')
         ->assertHasNoFormErrors();
@@ -122,43 +130,47 @@ it('can be attached to a avgResponsibleProcessingRecord', function (): void {
 });
 
 it('can do a lookup for a avgResponsibleProcessingRecord', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $dataBreachRecord = DataBreachRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->withValidState()
         ->create();
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
 
-    livewire(EditDataBreachRecord::class, [
-        'record' => $dataBreachRecord->getRouteKey(),
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditDataBreachRecord::class, [
+            'record' => $dataBreachRecord->getRouteKey(),
+        ])
         ->assertFormFieldExists(
             'avgResponsibleProcessingRecords',
             static function (Select $field) use ($avgResponsibleProcessingRecord): bool {
                 return $field->getSearchResults($avgResponsibleProcessingRecord->name) === [
-                    $avgResponsibleProcessingRecord->id => $avgResponsibleProcessingRecord->name,
+                    $avgResponsibleProcessingRecord->id->toString() => $avgResponsibleProcessingRecord->name,
                 ];
             },
         );
 });
 
 it('can be attached to a avgProcessorProcessingRecord', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $dataBreachRecord = DataBreachRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->withValidState()
         ->create();
     $avgProcessorProcessingRecord = AvgProcessorProcessingRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
     expect($dataBreachRecord->avgProcessorProcessingRecords->count())
         ->toBe(0);
 
-    livewire(EditDataBreachRecord::class, [
-        'record' => $dataBreachRecord->getRouteKey(),
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditDataBreachRecord::class, [
+            'record' => $dataBreachRecord->getRouteKey(),
+        ])
         ->fillForm([
-            'avgProcessorProcessingRecords' => [$avgProcessorProcessingRecord->id],
+            'avgProcessorProcessingRecords' => [$avgProcessorProcessingRecord->id->toString()],
         ])
         ->call('save')
         ->assertHasNoFormErrors();
@@ -169,43 +181,48 @@ it('can be attached to a avgProcessorProcessingRecord', function (): void {
 });
 
 it('can do a lookup for a avgProcessorProcessingRecord', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $dataBreachRecord = DataBreachRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->withValidState()
         ->create();
     $avgProcessorProcessingRecord = AvgProcessorProcessingRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
 
-    livewire(EditDataBreachRecord::class, [
-        'record' => $dataBreachRecord->getRouteKey(),
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditDataBreachRecord::class, [
+            'record' => $dataBreachRecord->getRouteKey(),
+        ])
         ->assertFormFieldExists(
             'avgProcessorProcessingRecords',
             static function (Select $field) use ($avgProcessorProcessingRecord): bool {
                 return $field->getSearchResults($avgProcessorProcessingRecord->name) === [
-                    $avgProcessorProcessingRecord->id => $avgProcessorProcessingRecord->name,
+                    $avgProcessorProcessingRecord->id->toString() => $avgProcessorProcessingRecord->name,
                 ];
             },
         );
 });
 
 it('can be attached to a WpgProcessingRecord', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $dataBreachRecord = DataBreachRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->withValidState()
         ->create();
     $wpgProcessingRecord = WpgProcessingRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
+
     expect($dataBreachRecord->avgProcessorProcessingRecords->count())
         ->toBe(0);
 
-    livewire(EditDataBreachRecord::class, [
-        'record' => $dataBreachRecord->getRouteKey(),
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditDataBreachRecord::class, [
+            'record' => $dataBreachRecord->getRouteKey(),
+        ])
         ->fillForm([
-            'wpgProcessingRecords' => [$wpgProcessingRecord->id],
+            'wpgProcessingRecords' => [$wpgProcessingRecord->id->toString()],
         ])
         ->call('save')
         ->assertHasNoFormErrors();
@@ -216,43 +233,48 @@ it('can be attached to a WpgProcessingRecord', function (): void {
 });
 
 it('can do a lookup for a WpgProcessingRecord', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $dataBreachRecord = DataBreachRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->withValidState()
         ->create();
     $wpgProcessingRecord = WpgProcessingRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
 
-    livewire(EditDataBreachRecord::class, [
-        'record' => $dataBreachRecord->getRouteKey(),
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditDataBreachRecord::class, [
+            'record' => $dataBreachRecord->getRouteKey(),
+        ])
         ->assertFormFieldExists(
             'wpgProcessingRecords',
             static function (Select $field) use ($wpgProcessingRecord): bool {
                 return $field->getSearchResults($wpgProcessingRecord->name) === [
-                    $wpgProcessingRecord->id => $wpgProcessingRecord->name,
+                    $wpgProcessingRecord->id->toString() => $wpgProcessingRecord->name,
                 ];
             },
         );
 });
 
 it('can be attached to a Document', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $dataBreachRecord = DataBreachRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->withValidState()
         ->create();
     $document = Document::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
+
     expect($dataBreachRecord->documents->count())
         ->toBe(0);
 
-    livewire(EditDataBreachRecord::class, [
-        'record' => $dataBreachRecord->getRouteKey(),
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditDataBreachRecord::class, [
+            'record' => $dataBreachRecord->getRouteKey(),
+        ])
         ->fillForm([
-            'document_id' => [$document->id],
+            'document_id' => [$document->id->toString()],
         ])
         ->call('save')
         ->assertHasNoFormErrors();
@@ -263,61 +285,40 @@ it('can be attached to a Document', function (): void {
 });
 
 it('can do a lookup for a document', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $dataBreachRecord = DataBreachRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->withValidState()
         ->create();
     $document = Document::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
 
-    livewire(EditDataBreachRecord::class, [
-        'record' => $dataBreachRecord->getRouteKey(),
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditDataBreachRecord::class, [
+            'record' => $dataBreachRecord->getRouteKey(),
+        ])
         ->assertFormFieldExists(
             'document_id',
             static function (Select $field) use ($document): bool {
                 return $field->getSearchResults($document->name) === [
-                    $document->id => $document->name,
+                    $document->id->toString() => $document->name,
                 ];
             },
         );
 });
 
 it('can be cloned', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $dataBreachRecord = DataBreachRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->withValidState()
         ->withAllRelatedEntities()
         ->create();
 
-    $entityNumber = EntityNumber::factory()
-        ->create();
-
-    $this->mock(EntityNumberService::class, static function (MockInterface $mock) use ($entityNumber): void {
-        $mock->expects('generate')
-            ->andReturn($entityNumber);
-    });
-
-    livewire(EditDataBreachRecord::class, [
-        'record' => $dataBreachRecord->getRouteKey(),
-    ])
-        ->callAction('clone')
-        ->assertRedirect();
-
-    $dataBreachRecordClone = DataBreachRecord::query()
-        ->where('entity_number_id', $entityNumber->id)
-        ->firstOrFail();
-
-    expect($dataBreachRecordClone->entity_number_id)->not()->toBe($dataBreachRecord->entity_number_id)
-        ->and($dataBreachRecordClone->name)->toBe($dataBreachRecord->name);
-
-    expect($dataBreachRecordClone->fgRemark)->toBeNull();
-    expect($dataBreachRecordClone->snapshots)->toBeEmpty();
-
-    expect($dataBreachRecordClone->documents->pluck('id')->toArray())
-        ->toBe($dataBreachRecordClone->documents->pluck('id')->toArray());
-
-    expect($dataBreachRecordClone->responsibles->pluck('id')->toArray())
-        ->toBe($dataBreachRecordClone->responsibles->pluck('id')->toArray());
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditDataBreachRecord::class, [
+            'record' => $dataBreachRecord->getRouteKey(),
+        ])
+        ->assertActionDoesNotExist('clone');
 });

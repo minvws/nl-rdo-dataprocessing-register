@@ -16,7 +16,7 @@ return [
         'established' => 'Vast',
     ],
     'transition' => [
-        'approved' => 'Goedgekeuren',
+        'approved' => 'Goedkeuren',
         'in_review' => 'Naar review',
         'obsolete' => 'Vervallen',
         'established' => 'Vaststellen',

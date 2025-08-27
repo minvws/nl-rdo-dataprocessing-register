@@ -13,6 +13,7 @@ return [
     ],
 
     'public_from_section' => [
+        'history' => 'Historie',
         'title' => 'Publieke beschikbaarheid',
         'subtitle' => 'Periodiek controleren we de publieke status van deze verwerking. In dit overzicht geven we de publieke beschikbaarheid weer.',
         'public_state' => 'Huidige status',
@@ -20,6 +21,6 @@ return [
         'public_state_not_public' => 'niet publiek beschikbaar',
         'public_history' => 'Overzicht',
         'public_history_since' => 'Publiek beschikbaar sinds :start',
-        'public_history_from_to' => 'Publiek beschikbaar van :start tot :end',
+        'public_history_from_to' => 'Publiek beschikbaar geweest van :start tot :end',
     ],
 ];

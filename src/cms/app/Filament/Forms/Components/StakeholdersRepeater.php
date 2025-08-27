@@ -108,7 +108,7 @@ class StakeholdersRepeater extends Repeater
             StakeholderDataItemsRepeater::make(),
 
             Hidden::make('organisation_id')
-                ->default(Authentication::organisation()->id),
+                ->default(Authentication::organisation()->id->toString()),
         ];
     }
 }

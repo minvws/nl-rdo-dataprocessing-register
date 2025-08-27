@@ -14,6 +14,9 @@ abstract class DataFactory
         return null;
     }
 
+    /**
+     * @return array<string, string|array<string, string>>
+     */
     public function generatePublicFrontmatter(Snapshot $snapshot): array
     {
         return [];

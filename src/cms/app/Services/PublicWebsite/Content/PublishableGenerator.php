@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\PublicWebsite\Content;
 
-use App\Enums\MarkdownField;
+use App\Enums\Snapshot\SnapshotDataSection;
 use App\Models\Contracts\Publishable;
 use App\Models\States\Snapshot\Established;
 use App\Services\PublicWebsite\Generator;
@@ -37,9 +37,18 @@ class PublishableGenerator extends Generator
             return;
         }
 
+        $frontmatterData = array_merge(
+            ['id' => $snapshot->id->toString()],
+            $snapshotData->public_frontmatter,
+        );
+
         $content = $this->viewFactory->make('public-website.processing-record', [
-            'frontmatter' => $this->convertToFrontmatter(array_merge(['id' => $snapshot->id], $snapshotData->public_frontmatter)),
-            'markdown' => $this->snapshotDataMarkdownRenderer->fromSnapshotData($snapshotData, MarkdownField::PUBLIC_MARKDOWN),
+            'frontmatter' => $this->convertToFrontmatter($frontmatterData),
+            'markdown' => $this->snapshotDataMarkdownRenderer->fromSnapshotMarkdown(
+                $snapshot,
+                $snapshotData->public_markdown,
+                SnapshotDataSection::PUBLIC,
+            ),
         ])->render();
 
         $this->publicWebsiteFilesystem->write($this->pathGenerator->getPublishablePath($publishable), $content);

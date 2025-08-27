@@ -12,7 +12,7 @@ use Ramsey\Uuid\Uuid as RamseyUuid;
 use Ramsey\Uuid\UuidInterface as RamseyUuidInterface;
 use Webmozart\Assert\Assert;
 
-class Uuid implements JsonSerializable, UuidInterface, Wireable
+final class Uuid implements JsonSerializable, UuidInterface, Wireable
 {
     private RamseyUuidInterface $uuid;
 
@@ -48,28 +48,30 @@ class Uuid implements JsonSerializable, UuidInterface, Wireable
     }
 
     /**
-     * @return array{id: string}
+     * @return array{uuid: string}
      */
     public function jsonSerialize(): array
     {
-        return ['id' => $this->toString()];
+        return ['uuid' => $this->toString()];
     }
 
     /**
-     * @return array{id: string}
+     * @return array{uuid: string}
      */
     public function toLivewire(): array
     {
-        return ['id' => $this->toString()];
+        return ['uuid' => $this->toString()];
     }
 
     public static function fromLivewire(mixed $value): self
     {
         Assert::isArray($value);
-        Assert::keyExists($value, 'id');
-        Assert::string($value['id']);
+        Assert::keyExists($value, 'uuid');
 
-        return new self($value['id']);
+        $uuid = $value['uuid'];
+        Assert::string($uuid);
+
+        return new self($uuid);
     }
 
     private function createRamseyUuidFromString(string $uuid): RamseyUuidInterface

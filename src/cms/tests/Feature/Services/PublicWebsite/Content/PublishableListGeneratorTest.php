@@ -12,9 +12,9 @@ use App\Services\PublicWebsite\PublicWebsiteFilesystem;
 use Carbon\CarbonImmutable;
 
 it('will write to the filesystem if organisation has publishable records', function (): void {
-    $publicWebsiteFilesystem = $this->createMock(PublicWebsiteFilesystem::class);
-    $publicWebsiteFilesystem->expects($this->once())
-        ->method('write');
+    $this->mock(PublicWebsiteFilesystem::class)
+        ->shouldReceive('write')
+        ->once();
 
     $organisation = Organisation::factory()
         ->create([
@@ -37,22 +37,18 @@ it('will write to the filesystem if organisation has publishable records', funct
             'public_markdown' => 'Nam quae temporibus et molestiae voluptatibus enim.',
         ]);
 
-
-    /** @var PublishableListGenerator $publishableListGenerator */
-    $publishableListGenerator = $this->app->make(PublishableListGenerator::class, ['publicWebsiteFilesystem' => $publicWebsiteFilesystem]);
+    $publishableListGenerator = $this->app->get(PublishableListGenerator::class);
     $publishableListGenerator->generate($organisation);
 });
 
-
 it('will not write to the filesystem if organisation has no publishable records', function (): void {
-    $publicWebsiteFilesystem = $this->createMock(PublicWebsiteFilesystem::class);
-    $publicWebsiteFilesystem->expects($this->never())
-        ->method('write');
+    $this->mock(PublicWebsiteFilesystem::class)
+        ->shouldReceive('write')
+        ->never();
 
     $organisation = Organisation::factory()
         ->create();
 
-    /** @var PublishableListGenerator $publishableListGenerator */
-    $publishableListGenerator = $this->app->make(PublishableListGenerator::class, ['publicWebsiteFilesystem' => $publicWebsiteFilesystem]);
+    $publishableListGenerator = $this->app->get(PublishableListGenerator::class);
     $publishableListGenerator->generate($organisation);
 });

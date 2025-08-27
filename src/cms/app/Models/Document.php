@@ -4,62 +4,69 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Collections\Algorithm\AlgorithmRecordCollection;
+use App\Collections\Avg\AvgProcessorProcessingRecordCollection;
+use App\Collections\Avg\AvgResponsibleProcessingRecordCollection;
+use App\Collections\DataBreachRecordCollection;
+use App\Collections\DocumentCollection;
+use App\Collections\MediaCollection;
+use App\Collections\Wpg\WpgProcessingRecordCollection;
 use App\Models\Algorithm\AlgorithmRecord;
 use App\Models\Avg\AvgProcessorProcessingRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\Concerns\HasDefaultMediaCollections;
 use App\Models\Concerns\HasOrganisation;
-use App\Models\Concerns\HasUuidAsKey;
+use App\Models\Concerns\HasSoftDeletes;
+use App\Models\Concerns\HasTimestamps;
+use App\Models\Concerns\HasUuidAsId;
+use App\Models\Contracts\TenantAware;
 use App\Models\Wpg\WpgProcessingRecord;
-use App\Vendor\MediaLibrary\Media;
 use Carbon\CarbonImmutable;
-use Illuminate\Database\Eloquent\Collection;
+use Database\Factories\DocumentFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
-use Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection;
 
 /**
- * @property string $id
  * @property string $name
  * @property CarbonImmutable|null $expires_at
  * @property CarbonImmutable|null $notify_at
  * @property string|null $location
- * @property CarbonImmutable|null $created_at
- * @property CarbonImmutable|null $updated_at
- * @property CarbonImmutable|null $deleted_at
  *
- * @property-read Collection<int, AlgorithmRecord> $algorithmRecords
- * @property-read Collection<int, AvgProcessorProcessingRecord> $avgProcessorProcessingRecords
- * @property-read Collection<int, AvgResponsibleProcessingRecord> $avgResponsibleProcessingRecords
- * @property-read Collection<int, DataBreachRecord> $dataBreachRecords
- * @property-read Collection<int, WpgProcessingRecord> $wpgProcessingRecords
- * @property-read MediaCollection<int, Media> $media
+ * @property-read AlgorithmRecordCollection $algorithmRecords
+ * @property-read AvgProcessorProcessingRecordCollection $avgProcessorProcessingRecords
+ * @property-read AvgResponsibleProcessingRecordCollection $avgResponsibleProcessingRecords
+ * @property-read DataBreachRecordCollection $dataBreachRecords
+ * @property-read MediaCollection $media
+ * @property-read WpgProcessingRecordCollection $wpgProcessingRecords
  */
-class Document extends Model implements HasMedia
+class Document extends Model implements HasMedia, TenantAware
 {
     use HasDefaultMediaCollections;
+    /** @use HasFactory<DocumentFactory> */
     use HasFactory;
     use HasOrganisation;
-    use HasUuidAsKey;
-    use SoftDeletes;
+    use HasSoftDeletes;
+    use HasTimestamps;
+    use HasUuidAsId;
 
-    protected $casts = [
-        'id' => 'string',
-
-        'expires_at' => 'date',
-        'notify_at' => 'date',
-    ];
-
+    protected static string $collectionClass = DocumentCollection::class;
     protected $fillable = [
         'name',
         'expires_at',
         'notify_at',
         'location',
     ];
+
+    public function casts(): array
+    {
+        return [
+            'expires_at' => 'date',
+            'notify_at' => 'date',
+        ];
+    }
 
     /**
      * @return MorphToMany<AlgorithmRecord, $this>

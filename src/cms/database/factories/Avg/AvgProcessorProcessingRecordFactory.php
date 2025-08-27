@@ -35,7 +35,6 @@ class AvgProcessorProcessingRecordFactory extends Factory
     public function definition(): array
     {
         return [
-            'id' => $this->faker->uuid(),
             'organisation_id' => Organisation::factory(),
             'import_id' => $this->faker->optional()->importId(),
 
@@ -66,7 +65,7 @@ class AvgProcessorProcessingRecordFactory extends Factory
             'victims' => $this->faker->boolean(),
             'convicts' => $this->faker->boolean(),
 
-            'review_at' => $this->faker->anyDate(),
+            'review_at' => $this->faker->optional()->calendarDate(),
             'public_from' => $this->faker->optional()->anyDate(),
 
             'avg_processor_processing_record_service_id' => AvgProcessorProcessingRecordService::factory(state: [
@@ -174,6 +173,7 @@ class AvgProcessorProcessingRecordFactory extends Factory
             Remark::factory()
                 ->for($avgProcessorProcessingRecord, 'remarkRelatable')
                 ->recycle($avgProcessorProcessingRecord->organisation)
+                ->recycle($avgProcessorProcessingRecord->organisation->users)
                 ->count($count ?? $this->faker->randomDigitNotNull())
                 ->create();
         });

@@ -31,13 +31,20 @@ class UuidCast implements CastsAttributes
 
     /**
      * @param array<string, mixed> $attributes
+     * @param UuidInterface|string|null $value
      *
      * @return array<string, string|null>
      */
     public function set(Model $model, string $key, mixed $value, array $attributes): array
     {
-        Assert::isInstanceOf($value, UuidInterface::class);
+        if ($value === null) {
+            return [$key => null];
+        }
 
-        return [$key => $value->toString()];
+        if ($value instanceof UuidInterface) {
+            $value = $value->toString();
+        }
+
+        return [$key => $value];
     }
 }

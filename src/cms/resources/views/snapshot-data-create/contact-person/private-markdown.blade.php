@@ -1,5 +1,4 @@
 @php
-    /** @formatter:off */
     /** @var App\Models\ContactPerson $record */
 @endphp
 

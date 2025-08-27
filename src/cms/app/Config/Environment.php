@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace App\Config;
 
 use Illuminate\Support\Facades\App;
-use RuntimeException;
-
-use function is_bool;
 
 class Environment
 {
@@ -27,16 +24,10 @@ class Environment
     }
 
     /**
-     * @param array<int, string> $environmentNames
+     * @param array<array-key, string> $environmentNames
      */
     private static function isEnvironment(array $environmentNames): bool
     {
-        $environment = App::environment($environmentNames);
-
-        if (!is_bool($environment)) {
-            throw new RuntimeException('Unable to determine environment');
-        }
-
-        return $environment;
+        return App::environment($environmentNames);
     }
 }

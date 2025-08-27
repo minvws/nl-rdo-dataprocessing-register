@@ -4,17 +4,19 @@ declare(strict_types=1);
 
 namespace App\Models\Wpg;
 
+use App\Collections\Wpg\WpgGoalCollection;
+use App\Collections\Wpg\WpgProcessingRecordCollection;
 use App\Models\Concerns\HasOrganisation;
-use App\Models\Concerns\HasUuidAsKey;
-use Carbon\CarbonImmutable;
-use Illuminate\Database\Eloquent\Collection;
+use App\Models\Concerns\HasSoftDeletes;
+use App\Models\Concerns\HasTimestamps;
+use App\Models\Concerns\HasUuidAsId;
+use App\Models\Contracts\TenantAware;
+use Database\Factories\Wpg\WpgGoalFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * @property string $id
  * @property string $description
  * @property bool $article_8
  * @property bool $article_9
@@ -27,25 +29,21 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property bool $article_13_3
  * @property string|null $explanation
  * @property string|null $import_id
- * @property CarbonImmutable|null $created_at
- * @property CarbonImmutable|null $updated_at
- * @property CarbonImmutable|null $deleted_at
  * @property string|null $remarks
  * @property int $sort
  *
- * @property-read Collection<int, WpgProcessingRecord> $wpgProcessingRecords
+ * @property-read WpgProcessingRecordCollection $wpgProcessingRecords
  */
-class WpgGoal extends Model
+class WpgGoal extends Model implements TenantAware
 {
+    /** @use HasFactory<WpgGoalFactory> */
     use HasFactory;
     use HasOrganisation;
-    use HasUuidAsKey;
-    use SoftDeletes;
+    use HasSoftDeletes;
+    use HasTimestamps;
+    use HasUuidAsId;
 
-    protected $casts = [
-        'id' => 'string',
-    ];
-
+    protected static string $collectionClass = WpgGoalCollection::class;
     protected $fillable = [
         'description',
         'article_8',

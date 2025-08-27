@@ -5,31 +5,33 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\EntityNumberType;
-use App\Models\Concerns\HasUuidAsKey;
+use App\Models\Concerns\HasUuidAsId;
+use Database\Factories\EntityNumberCounterFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * @property string $id
- * @property EntityNumberType $type
- * @property string $prefix
  * @property int $number
+ * @property string $prefix
+ * @property EntityNumberType $type
  */
 class EntityNumberCounter extends Model
 {
+    /** @use HasFactory<EntityNumberCounterFactory> */
     use HasFactory;
-    use HasUuidAsKey;
-
-    protected $casts = [
-        'id' => 'string',
-        'type' => EntityNumberType::class,
-    ];
+    use HasUuidAsId;
 
     protected $fillable = [
-        'type',
-        'prefix',
         'number',
+        'prefix',
+        'type',
     ];
-
     public $timestamps = false;
+
+    public function casts(): array
+    {
+        return [
+            'type' => EntityNumberType::class,
+        ];
+    }
 }

@@ -4,7 +4,16 @@ declare(strict_types=1);
 
 namespace App\Models\Wpg;
 
+use App\Collections\DataBreachRecordCollection;
+use App\Collections\DocumentCollection;
+use App\Collections\ProcessorCollection;
+use App\Collections\ResponsibleCollection;
+use App\Collections\SystemCollection;
+use App\Collections\Wpg\WpgGoalCollection;
+use App\Collections\Wpg\WpgProcessingRecordCollection;
+use App\Components\Uuid\UuidInterface;
 use App\Enums\CoreEntityDataCollectionSource;
+use App\Models\Casts\UuidCast;
 use App\Models\Concerns\HasChildren;
 use App\Models\Concerns\HasContactPersons;
 use App\Models\Concerns\HasDataBreachRecords;
@@ -16,29 +25,26 @@ use App\Models\Concerns\HasProcessors;
 use App\Models\Concerns\HasRemarks;
 use App\Models\Concerns\HasResponsibles;
 use App\Models\Concerns\HasSnapshots;
+use App\Models\Concerns\HasSoftDeletes;
 use App\Models\Concerns\HasSystems;
-use App\Models\Concerns\HasUuidAsKey;
+use App\Models\Concerns\HasTimestamps;
+use App\Models\Concerns\HasUsers;
+use App\Models\Concerns\HasUuidAsId;
 use App\Models\Concerns\HasWpgGoals;
 use App\Models\Concerns\IsCloneable;
-use App\Models\ContactPerson;
+use App\Models\Concerns\IsReviewable;
 use App\Models\Contracts\Cloneable;
 use App\Models\Contracts\EntityNumerable;
+use App\Models\Contracts\Reviewable;
 use App\Models\Contracts\SnapshotSource;
-use App\Models\DataBreachRecord;
-use App\Models\Document;
-use App\Models\Processor;
-use App\Models\Responsible;
-use App\Models\Snapshot;
-use App\Models\System;
+use App\Models\Contracts\TenantAware;
 use Carbon\CarbonImmutable;
-use Illuminate\Database\Eloquent\Collection;
+use Database\Factories\Wpg\WpgProcessingRecordFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * @property string $id
  * @property string $name
  * @property string|null $import_id
  * @property string|null $import_number
@@ -50,8 +56,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string|null $third_party_explanation
  * @property bool $has_security
  * @property bool $decision_making
- * @property CarbonImmutable|null $created_at
- * @property CarbonImmutable|null $updated_at
  * @property bool $article_15
  * @property bool $article_15_a
  * @property bool $article_16
@@ -64,7 +68,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property bool $article_23
  * @property bool $article_24
  * @property bool $geb_pia
- * @property CarbonImmutable|null $review_at
  * @property string|null $explanation_available
  * @property string|null $explanation_provisioning
  * @property string|null $explanation_transfer
@@ -74,9 +77,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property bool $measures_implemented
  * @property bool $other_measures
  * @property string|null $measures_description
- * @property string|null $wpg_processing_record_service_id
- * @property CarbonImmutable|null $deleted_at
- * @property string|null $parent_id
+ * @property ?UuidInterface $wpg_processing_record_service_id
  * @property CarbonImmutable|null $public_from
  * @property bool $has_processors
  * @property bool $police_race_or_ethnicity
@@ -91,25 +92,23 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property bool $has_systems
  * @property bool $has_pseudonymization
  *
- * @property-read Collection<int, WpgProcessingRecord> $children
- * @property-read Collection<int, ContactPerson> $contactPersons
- * @property-read Collection<int, Document> $documents
- * @property-read WpgProcessingRecord|null $parent
- * @property-read Collection<int, Processor> $processors
- * @property-read Collection<int, Responsible> $responsibles
- * @property-read Collection<int, Snapshot> $snapshots
- * @property-read Collection<int, System> $systems
- * @property-read Collection<int, WpgGoal> $wpgGoals
+ * @property-read DataBreachRecordCollection $dataBreachRecords
+ * @property-read DocumentCollection $documents
+ * @property-read ProcessorCollection $processors
+ * @property-read ResponsibleCollection $responsibles
+ * @property-read SystemCollection $systems
+ * @property-read WpgGoalCollection $wpgGoals
  * @property-read WpgProcessingRecordService|null $wpgProcessingRecordService
- * @property-read Collection<int, DataBreachRecord> $dataBreachRecords
  */
-class WpgProcessingRecord extends Model implements EntityNumerable, SnapshotSource, Cloneable
+class WpgProcessingRecord extends Model implements Cloneable, EntityNumerable, Reviewable, SnapshotSource, TenantAware
 {
+    /** @use HasChildren<WpgProcessingRecord, WpgProcessingRecordCollection> */
     use HasChildren;
     use HasContactPersons;
     use HasDataBreachRecords;
     use HasDocuments;
     use HasEntityNumber;
+    /** @use HasFactory<WpgProcessingRecordFactory> */
     use HasFactory;
     use HasFgRemark;
     use HasOrganisation;
@@ -117,56 +116,20 @@ class WpgProcessingRecord extends Model implements EntityNumerable, SnapshotSour
     use HasRemarks;
     use HasResponsibles;
     use HasSnapshots;
+    use HasSoftDeletes;
     use HasSystems;
-    use HasUuidAsKey;
+    use HasTimestamps;
+    use HasUuidAsId;
+    use HasUsers;
     use HasWpgGoals;
     use IsCloneable;
-    use SoftDeletes;
+    use IsReviewable;
 
-    protected $casts = [
-        'article_15' => 'bool',
-        'article_15_a' => 'bool',
-        'article_16' => 'bool',
-        'article_17' => 'bool',
-        'article_17_a' => 'bool',
-        'article_18' => 'bool',
-        'article_19' => 'bool',
-        'article_20' => 'bool',
-        'article_22' => 'bool',
-        'article_23' => 'bool',
-        'article_24' => 'bool',
-        'decision_making' => 'bool',
-        'convicts' => 'bool',
-        'geb_pia' => 'bool',
-        'id' => 'string',
-        'review_at' => 'date',
-        'has_security' => 'bool',
-        'suspects' => 'bool',
-        'police_justice' => 'bool',
-        'third_parties' => 'bool',
-        'victims' => 'bool',
-        'wpg_processing_record_service_id' => 'string',
-        'public_from' => 'datetime',
-        'has_processors' => 'bool',
-        'has_systems' => 'bool',
-        'police_race_or_ethnicity' => 'bool',
-        'police_political_attitude' => 'bool',
-        'police_faith_or_belief' => 'bool',
-        'police_association_membership' => 'bool',
-        'police_genetic' => 'bool',
-        'police_identification' => 'bool',
-        'police_health' => 'bool',
-        'police_sexual_life' => 'bool',
-        'data_collection_source' => CoreEntityDataCollectionSource::class,
-        'measures' => 'bool',
-        'other_measures' => 'bool',
-    ];
-
+    protected static string $collectionClass = WpgProcessingRecordCollection::class;
     protected $fillable = [
         'system_id',
         'wpg_processing_record_service_id',
         'receiver_id',
-        'parent_id',
 
         'data_collection_source',
         'name',
@@ -204,7 +167,6 @@ class WpgProcessingRecord extends Model implements EntityNumerable, SnapshotSour
         'import_id',
         'created_at',
         'updated_at',
-        'review_at',
         'public_from',
         'has_processors',
         'has_systems',
@@ -217,6 +179,46 @@ class WpgProcessingRecord extends Model implements EntityNumerable, SnapshotSour
         'police_health',
         'police_sexual_life',
     ];
+
+    public function casts(): array
+    {
+        return [
+            'article_15' => 'bool',
+            'article_15_a' => 'bool',
+            'article_16' => 'bool',
+            'article_17' => 'bool',
+            'article_17_a' => 'bool',
+            'article_18' => 'bool',
+            'article_19' => 'bool',
+            'article_20' => 'bool',
+            'article_22' => 'bool',
+            'article_23' => 'bool',
+            'article_24' => 'bool',
+            'decision_making' => 'bool',
+            'convicts' => 'bool',
+            'geb_pia' => 'bool',
+            'has_security' => 'bool',
+            'suspects' => 'bool',
+            'police_justice' => 'bool',
+            'third_parties' => 'bool',
+            'victims' => 'bool',
+            'wpg_processing_record_service_id' => UuidCast::class,
+            'public_from' => 'datetime',
+            'has_processors' => 'bool',
+            'has_systems' => 'bool',
+            'police_race_or_ethnicity' => 'bool',
+            'police_political_attitude' => 'bool',
+            'police_faith_or_belief' => 'bool',
+            'police_association_membership' => 'bool',
+            'police_genetic' => 'bool',
+            'police_identification' => 'bool',
+            'police_health' => 'bool',
+            'police_sexual_life' => 'bool',
+            'data_collection_source' => CoreEntityDataCollectionSource::class,
+            'measures' => 'bool',
+            'other_measures' => 'bool',
+        ];
+    }
 
     /**
      * @return BelongsTo<WpgProcessingRecordService, $this>

@@ -62,12 +62,12 @@ it('returns the correct value for livewire', function (): void {
     $uuid = fake()->uuid();
 
     expect(Uuid::fromString($uuid)->toLivewire())
-        ->toBe(['id' => $uuid]);
+        ->toBe(['uuid' => $uuid]);
 });
 
 it('returns a valid value from livewire', function (): void {
     $uuid = fake()->uuid();
-    $result = Uuid::fromLivewire(['id' => $uuid]);
+    $result = Uuid::fromLivewire(['uuid' => $uuid]);
 
     expect($result->toString())
         ->toBe($uuid);
@@ -83,5 +83,5 @@ it('returns the correct json value', function (): void {
     $uuid = fake()->uuid();
 
     expect(Uuid::fromString($uuid)->jsonSerialize())
-        ->toBe(['id' => $uuid]);
+        ->toBe(['uuid' => $uuid]);
 });

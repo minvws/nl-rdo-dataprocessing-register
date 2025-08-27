@@ -4,38 +4,41 @@ declare(strict_types=1);
 
 namespace App\Models\Concerns;
 
+use App\Components\Uuid\UuidInterface;
+use App\Models\Casts\UuidCast;
 use App\Models\EntityNumber;
 use App\Observers\EntityNumerableObserver;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Webmozart\Assert\Assert;
 
 /**
- * @property ?string $entity_number_id
+ * @property ?UuidInterface $entity_number_id
  * @property string $number
  *
  * @property-read ?EntityNumber $entityNumber
  */
 trait HasEntityNumber
 {
-    public static function bootHasEntityNumber(): void
+    final public static function bootHasEntityNumber(): void
     {
         static::observe(EntityNumerableObserver::class);
     }
 
-    public function initializeHasEntityNumber(): void
+    final public function initializeHasEntityNumber(): void
     {
+        $this->mergeCasts(['entity_number_id' => UuidCast::class]);
         $this->mergeFillable(['entity_number_id']);
     }
 
     /**
      * @return BelongsTo<EntityNumber, $this>
      */
-    public function entityNumber(): BelongsTo
+    final public function entityNumber(): BelongsTo
     {
         return $this->belongsTo(EntityNumber::class);
     }
 
-    public function getNumber(): string
+    final public function getNumber(): string
     {
         $entityNumber = $this->entityNumber;
         Assert::isInstanceOf($entityNumber, EntityNumber::class);
@@ -43,15 +46,15 @@ trait HasEntityNumber
         return $entityNumber->number;
     }
 
-    public function getEntityNumberId(): ?string
+    final public function getEntityNumberId(): ?UuidInterface
     {
         $entityNumberId = $this->getAttribute('entity_number_id');
-        Assert::nullOrString($entityNumberId);
+        Assert::nullOrIsInstanceOf($entityNumberId, UuidInterface::class);
 
         return $entityNumberId;
     }
 
-    public function setEntityNumberId(string $id): void
+    final public function setEntityNumberId(UuidInterface $id): void
     {
         $this->setAttribute('entity_number_id', $id);
     }

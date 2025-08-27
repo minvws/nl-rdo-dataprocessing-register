@@ -25,11 +25,10 @@ class DbAdminLogRepository implements AdminLogRepository
     {
         $this->logger->debug($message, $context);
 
-        $entry = new AdminLogEntry([
+        AdminLogEntry::create([
             'message' => $message,
             'context' => $context,
         ]);
-        $entry->save();
     }
 
     /**

@@ -4,15 +4,24 @@ declare(strict_types=1);
 
 namespace App\Import\Factories;
 
-use App\Components\Uuid\Uuid;
+use App\Components\Uuid\UuidInterface;
+use App\Import\Factories\Concerns\DataConverters;
 use App\Import\Factory;
 use App\Models\Receiver;
-use Illuminate\Database\Eloquent\Model;
 
-class ReceiverFactory extends AbstractFactory implements Factory
+/**
+ * @implements Factory<Receiver>
+ */
+class ReceiverFactory implements Factory
 {
-    public function create(array $data, string $organisationId): ?Model
+    use DataConverters;
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    public function create(array $data, UuidInterface $organisationId): Receiver
     {
+        /** @var Receiver $receiver */
         $receiver = Receiver::firstOrNew([
             'import_id' => $data['Id'],
             'organisation_id' => $organisationId,
@@ -22,11 +31,8 @@ class ReceiverFactory extends AbstractFactory implements Factory
             return $receiver;
         }
 
-        $receiver->id = Uuid::generate()->toString();
         $receiver->organisation_id = $organisationId;
-
-        $receiver->description = $data['Omschrijving'];
-
+        $receiver->description = $this->toStringOrNull($data, 'Omschrijving');
         $receiver->save();
 
         return $receiver;

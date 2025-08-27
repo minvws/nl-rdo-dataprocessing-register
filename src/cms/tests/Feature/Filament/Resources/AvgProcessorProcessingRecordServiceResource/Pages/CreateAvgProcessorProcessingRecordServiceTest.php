@@ -6,17 +6,17 @@ use App\Filament\Resources\AvgProcessorProcessingRecordServiceResource;
 use App\Filament\Resources\AvgProcessorProcessingRecordServiceResource\Pages\CreateAvgProcessorProcessingRecordService;
 use App\Models\Avg\AvgProcessorProcessingRecordService;
 
-use function Pest\Livewire\livewire;
-
 it('loads the create page', function (): void {
-    $this->get(AvgProcessorProcessingRecordServiceResource::getUrl('create'))
+    $this->asFilamentUser()
+        ->get(AvgProcessorProcessingRecordServiceResource::getUrl('create'))
         ->assertSuccessful();
 });
 
 it('can create an entry', function (): void {
     $name = fake()->uuid();
 
-    livewire(CreateAvgProcessorProcessingRecordService::class)
+    $this->asFilamentUser()
+        ->createLivewireTestable(CreateAvgProcessorProcessingRecordService::class)
         ->fillForm([
             'name' => $name,
         ])

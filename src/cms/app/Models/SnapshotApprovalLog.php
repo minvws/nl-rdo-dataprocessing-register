@@ -4,37 +4,45 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Models\Concerns\HasUuidAsKey;
-use Carbon\CarbonImmutable;
+use App\Collections\SnapshotApprovalLogCollection;
+use App\Components\Uuid\UuidInterface;
+use App\Models\Casts\UuidCast;
+use App\Models\Concerns\HasTimestamps;
+use App\Models\Concerns\HasUuidAsId;
+use Database\Factories\SnapshotApprovalLogFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * @property string $id
- * @property string $snapshot_id
- * @property string $user_id
- * @property array $message
- * @property CarbonImmutable|null $created_at
- * @property CarbonImmutable|null $updated_at
+ * @property array<string, mixed> $message
+ * @property UuidInterface $snapshot_id
+ * @property UuidInterface $user_id
  *
  * @property-read User $user
  */
 class SnapshotApprovalLog extends Model
 {
+    /** @use HasFactory<SnapshotApprovalLogFactory> */
     use HasFactory;
-    use HasUuidAsKey;
+    use HasTimestamps;
+    use HasUuidAsId;
 
-    protected $casts = [
-        'id' => 'string',
-        'message' => 'json',
-    ];
-
+    protected static string $collectionClass = SnapshotApprovalLogCollection::class;
     protected $fillable = [
+        'message',
         'snapshot_id',
         'user_id',
-        'message',
     ];
+
+    public function casts(): array
+    {
+        return [
+            'message' => 'json',
+            'snapshot_id' => UuidCast::class,
+            'user_id' => UuidCast::class,
+        ];
+    }
 
     /**
      * @return BelongsTo<User, $this>

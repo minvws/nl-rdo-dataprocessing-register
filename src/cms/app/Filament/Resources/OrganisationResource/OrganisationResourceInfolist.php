@@ -15,7 +15,7 @@ use Filament\Infolists\Infolist;
 use Illuminate\Support\HtmlString;
 
 use function __;
-use function sprintf;
+use function view;
 
 class OrganisationResourceInfolist
 {
@@ -67,16 +67,18 @@ class OrganisationResourceInfolist
                         ->placeholder(__('general.none_selected'))
                         ->formatStateUsing(static function (Organisation $organisation): HtmlString {
                             $poster = $organisation->getFilamentPoster();
-                            if ($poster === null) {
-                                return new HtmlString(
-                                    sprintf(
-                                        '<div class="fi-in-placeholder text-sm leading-6 text-gray-400 dark:text-gray-500">%s</div>',
-                                        __('general.none_selected'),
-                                    ),
+                            $view = $poster === null
+                                ? view(
+                                    'filament.infolists.components.entries.organisation.poster_none_selected',
+                                )
+                                : view(
+                                    'filament.infolists.components.entries.organisation.poster',
+                                    [
+                                        'poster' => $poster,
+                                    ],
                                 );
-                            }
 
-                            return new HtmlString(sprintf('<img src="%s">', $poster->getFullUrl()));
+                            return new HtmlString($view->render());
                         }),
                 ]),
         ];

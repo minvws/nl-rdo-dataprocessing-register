@@ -38,7 +38,6 @@ class AvgResponsibleProcessingRecordFactory extends Factory
         $decision_making = $this->faker->boolean();
 
         return [
-            'id' => $this->faker->uuid(),
             'organisation_id' => Organisation::factory(),
             'import_id' => $this->faker->optional()->importId(),
 
@@ -68,7 +67,7 @@ class AvgResponsibleProcessingRecordFactory extends Factory
             'has_processors' => $this->faker->boolean(),
             'has_security' => $this->faker->boolean(),
             'has_systems' => $this->faker->boolean(),
-            'review_at' => $this->faker->anyDate(),
+            'review_at' => $this->faker->optional()->calendarDate(),
             'public_from' => $this->faker->optional()->anyDate(),
         ];
     }
@@ -193,6 +192,7 @@ class AvgResponsibleProcessingRecordFactory extends Factory
             Remark::factory()
                 ->for($avgResponsibleProcessingRecord, 'remarkRelatable')
                 ->recycle($avgResponsibleProcessingRecord->organisation)
+                ->recycle($avgResponsibleProcessingRecord->organisation->users)
                 ->count($count ?? $this->faker->randomDigitNotNull())
                 ->create();
         });

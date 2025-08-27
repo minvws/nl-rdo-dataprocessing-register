@@ -26,7 +26,9 @@ class AvgResponsibleProcessingRecordExporter extends Exporter
                 ->label(__('responsible_legal_entity.model_singular')),
             ExportColumn::make('name')
                 ->label(__('processing_record.name')),
-            ExportColumn::make('number')
+            ExportColumn::make('data_collection_source')
+                ->label(__('general.data_collection_source')),
+            ExportColumn::make('entityNumber.number')
                 ->label(__('avg_responsible_processing_record.number')),
             ExportColumn::make('avgResponsibleProcessingRecordService.name')
                 ->label(__('avg_responsible_processing_record_service.model_singular')),
@@ -34,7 +36,7 @@ class AvgResponsibleProcessingRecordExporter extends Exporter
                 ->label(__('tag.model_plural')),
             ExportColumn::make('review_at')
                 ->label(__('general.review_at')),
-            ExportColumn::make('parent.number')
+            ExportColumn::make('parent.entityNumber.number')
                 ->label(__('general.parent')),
 
             // verantwoordelijke
@@ -120,12 +122,14 @@ class AvgResponsibleProcessingRecordExporter extends Exporter
                 ->label(__('avg_responsible_processing_record.geb_dpia_high_risk_freedoms')),
 
             // contactpersoon
+            ExportColumn::make('users.name')
+                ->label(__('contact_person.form_title_users')),
             ExportColumn::make('contactPersons.name')
-                ->label(__('contact_person.model_plural')),
+                ->label(__('contact_person.form_title_contact_persons')),
 
             // documenten
             ExportColumn::make('document_count')
-                ->label(__('documents.model_plural'))
+                ->label(__('document.model_plural'))
                 ->counts('documents'),
 
             // opmerkingen

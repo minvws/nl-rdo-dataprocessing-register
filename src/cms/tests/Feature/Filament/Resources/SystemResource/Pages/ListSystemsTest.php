@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 use App\Filament\Resources\SystemResource\Pages\ListSystems;
 use App\Models\System;
-
-use function Pest\Livewire\livewire;
+use Tests\Helpers\Model\OrganisationTestHelper;
 
 it('loads the list page', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $systems = System::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->count(5)
         ->create();
 
-    livewire(ListSystems::class)
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ListSystems::class)
         ->assertCanSeeTableRecords($systems);
 });

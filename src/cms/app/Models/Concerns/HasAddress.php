@@ -12,7 +12,7 @@ trait HasAddress
     /**
      * @return MorphOne<Address, $this>
      */
-    public function address(): MorphOne
+    final public function address(): MorphOne
     {
         return $this->morphOne(Address::class, 'addressable');
     }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrganisationResource;
 
+use App\Components\Uuid\UuidInterface;
 use App\Enums\Authorization\Permission;
 use App\Enums\Media\MediaGroup;
 use App\Facades\Authentication;
@@ -13,6 +14,7 @@ use App\Filament\Forms\Components\PublicFromField;
 use App\Filament\Forms\Components\TextInput\EntityNumberPrefix;
 use App\Models\Organisation;
 use App\Rules\IPRanges;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
@@ -48,7 +50,14 @@ class OrganisationResourceForm
                             ->label(__('responsible_legal_entity.model_singular'))
                             ->relationship('responsibleLegalEntity', 'name')
                             ->searchable(['name'])
-                            ->required(),
+                            ->required()
+                            ->formatStateUsing(static function (string|UuidInterface $state): string {
+                                if ($state instanceof UuidInterface) {
+                                    return $state->toString();
+                                }
+
+                                return $state;
+                            }),
                     ]),
                 Section::make()
                     ->heading(__('organisation.section_prefix'))
@@ -79,6 +88,16 @@ class OrganisationResourceForm
                             ->default('*.*.*.*')
                             ->rules([new IPRanges()])
                             ->visible(Authorization::hasPermission(Permission::ORGANISATION_UPDATE_IP_WHITELIST)),
+                        Repeater::make('allowed_email_domains')
+                            ->label(__('organisation.allowed_email_domains'))
+                            ->helperText(__('organisation.allowed_email_domains_help'))
+                            ->addActionLabel(__('organisation.allowed_email_domains_add'))
+                            ->reorderable(false)
+                            ->simple(
+                                TextInput::make('domain')
+                                    ->prefix('@')
+                                    ->required(),
+                            ),
                         MarkdownEditor::make('public_website_content')
                             ->label(__('organisation.public_website_content'))
                             ->columnSpan(2),
@@ -95,7 +114,7 @@ class OrganisationResourceForm
                             ->panelLayout('integrated')
                             ->columnSpanFull()
                             ->properties([
-                                'organisation_id' => Authentication::organisation()->id,
+                                'organisation_id' => Authentication::organisation()->id->toString(),
                             ])
                             ->collection(MediaGroup::ORGANISATION_POSTERS->value)
                             ->image(),

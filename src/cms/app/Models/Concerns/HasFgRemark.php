@@ -15,7 +15,7 @@ trait HasFgRemark
     /**
      * @return MorphOne<FgRemark, $this>
      */
-    public function fgRemark(): MorphOne
+    final public function fgRemark(): MorphOne
     {
         return $this->morphOne(FgRemark::class, 'fg_remark_relatable');
     }

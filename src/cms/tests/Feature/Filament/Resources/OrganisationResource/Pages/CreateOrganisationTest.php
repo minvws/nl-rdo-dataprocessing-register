@@ -2,27 +2,25 @@
 
 declare(strict_types=1);
 
-use App\Enums\Authorization\Role;
 use App\Filament\Resources\OrganisationResource;
 use App\Filament\Resources\OrganisationResource\Pages\CreateOrganisation;
 use App\Models\Organisation;
 use App\Models\ResponsibleLegalEntity;
-
-use function Pest\Livewire\livewire;
+use Tests\Helpers\Model\OrganisationTestHelper;
+use Tests\Helpers\Model\UserTestHelper;
 
 it('loads the create page', function (): void {
-    $this->user->assignGlobalRole(Role::FUNCTIONAL_MANAGER);
-
-    $this->get(OrganisationResource::getUrl('create'))
+    $this->asFilamentUser()
+        ->get(OrganisationResource::getUrl('create'))
         ->assertSuccessful();
 });
 
 it('can create as functional manager', function (): void {
-    $this->user->assignGlobalRole(Role::FUNCTIONAL_MANAGER);
     $newOrganisation = Organisation::factory()->make();
     $responsibleLegalEntity = ResponsibleLegalEntity::factory()->create();
 
-    livewire(CreateOrganisation::class)
+    $this->asFilamentUser()
+        ->createLivewireTestable(CreateOrganisation::class)
         ->fillForm([
             'name' => $newOrganisation->name,
             'slug' => $newOrganisation->slug,
@@ -42,7 +40,11 @@ it('can create as functional manager', function (): void {
     ]);
 });
 
-it('cannot create as non-functional manager', function (): void {
-    livewire(CreateOrganisation::class)
+it('cannot create without permission', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisation($organisation);
+
+    $this->withFilamentSession($user, $organisation)
+        ->createLivewireTestable(CreateOrganisation::class)
         ->assertForbidden();
 });

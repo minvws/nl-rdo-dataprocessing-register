@@ -6,7 +6,6 @@ namespace App\Filament\Resources\AlgorithmRecordResource;
 
 use App\Filament\Tables\Columns\CreatedAtColumn;
 use App\Filament\Tables\Columns\EntityNumber;
-use App\Filament\Tables\Columns\ExpiringDateColumn;
 use App\Filament\Tables\Columns\SnapshotStatusColumn;
 use App\Filament\Tables\Columns\UpdatedAtColumn;
 use App\Filament\Tables\DocumentFilter;
@@ -29,8 +28,6 @@ class AlgorithmRecordResourceTable
                     ->searchable()
                     ->sortable(),
                 SnapshotStatusColumn::make(),
-                ExpiringDateColumn::make('review_at')
-                    ->label(__('general.review_at')),
                 CreatedAtColumn::make(),
                 UpdatedAtColumn::make(),
             ])

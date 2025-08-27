@@ -5,19 +5,20 @@ declare(strict_types=1);
 namespace App\Services\Snapshot;
 
 use App\Models\Snapshot;
+use App\Models\SnapshotApproval;
 
 class SnapshotService
 {
     public function countApproved(Snapshot $snapshot): int
     {
-        return $snapshot->snapshotApprovals()
+        return SnapshotApproval::where('snapshot_id', $snapshot->id)
             ->approved()
             ->count();
     }
 
     public function countTotal(Snapshot $snapshot): int
     {
-        return $snapshot->snapshotApprovals()
+        return SnapshotApproval::where('snapshot_id', $snapshot->id)
             ->count();
     }
 

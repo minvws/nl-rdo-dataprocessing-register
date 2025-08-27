@@ -7,7 +7,6 @@ namespace App\Http;
 use App\Http\Middleware\Authenticate;
 use App\Http\Middleware\EncryptCookies;
 use App\Http\Middleware\PreventRequestsDuringMaintenance;
-use App\Http\Middleware\RedirectIfAuthenticated;
 use App\Http\Middleware\SecurityHeaders;
 use App\Http\Middleware\TrimStrings;
 use App\Http\Middleware\TrustHosts;
@@ -57,11 +56,6 @@ class Kernel extends HttpKernel
             SubstituteBindings::class,
             AddCspHeaders::class,
         ],
-
-        'api' => [
-            ThrottleRequests::class . ':api',
-            SubstituteBindings::class,
-        ],
     ];
 
     /** @var array<string, class-string|string> $middlewareAliases */
@@ -71,7 +65,6 @@ class Kernel extends HttpKernel
         'auth.session' => AuthenticateSession::class,
         'cache.headers' => SetCacheHeaders::class,
         'can' => Authorize::class,
-        'guest' => RedirectIfAuthenticated::class,
         'password.confirm' => RequirePassword::class,
         'precognitive' => HandlePrecognitiveRequests::class,
         'signed' => ValidateSignature::class,

@@ -4,55 +4,54 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Collections\Avg\AvgProcessorProcessingRecordCollection;
+use App\Collections\Avg\AvgResponsibleProcessingRecordCollection;
+use App\Collections\ContactPersonCollection;
+use App\Collections\Wpg\WpgProcessingRecordCollection;
+use App\Components\Uuid\UuidInterface;
 use App\Models\Avg\AvgProcessorProcessingRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
+use App\Models\Casts\UuidCast;
 use App\Models\Concerns\HasAddress;
 use App\Models\Concerns\HasOrganisation;
 use App\Models\Concerns\HasSnapshots;
-use App\Models\Concerns\HasUuidAsKey;
+use App\Models\Concerns\HasSoftDeletes;
+use App\Models\Concerns\HasTimestamps;
+use App\Models\Concerns\HasUuidAsId;
 use App\Models\Contracts\SnapshotSource;
+use App\Models\Contracts\TenantAware;
 use App\Models\Wpg\WpgProcessingRecord;
-use Carbon\CarbonImmutable;
-use Illuminate\Database\Eloquent\Collection;
+use Database\Factories\ContactPersonFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * @property string $id
  * @property string $name
  * @property string|null $email
  * @property string|null $phone
  * @property string|null $import_id
- * @property CarbonImmutable|null $created_at
- * @property CarbonImmutable|null $updated_at
- * @property string|null $contact_person_position_id
- * @property CarbonImmutable|null $deleted_at
+ * @property ?UuidInterface $contact_person_position_id
  *
  * @property-read Address|null $address
- * @property-read Collection<int, AvgProcessorProcessingRecord> $avgProcessorProcessingRecords
- * @property-read Collection<int, AvgResponsibleProcessingRecord> $avgResponsibleProcessingRecords
+ * @property-read AvgProcessorProcessingRecordCollection $avgProcessorProcessingRecords
+ * @property-read AvgResponsibleProcessingRecordCollection $avgResponsibleProcessingRecords
  * @property-read ContactPersonPosition|null $contactPersonPosition
- * @property-read Collection<int, Snapshot> $snapshots
- * @property-read Collection<int, WpgProcessingRecord> $wpgProcessingRecords
+ * @property-read WpgProcessingRecordCollection $wpgProcessingRecords
  */
-class ContactPerson extends Model implements SnapshotSource
+class ContactPerson extends Model implements SnapshotSource, TenantAware
 {
     use HasAddress;
+    /** @use HasFactory<ContactPersonFactory> */
     use HasFactory;
     use HasOrganisation;
     use HasSnapshots;
-    use HasUuidAsKey;
-    use SoftDeletes;
+    use HasSoftDeletes;
+    use HasTimestamps;
+    use HasUuidAsId;
 
-    protected $table = 'contact_persons';
-
-    protected $casts = [
-        'id' => 'string',
-    ];
-
+    protected static string $collectionClass = ContactPersonCollection::class;
     protected $fillable = [
         'contact_person_position_id',
 
@@ -62,6 +61,14 @@ class ContactPerson extends Model implements SnapshotSource
         'phone',
         'import_id',
     ];
+    protected $table = 'contact_persons';
+
+    public function casts(): array
+    {
+        return [
+            'contact_person_position_id' => UuidCast::class,
+        ];
+    }
 
     /**
      * @return MorphToMany<AvgProcessorProcessingRecord, $this>

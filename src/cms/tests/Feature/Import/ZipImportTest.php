@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Components\Uuid\Uuid;
 use App\Import\ImportFailedException;
 use App\Import\ZipImporter;
 use App\Models\Avg\AvgProcessorProcessingRecord;
@@ -13,15 +14,15 @@ it('can process a zip file', function (): void {
     $importIdThatExistsInTheTestZipFile = '12536';
     $numberThatExistsInTheTestZipFile = 'M12536';
 
-    prepareImportZip('import.zip');
+    $zipFilename = sprintf('%s.zip', fake()->slug);
+    prepareImportZip($zipFilename);
 
     $organisation = Organisation::factory()
         ->create();
-    $importFile = new TemporaryUploadedFile('import.zip', '');
+    $importFile = new TemporaryUploadedFile($zipFilename, '');
 
-    /** @var ZipImporter $zipImporter */
     $zipImporter = $this->app->get(ZipImporter::class);
-    $zipImporter->importFiles([$importFile], fake()->uuid(), $organisation->id);
+    $zipImporter->importFiles([$importFile], Uuid::fromString(fake()->uuid()), $organisation->id->toString());
 
     $avgProcessorProcessingRecord = AvgProcessorProcessingRecord::query()
         ->where('import_id', $importIdThatExistsInTheTestZipFile)
@@ -34,36 +35,42 @@ it('fails if there are too many files in the zip', function (): void {
     $organisation = Organisation::factory()->create();
     $importFile = new TemporaryUploadedFile('import.zip', '');
 
-    $zipArchive = $this->createMock(ZipArchive::class);
-    $zipArchive->expects($this->once())
-        ->method('count')
-        ->willReturn(2);
+    $zipArchive = $this->mock(ZipArchive::class)
+        ->shouldReceive('open')
+        ->once()
+        ->shouldReceive('count')
+        ->once()
+        ->andReturn(2)
+        ->getMock();
 
     $zipImporter = new ZipImporter($zipArchive, [], [], 1, 1);
 
     $this->expectException(ImportFailedException::class);
     $this->expectExceptionMessage('too many files in zip');
-    $zipImporter->importFiles([$importFile], fake()->uuid(), $organisation->id);
+    $zipImporter->importFiles([$importFile], Uuid::fromString(fake()->uuid()), $organisation->id->toString());
 });
 
 it('fails if the filesize in the zip is too large', function (): void {
     $importFile = new TemporaryUploadedFile('import.zip', '');
     $organisation = Organisation::factory()->create();
 
-    $zipArchive = $this->createMock(ZipArchive::class);
-    $zipArchive->expects($this->once())
-        ->method('count')
-        ->willReturn(1);
-    $zipArchive->expects($this->once())
-        ->method('statIndex')
+    $zipArchive = $this->mock(ZipArchive::class)
+        ->shouldReceive('open')
+        ->once()
+        ->shouldReceive('count')
+        ->once()
+        ->andReturn(1)
+        ->shouldReceive('statIndex')
+        ->once()
         ->with(0)
-        ->willReturn(['size' => (1_024 * 1_024) + 1]);
+        ->andReturn(['size' => (1_024 * 1_024) + 1])
+        ->getMock();
 
     $zipImporter = new ZipImporter($zipArchive, [], [], 1, 1);
 
     $this->expectException(ImportFailedException::class);
     $this->expectExceptionMessage('filesize too large in zip');
-    $zipImporter->importFiles([$importFile], fake()->uuid(), $organisation->id);
+    $zipImporter->importFiles([$importFile], Uuid::fromString(fake()->uuid()), $organisation->id->toString());
 });
 
 it('skips the import if factory cannot be found', function (): void {
@@ -71,18 +78,24 @@ it('skips the import if factory cannot be found', function (): void {
     $filename = sprintf('%s.json', fake()->slug());
     $importFile = new TemporaryUploadedFile('import.zip', '');
 
-    $zipArchive = $this->createMock(ZipArchive::class);
-    $zipArchive->expects($this->once())
-        ->method('count')
-        ->willReturn(1);
-    $zipArchive->expects($this->once())
-        ->method('statIndex')
+    $zipArchive = $this->mock(ZipArchive::class)
+        ->shouldReceive('open')
+        ->shouldReceive('count')
+        ->once()
+        ->andReturn(1)
+        ->shouldReceive('statIndex')
+        ->once()
         ->with(0)
-        ->willReturn(['size' => 1]);
-    $zipArchive->expects($this->once())
-        ->method('getNameIndex')
+        ->andReturn(['size' => 1])
+        ->shouldReceive('getNameIndex')
+        ->once()
         ->with(0)
-        ->willReturn($filename);
+        ->andReturn($filename)
+        ->shouldReceive('renameName')
+        ->once()
+        ->shouldReceive('extractTo')
+        ->once()
+        ->getMock();
 
     Log::shouldReceive('debug')
         ->once()
@@ -91,7 +104,7 @@ it('skips the import if factory cannot be found', function (): void {
         ->times(4);
 
     $zipImporter = new ZipImporter($zipArchive, [], [], 1, 1);
-    $zipImporter->importFiles([$importFile], fake()->uuid(), $organisation->id);
+    $zipImporter->importFiles([$importFile], Uuid::fromString(fake()->uuid()), $organisation->id->toString());
 });
 
 it('skips the import if importer cannot be found', function (): void {
@@ -101,18 +114,25 @@ it('skips the import if importer cannot be found', function (): void {
     $filename = sprintf('%s/%s.%s', $factoryName, fake()->slug(), $fileExtension);
     $importFile = new TemporaryUploadedFile('import.zip', '');
 
-    $zipArchive = $this->createMock(ZipArchive::class);
-    $zipArchive->expects($this->once())
-        ->method('count')
-        ->willReturn(1);
-    $zipArchive->expects($this->once())
-        ->method('statIndex')
+    $zipArchive = $this->mock(ZipArchive::class)
+        ->shouldReceive('open')
+        ->once()
+        ->shouldReceive('count')
+        ->once()
+        ->andReturn(1)
+        ->shouldReceive('statIndex')
+        ->once()
         ->with(0)
-        ->willReturn(['size' => 1]);
-    $zipArchive->expects($this->once())
-        ->method('getNameIndex')
+        ->andReturn(['size' => 1])
+        ->shouldReceive('getNameIndex')
+        ->once()
         ->with(0)
-        ->willReturn($filename);
+        ->andReturn($filename)
+        ->shouldReceive('renameName')
+        ->once()
+        ->shouldReceive('extractTo')
+        ->once()
+        ->getMock();
 
     Log::shouldReceive('debug')
         ->once()
@@ -121,5 +141,5 @@ it('skips the import if importer cannot be found', function (): void {
         ->times(5);
 
     $zipImporter = new ZipImporter($zipArchive, [$factoryName => fake()->slug()], [], 1, 1);
-    $zipImporter->importFiles([$importFile], fake()->uuid(), $organisation->id);
+    $zipImporter->importFiles([$importFile], Uuid::fromString(fake()->uuid()), $organisation->id->toString());
 });

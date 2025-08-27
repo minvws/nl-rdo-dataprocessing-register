@@ -19,7 +19,7 @@ class SitemapGenerator
     public function generate(): void
     {
         $contents = $this->viewFactory->make('public-website.sitemap', [
-            'id' => Uuid::generate(),
+            'id' => Uuid::generate()->toString(),
         ])
             ->render();
 

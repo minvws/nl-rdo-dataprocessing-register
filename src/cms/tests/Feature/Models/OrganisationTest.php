@@ -20,6 +20,7 @@ use App\Models\Organisation;
 use App\Models\Processor;
 use App\Models\Receiver;
 use App\Models\Responsible;
+use App\Models\Snapshot;
 use App\Models\Stakeholder;
 use App\Models\StakeholderDataItem;
 use App\Models\System;
@@ -248,6 +249,19 @@ it('has responsibles', function (): void {
         ->toBe(1);
 });
 
+it('has snapshots', function (): void {
+    $organisation = Organisation::factory()->create();
+    expect($organisation->snapshots()->count())
+        ->toBe(0);
+
+    Snapshot::factory()
+        ->for($organisation)
+        ->create();
+
+    expect($organisation->snapshots()->count())
+        ->toBe(1);
+});
+
 it('has stakeholder data items', function (): void {
     $organisation = Organisation::factory()->create();
     expect($organisation->stakeholderDataItems()->count())
@@ -331,20 +345,4 @@ it('has wpgProcessingRecordServices', function (): void {
 
     expect($organisation->wpgProcessingRecordServices()->count())
         ->toBe(1);
-});
-
-it('denies IP address that are not explicity allowed', function (): void {
-    $organisation = new Organisation();
-    $organisation->allowed_ips = '127.0.0.2';
-
-    expect($organisation->isIPAllowed('127.0.0.1'))
-        ->toBeFalse();
-});
-
-it('allows IP address that are explicity allowed', function (): void {
-    $organisation = new Organisation();
-    $organisation->allowed_ips = '196.168.1.2,127.0.0.1';
-
-    expect($organisation->isIPAllowed('127.0.0.1'))
-        ->toBeTrue();
 });

@@ -5,15 +5,18 @@ declare(strict_types=1);
 namespace App\Observers;
 
 use App\Enums\Media\MediaGroup;
-use App\Events\Models\OrganisationEvent;
+use App\Events\PublicWebsite;
+use App\Events\StaticWebsite;
 use App\Models\Organisation;
 use App\Vendor\MediaLibrary\Media;
+use Illuminate\Support\Facades\Log;
 use Webmozart\Assert\Assert;
 
 use function in_array;
 
 class MediaObserver
 {
+    /** @var array<string> */
     private array $triggerGroups;
 
     public function __construct()
@@ -44,7 +47,15 @@ class MediaObserver
             $organisation = $media->organisation;
             Assert::isInstanceOf($organisation, Organisation::class);
 
-            OrganisationEvent::dispatch($organisation);
+            $this->dispatchBuildEvent();
         }
+    }
+
+    private function dispatchBuildEvent(): void
+    {
+        Log::debug('build event triggered by media observer');
+
+        PublicWebsite\BuildEvent::dispatch();
+        StaticWebsite\BuildEvent::dispatch();
     }
 }

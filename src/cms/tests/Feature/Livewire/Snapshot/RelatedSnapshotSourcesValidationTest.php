@@ -7,13 +7,13 @@ use App\Models\Processor;
 use App\Models\RelatedSnapshotSource;
 use App\Models\Snapshot;
 use App\Models\States\Snapshot\Approved;
-
-use function Pest\Livewire\livewire;
+use Tests\Helpers\Model\OrganisationTestHelper;
 
 it('can load the table', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $processor = Processor::factory()->create();
     $snapshot = Snapshot::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create([
             'state' => Approved::class,
             'snapshot_source_id' => $processor->id,
@@ -25,9 +25,10 @@ it('can load the table', function (): void {
             'snapshot_source_id' => $processor->id,
         ]);
 
-    livewire(RelatedSnapshotSourcesValidation::class, [
-        'snapshot' => $snapshot,
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(RelatedSnapshotSourcesValidation::class, [
+            'snapshot' => $snapshot,
+        ])
         ->loadTable()
         ->assertCountTableRecords(1);
 });

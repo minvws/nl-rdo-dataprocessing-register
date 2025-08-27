@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace App\Import\Factories\Avg;
 
-use App\Components\Uuid\Uuid;
-use App\Import\Factories\AbstractFactory;
+use App\Components\Uuid\UuidInterface;
+use App\Config\Config;
+use App\Import\Factories\Concerns\DataConverters;
+use App\Import\Factories\Concerns\RelationHelper;
+use App\Import\Factories\Concerns\SnapshotHelper;
+use App\Import\Factories\Concerns\StateHelper;
 use App\Import\Factories\ContactPersonFactory;
 use App\Import\Factories\General\LookupListFactory;
 use App\Import\Factories\ProcessorFactory;
@@ -19,18 +23,27 @@ use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecordService;
 use App\Models\Organisation;
 use App\Services\Snapshot\SnapshotFactory;
+use App\ValueObjects\CalendarDate;
 use Carbon\CarbonImmutable;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Spatie\ModelStates\Exceptions\InvalidConfig;
 use Throwable;
+use Webmozart\Assert\Assert;
 
 use function count;
 use function in_array;
 use function sprintf;
 
-class AvgResponsibleProcessingRecordFactory extends AbstractFactory implements Factory
+/**
+ * @implements Factory<AvgResponsibleProcessingRecord>
+ */
+class AvgResponsibleProcessingRecordFactory implements Factory
 {
+    use DataConverters;
+    use RelationHelper;
+    use SnapshotHelper;
+    use StateHelper;
+
     public function __construct(
         private readonly AvgGoalFactory $avgGoalFactory,
         private readonly ContactPersonFactory $contactPersonFactory,
@@ -46,12 +59,14 @@ class AvgResponsibleProcessingRecordFactory extends AbstractFactory implements F
     }
 
     /**
+     * @param array<string, mixed> $data
+     *
      * @throws InvalidConfig
      * @throws Throwable
      */
-    public function create(array $data, string $organisationId): ?Model
+    public function create(array $data, UuidInterface $organisationId): ?AvgResponsibleProcessingRecord
     {
-        $organisation = Organisation::findOrFail($organisationId);
+        /** @var AvgResponsibleProcessingRecord $avgResponsibleProcessingRecord */
         $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::firstOrNew([
             'import_id' => $data['Id'],
             'organisation_id' => $organisationId,
@@ -61,113 +76,122 @@ class AvgResponsibleProcessingRecordFactory extends AbstractFactory implements F
             return null;
         }
 
-        if ($this->skipState($data['Status'])) {
+        if ($this->skipState($this->toString($data, 'Status'))) {
             return null;
         }
 
-        $avgResponsibleProcessingRecord->id = Uuid::generate()->toString();
+        /** @var Organisation $organisation */
+        $organisation = Organisation::findOrFail($organisationId);
+
         $avgResponsibleProcessingRecord->organisation_id = $organisationId;
-        $avgResponsibleProcessingRecord->import_number = $data['Nummer'];
-        $avgResponsibleProcessingRecord->import_id = $this->toStringOrNull($data['Id']);
-        $avgResponsibleProcessingRecord->created_at = $this->toCarbon($data['AanmaakDatum']);
-        $avgResponsibleProcessingRecord->updated_at = $this->toCarbon($data['LaatsteWijzigDatum']);
-        $avgResponsibleProcessingRecord->review_at = CarbonImmutable::now()->addMonths($organisation->review_at_default_in_months);
+        $avgResponsibleProcessingRecord->import_number = $this->toStringOrNull($data, 'Nummer');
+        $avgResponsibleProcessingRecord->import_id = $this->toStringOrNull($data, 'Id');
+        $avgResponsibleProcessingRecord->created_at = $this->toCarbon($data, 'AanmaakDatum');
+        $avgResponsibleProcessingRecord->updated_at = $this->toCarbon($data, 'LaatsteWijzigDatum');
+        $avgResponsibleProcessingRecord->review_at = CalendarDate::instance(CarbonImmutable::now(Config::string('app.display_timezone')))
+            ->addMonths($organisation->review_at_default_in_months);
 
-        $avgResponsibleProcessingRecord->name = $this->toString($data['Naam']);
-        $avgResponsibleProcessingRecord->responsibility_distribution = $this->toString($data['VerdelingVerantwoordelijkheid']);
+        $avgResponsibleProcessingRecord->name = $this->toString($data, 'Naam');
+        $avgResponsibleProcessingRecord->responsibility_distribution = $this->toString($data, 'VerdelingVerantwoordelijkheid');
 
-        $avgResponsibleProcessingRecord->has_security = $this->toBoolean($data['Beveiliging']['HasBeveiliging']);
-        $maatregelen = $data['Beveiliging']['Maatregelen'];
+        $avgResponsibleProcessingRecord->has_security = $this->toBoolean($data, 'Beveiliging.HasBeveiliging');
+        $maatregelen = $this->toArray($data, 'Beveiliging.Maatregelen');
+        Assert::allString($maatregelen);
         $avgResponsibleProcessingRecord->measures_implemented = in_array(
             'Vastgesteld beveiligingsbeleid dat ook is geïmplementeerd',
-            $this->toArray($maatregelen),
+            $maatregelen,
             true,
         );
-        $avgResponsibleProcessingRecord->measures_description = $this->toString([
-            sprintf('Encryptie: %s', $this->toString($data['Beveiliging']['Encryptie'])),
-            sprintf('ElectronischeWeg: %s', $this->toString($data['Beveiliging']['ElectronischeWeg'])),
-            sprintf('Toegang: %s', $this->toString($data['Beveiliging']['Toegang'])),
-            sprintf('Verwerkers: %s', $this->toString($data['Beveiliging']['Verwerkers'])),
-            sprintf('Verantwoordelijken: %s', $this->toString($data['Beveiliging']['Verantwoordelijken'])),
-            sprintf('Maatregelen: %s', $this->toString($maatregelen)),
+        $avgResponsibleProcessingRecord->measures_description = $this->toImplodedString([
+            sprintf('Encryptie: %s', $this->toString($data, 'Beveiliging.Encryptie')),
+            sprintf('ElectronischeWeg: %s', $this->toString($data, 'Beveiliging.ElectronischeWeg')),
+            sprintf('Toegang: %s', $this->toString($data, 'Beveiliging.Toegang')),
+            sprintf('Verwerkers: %s', $this->toString($data, 'Beveiliging.Verwerkers')),
+            sprintf('Verantwoordelijken: %s', $this->toString($data, 'Beveiliging.Verantwoordelijken')),
+            sprintf('Maatregelen: %s', $this->toImplodedString($maatregelen)),
         ]);
-        if ($maatregelen !== null) {
-            foreach ($maatregelen as $maatregel) {
-                if (Str::of($maatregel)->startsWith('Overige beveiligingsmaatregelen')) {
-                    $avgResponsibleProcessingRecord->other_measures = true;
-                    break;
-                }
+        foreach ($maatregelen as $maatregel) {
+            if (Str::of($maatregel)->startsWith('Overige beveiligingsmaatregelen')) {
+                $avgResponsibleProcessingRecord->other_measures = true;
+                break;
             }
         }
-        $avgResponsibleProcessingRecord->has_pseudonymization = $this->toBoolean($data['Beveiliging']['Pseudonimisering'] !== 'Nee');
-        $avgResponsibleProcessingRecord->pseudonymization = $this->toString($data['Beveiliging']['Pseudonimisering']);
+        $avgResponsibleProcessingRecord->has_pseudonymization = $this->toString($data, 'Beveiliging.Pseudonimisering') !== 'Nee';
+        $avgResponsibleProcessingRecord->pseudonymization = $this->toString($data, 'Beveiliging.Pseudonimisering');
 
-        $avgResponsibleProcessingRecord->decision_making = $this->toBoolean($data['Besluitvorming']['HasBesluitvorming']);
-        $avgResponsibleProcessingRecord->logic = $this->toStringOrNull($data['Besluitvorming']['Logica']);
-        $avgResponsibleProcessingRecord->importance_consequences = $this->toStringOrNull($data['Besluitvorming']['BelangGevolgen']);
+        $avgResponsibleProcessingRecord->decision_making = $this->toBoolean($data, 'Besluitvorming.HasBesluitvorming');
+        $avgResponsibleProcessingRecord->logic = $this->toStringOrNull($data, 'Besluitvorming.Logica');
+        $avgResponsibleProcessingRecord->importance_consequences = $this->toStringOrNull($data, 'Besluitvorming.BelangGevolgen');
 
-        $avgResponsibleProcessingRecord->outside_eu = $this->toBoolean($data['Doorgifte']['BuitenEu']);
-        $avgResponsibleProcessingRecord->outside_eu_description = $this->toString($data['Doorgifte']['BuitenEuOmschrijving']);
+        $avgResponsibleProcessingRecord->outside_eu = $this->toBoolean($data, 'Doorgifte.BuitenEu');
+        $avgResponsibleProcessingRecord->outside_eu_description = $this->toString($data, 'Doorgifte.BuitenEuOmschrijving');
         $avgResponsibleProcessingRecord->outside_eu_protection_level = $this->toBoolean(
-            $data['Doorgifte']['BuitenEuPassendBeschermingsniveau'],
+            $data,
+            'Doorgifte.BuitenEuPassendBeschermingsniveau',
         );
         $avgResponsibleProcessingRecord->outside_eu_protection_level_description = $this->toStringOrNull(
-            $data['Doorgifte']['BuitenEuPassendBeschermingsniveauOmschrijving'],
+            $data,
+            'Doorgifte.BuitenEuPassendBeschermingsniveauOmschrijving',
         );
 
-        $avgResponsibleProcessingRecord->geb_dpia_executed = $this->toBoolean($data['GebPia']['IsGebpiaAlUitgevoerd']);
-        $avgResponsibleProcessingRecord->geb_dpia_automated = $this->toBoolean($data['GebPia']['IsGeautomatiseerdProfilering']);
-        $avgResponsibleProcessingRecord->geb_dpia_large_scale_processing = $this->toBoolean($data['GebPia']['IsGrootschaligeVerwerking']);
-        $avgResponsibleProcessingRecord->geb_dpia_large_scale_monitoring = $this->toBoolean($data['GebPia']['IsGrootschaligeMonitoring']);
-        $avgResponsibleProcessingRecord->geb_dpia_list_required = $this->toBoolean($data['GebPia']['StaatOpLijstVerplichteGebpia']);
-        $avgResponsibleProcessingRecord->geb_dpia_criteria_wp248 = $this->toBoolean($data['GebPia']['VoeldoetAanTweeCriteriaWP248']);
-        $avgResponsibleProcessingRecord->geb_dpia_high_risk_freedoms = $this->toBoolean($data['GebPia']['IsHoogRisicoRechtenVrijheden']);
+        $avgResponsibleProcessingRecord->geb_dpia_executed = $this->toBoolean($data, 'GebPia,IsGebpiaAlUitgevoerd');
+        $avgResponsibleProcessingRecord->geb_dpia_automated = $this->toBoolean($data, 'GebPia,IsGeautomatiseerdProfilering');
+        $avgResponsibleProcessingRecord->geb_dpia_large_scale_processing = $this->toBoolean($data, 'GebPia,IsGrootschaligeVerwerking');
+        $avgResponsibleProcessingRecord->geb_dpia_large_scale_monitoring = $this->toBoolean($data, 'GebPia,IsGrootschaligeMonitoring');
+        $avgResponsibleProcessingRecord->geb_dpia_list_required = $this->toBoolean($data, 'GebPia,StaatOpLijstVerplichteGebpia');
+        $avgResponsibleProcessingRecord->geb_dpia_criteria_wp248 = $this->toBoolean($data, 'GebPia,VoeldoetAanTweeCriteriaWP248');
+        $avgResponsibleProcessingRecord->geb_dpia_high_risk_freedoms = $this->toBoolean($data, 'GebPia,IsHoogRisicoRechtenVrijheden');
 
-        $avgResponsibleProcessingRecord->has_processors = count($data['Verwerkers']) > 0;
-        $avgResponsibleProcessingRecord->has_systems = count($data['Systemen']) > 0;
+        $avgResponsibleProcessingRecord->has_processors = count($this->toArray($data, 'Verwerkers')) > 0;
+        $avgResponsibleProcessingRecord->has_systems = count($this->toArray($data, 'Systemen')) > 0;
 
         $avgResponsibleProcessingRecord->avg_responsible_processing_record_service_id = $this->lookupListFactory->create(
             AvgResponsibleProcessingRecordService::class,
             $organisationId,
-            $data['Dienst'],
+            $this->toStringOrNull($data, 'Dienst'),
         )?->id;
 
         $avgResponsibleProcessingRecord->save();
 
-        $this->createRelations($avgResponsibleProcessingRecord, $organisationId, 'avgGoals', $data['Doelen'], $this->avgGoalFactory);
+        $this->createRelations($avgResponsibleProcessingRecord->avgGoals(), $organisationId, $data, 'Doelen', $this->avgGoalFactory);
         $this->createRelations(
-            $avgResponsibleProcessingRecord,
+            $avgResponsibleProcessingRecord->contactPersons(),
             $organisationId,
-            'contactPersons',
-            $data['Contactpersonen'],
+            $data,
+            'Contactpersonen',
             $this->contactPersonFactory,
         );
         $this->createRelations(
-            $avgResponsibleProcessingRecord,
+            $avgResponsibleProcessingRecord->processors(),
             $organisationId,
-            'processors',
-            $data['Verwerkers'],
+            $data,
+            'Verwerkers',
             $this->processorFactory,
         );
-        $this->createRelations($avgResponsibleProcessingRecord, $organisationId, 'receivers', $data['Ontvangers'], $this->receiverFactory);
-        $this->createRelations($avgResponsibleProcessingRecord, $organisationId, 'remarks', $data['Opmerkingen'], $this->remarkFactory);
+        $this->createRelations($avgResponsibleProcessingRecord->receivers(), $organisationId, $data, 'Ontvangers', $this->receiverFactory);
+        $this->createRelations($avgResponsibleProcessingRecord->remarks(), $organisationId, $data, 'Opmerkingen', $this->remarkFactory);
         $this->createRelations(
-            $avgResponsibleProcessingRecord,
+            $avgResponsibleProcessingRecord->responsibles(),
             $organisationId,
-            'responsibles',
-            $data['Verantwoordelijken'],
+            $data,
+            'Verantwoordelijken',
             $this->responsibleFactory,
         );
-        $this->createRelations($avgResponsibleProcessingRecord, $organisationId, 'systems', $data['Systemen'], $this->systemFactory);
+        $this->createRelations($avgResponsibleProcessingRecord->systems(), $organisationId, $data, 'Systemen', $this->systemFactory);
         $this->createRelations(
-            $avgResponsibleProcessingRecord,
+            $avgResponsibleProcessingRecord->stakeholders(),
             $organisationId,
-            'stakeholders',
-            $data['Betrokkenen'],
+            $data,
+            'Betrokkenen',
             $this->stakeholderFactory,
         );
 
-        $this->createSnapshot($avgResponsibleProcessingRecord, $data['Versie'], $data['Status'], $this->snapshotFactory);
+        $this->createSnapshot(
+            $avgResponsibleProcessingRecord,
+            $this->toInt($data, 'Versie'),
+            $this->toString($data, 'Status'),
+            $this->snapshotFactory,
+        );
 
         return $avgResponsibleProcessingRecord;
     }

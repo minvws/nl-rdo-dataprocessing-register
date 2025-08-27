@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Collections\OrganisationUserRoleCollection;
+use App\Collections\UserGlobalRoleCollection;
 use App\Models\Organisation;
 use App\Models\Principal;
 use App\Models\User;
-use App\Models\UserGlobalRole;
-use App\Models\UserOrganisationRole;
 use Filament\Facades\Filament;
-use Illuminate\Support\Collection;
 use Webmozart\Assert\Assert;
 use Webmozart\Assert\InvalidArgumentException;
 
@@ -29,18 +28,7 @@ class AuthenticationService
         return $organisation;
     }
 
-    /**
-     * @throws InvalidArgumentException
-     */
-    public function user(): User
-    {
-        $user = Filament::auth()->user();
-        Assert::isInstanceOf($user, User::class);
-
-        return $user;
-    }
-
-    public function getPrincipal(): Principal
+    public function principal(): Principal
     {
         if ($this->principal === null) {
             $roles = [];
@@ -60,31 +48,37 @@ class AuthenticationService
     }
 
     /**
-     * @return Collection<int, UserGlobalRole>
+     * @throws InvalidArgumentException
      */
-    private function getGlobalRoles(): Collection
+    public function user(): User
+    {
+        $user = Filament::auth()->user();
+        Assert::isInstanceOf($user, User::class);
+
+        return $user;
+    }
+
+    private function getGlobalRoles(): UserGlobalRoleCollection
     {
         try {
             return $this->user()->globalRoles;
         } catch (InvalidArgumentException) {
-            return new Collection();
+            return new UserGlobalRoleCollection();
         }
     }
 
-    /**
-     * @return Collection<int, UserOrganisationRole>
-     */
-    private function getOrganisationRoles(): Collection
+    private function getOrganisationRoles(): OrganisationUserRoleCollection
     {
         try {
-            /** @var Collection<int, UserOrganisationRole> $userOrganisationRoles */
-            $userOrganisationRoles = $this->user()->organisationRoles()
+            $organisationUserRoles = $this->user()
+                ->organisationRoles()
                 ->where(['organisation_id' => $this->organisation()->id])
                 ->get();
+            Assert::isInstanceOf($organisationUserRoles, OrganisationUserRoleCollection::class);
         } catch (InvalidArgumentException) {
-            return new Collection();
+            $organisationUserRoles = new OrganisationUserRoleCollection();
         }
 
-        return $userOrganisationRoles;
+        return $organisationUserRoles;
     }
 }

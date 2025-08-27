@@ -3,36 +3,42 @@
 declare(strict_types=1);
 
 use App\Enums\CoreEntityDataCollectionSource;
+use App\Enums\RegisterLayout;
 use App\Filament\Resources\AvgProcessorProcessingRecordResource;
 use App\Filament\Resources\AvgProcessorProcessingRecordResource\Pages\CreateAvgProcessorProcessingRecord;
 use App\Models\Avg\AvgProcessorProcessingRecord;
 use App\Models\Avg\AvgProcessorProcessingRecordService;
 use App\Models\Responsible;
+use Tests\Helpers\Model\OrganisationTestHelper;
+use Tests\Helpers\Model\UserTestHelper;
 
-use function Pest\Livewire\livewire;
+it('loads the create page with all layouts', function (RegisterLayout $registerLayout): void {
+    $user = UserTestHelper::create(['register_layout' => $registerLayout]);
 
-it('loads the create page', function (): void {
-    $this->get(AvgProcessorProcessingRecordResource::getUrl('create'))
+    $this->asFilamentUser($user)
+        ->get(AvgProcessorProcessingRecordResource::getUrl('create'))
         ->assertSuccessful();
-});
+})->with(RegisterLayout::cases());
 
 it('can create an entry', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $avgProcessorProcessingRecordService = AvgProcessorProcessingRecordService::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create([
             'enabled' => true,
         ]);
     $responsible = Responsible::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
     $name = fake()->uuid();
 
-    livewire(CreateAvgProcessorProcessingRecord::class)
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(CreateAvgProcessorProcessingRecord::class)
         ->fillForm([
             'data_collection_source' => CoreEntityDataCollectionSource::PRIMARY->value,
             'name' => $name,
             'avg_processor_processing_record_service_id' => $avgProcessorProcessingRecordService->id,
-            'responsible_id' => [$responsible->id],
+            'responsible_id' => [$responsible->id->toString()],
         ])
         ->call('create')
         ->assertHasNoFormErrors();
@@ -43,14 +49,16 @@ it('can create an entry', function (): void {
 });
 
 it('does not allow an invalid value for dataCollectionSource', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $avgProcessorProcessingRecordService = AvgProcessorProcessingRecordService::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create([
             'enabled' => true,
         ]);
     $name = fake()->uuid();
 
-    livewire(CreateAvgProcessorProcessingRecord::class)
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(CreateAvgProcessorProcessingRecord::class)
         ->fillForm([
             'data_collection_source' => 'invalid',
             'name' => $name,

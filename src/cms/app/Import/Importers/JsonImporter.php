@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Import\Importers;
 
+use App\Components\Uuid\UuidInterface;
 use App\Import\Factory;
 use App\Import\Importer;
 use App\Import\ImportFailedException;
 use App\Jobs\ImportEntityJob;
 use App\Jobs\ImportFinishedJob;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Webmozart\Assert\Assert;
@@ -20,11 +22,11 @@ use function str_replace;
 class JsonImporter implements Importer
 {
     /**
-     * @param class-string<Factory> $factoryClass
+     * @param class-string<Factory<Model>> $factoryClass
      *
      * @throws ImportFailedException
      */
-    public function import(string $zipFilename, string $input, string $factoryClass, string $userId, string $organisationId): void
+    public function import(string $zipFilename, string $input, string $factoryClass, UuidInterface $userId, string $organisationId): void
     {
         Log::info('starting input of json-data');
 
@@ -39,7 +41,7 @@ class JsonImporter implements Importer
 
         Log::info('start dispatching jobs', ['dataSetCount' => $dataSetCount, 'factoryClass' => $factoryClass]);
         foreach ($dataSets as $dataSet) {
-            Assert::isArray($dataSet);
+            Assert::isMap($dataSet);
 
             ImportEntityJob::dispatch($factoryClass, $dataSet, $organisationId);
             Log::info('dispatched job to import data', ['factoryClass' => $factoryClass, 'organisationId' => $organisationId]);
@@ -52,12 +54,13 @@ class JsonImporter implements Importer
     private function removeUtf8ByteOrderMark(string $input): string
     {
         $input = str_replace("\xEF\xBB\xBF", '', $input);
-        Assert::string($input);
 
         return $input;
     }
 
     /**
+     * @return array<array-key, mixed>
+     *
      * @throws ImportFailedException
      */
     private function getDataFromJson(string $input): array

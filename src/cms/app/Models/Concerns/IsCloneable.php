@@ -27,7 +27,7 @@ trait IsCloneable
     /**
      * @param array<string> $cloneableRelations
      */
-    public function addCloneableRelations(array $cloneableRelations): static
+    final public function addCloneableRelations(array $cloneableRelations): static
     {
         $this->cloneable_relations = array_values(array_unique(array_merge($this->cloneable_relations, $cloneableRelations)));
 
@@ -37,7 +37,7 @@ trait IsCloneable
     /**
      * @param array<string> $except
      */
-    public function clone(array $except = []): Model
+    final public function clone(array $except = []): Model
     {
         $this->clone_exempt_attributes = array_values(array_unique(array_merge($this->clone_exempt_attributes, $except)));
 

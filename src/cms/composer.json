@@ -9,24 +9,25 @@
     ],
     "license": "MIT",
     "require": {
-        "php": "^8.2",
+        "php": "^8.4",
         "ext-fileinfo": "*",
         "ext-pdo": "*",
+        "ext-sockets": "*",
         "ext-zip": "*",
         "bacon/bacon-qr-code": "^3.0",
         "barryvdh/laravel-dompdf": "^3.1",
         "bkwld/cloner": "^3.13",
-        "filament/filament": "^3.2",
+        "filament/filament": "^3.3.9",
         "filament/spatie-laravel-media-library-plugin": "^3.0-stable",
         "guzzlehttp/guzzle": "^7.2",
-        "laravel/framework": "^11.33",
+        "laravel/framework": "^12.0",
         "laravel/tinker": "^2.8",
         "livewire/livewire": "^3.4",
         "minvws/laravel-logging": "*@dev",
         "mlocati/ip-lib": "^1.18",
-        "owen-it/laravel-auditing": "^13.5",
+        "owen-it/laravel-auditing": "^14.0",
         "solution-forest/filament-tree": "^2.1",
-        "spatie/laravel-csp": "^2.8",
+        "spatie/laravel-csp": "^3.13",
         "spatie/laravel-model-states": "^2.6",
         "spomky-labs/otphp": "^11.2",
         "tapp/filament-auditing": "^3.0",
@@ -35,10 +36,11 @@
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.9",
+        "calebdw/larastan": "^3.0",
         "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
         "doctrine/sql-formatter": "^1.5",
         "fakerphp/faker": "^1.9.1",
-        "larastan/larastan": "^3.0",
+        "larastan/larastan": "*",
         "laravel/sail": "^1.18",
         "mockery/mockery": "^1.4.4",
         "nunomaduro/collision": "^8.0",
@@ -46,6 +48,7 @@
         "pestphp/pest-plugin-faker": "^3.0",
         "pestphp/pest-plugin-laravel": "^3.0",
         "pestphp/pest-plugin-livewire": "^3.0",
+        "phpcsstandards/phpcsextra": "^1.2.0",
         "phpmd/phpmd": "^2.14",
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan": "^2.1",
@@ -60,6 +63,9 @@
         "swisnl/phpstan-faker": "^1.1"
     },
     "autoload": {
+        "files": [
+            "app/helpers.php"
+        ],
         "psr-4": {
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
@@ -93,22 +99,58 @@
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi"
         ],
-        "phpcbf": "vendor/bin/phpcbf -n",
-        "phpcs": "vendor/bin/phpcs -n",
+        "phpcbf": "vendor/bin/phpcbf -n --parallel=12",
+        "phpcs": "vendor/bin/phpcs -n --parallel=12",
         "phpmd": "vendor/bin/phpmd app github ./phpmd.xml",
         "phpmd-baseline": "vendor/bin/phpmd app github ./phpmd.xml --generate-baseline",
         "phpstan": "vendor/bin/phpstan --memory-limit=-1",
-        "phpstan-reset": "php artisan optimize:clear && rm -rf /tmp/phpstan && vendor/bin/phpstan analyze --memory-limit=-1",
+        "phpstan-clear-cache": "rm -rf /tmp/phpstan",
+        "phpstan-reset": [
+            "php artisan optimize:clear",
+            "@phpstan-clear-cache",
+            "vendor/bin/phpstan analyze --memory-limit=-1"
+        ],
         "phpstan-baseline": "vendor/bin/phpstan --memory-limit=-1 --generate-baseline",
         "public-check": "php artisan public-website:check",
-        "public-refresh": "php artisan public-website:refresh --delete-existing",
-        "reset": "composer install && composer reset-db && npm i && npm run build && composer reset-public",
+        "public-refresh": "php artisan public-website:refresh",
+        "queue-listen": "php artisan queue:listen --queue=high,default,low",
+        "reset": [
+            "composer install",
+            "rm -rf storage/app/livewire-tmp",
+            "php artisan optimize:clear",
+            "php artisan storage:link",
+            "@reset-db",
+            "@reset-test-db",
+            "npm i",
+            "npm run build",
+            "@reset-public",
+            "@reset-static",
+            "@phpstan-clear-cache"
+        ],
         "reset-db": "php artisan migrate:fresh --step --seed",
-        "reset-public": "composer public-refresh && composer public-check",
+        "reset-public": [
+            "rm -rf storage/app/public-website",
+            "@public-refresh",
+            "@public-check"
+        ],
+        "reset-static": [
+            "rm -rf storage/app/static-website",
+            "@static-refresh"
+        ],
         "reset-test-db": "DB_DATABASE=testing php artisan migrate:fresh",
+        "static-check": "php artisan static-website:check",
+        "static-refresh": "php artisan static-website:refresh",
         "test": "php artisan test --parallel --coverage --compact",
-        "test-reset": "php artisan test --parallel --recreate-databases",
-        "test-report": "php artisan test --coverage-html strorage/phpunit"
+        "test-update-snapshots": [
+            "@reset-test-db",
+            "php vendor/bin/pest --update-snapshots"
+        ],
+        "test-report": "php artisan test --coverage-html strorage/phpunit",
+        "test-reset": [
+            "rm -rf storage/app/livewire-tmp",
+            "php artisan optimize:clear",
+            "php artisan test --parallel --recreate-databases"
+        ]
     },
     "config": {
         "optimize-autoloader": true,

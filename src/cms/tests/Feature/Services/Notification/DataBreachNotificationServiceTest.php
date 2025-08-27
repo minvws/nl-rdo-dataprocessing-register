@@ -16,13 +16,13 @@ it('will notify the chief privacy officer', function (): void {
     $organisation = Organisation::factory()->create();
     $chiefPrivacyOfficer = User::factory()
         ->hasAttached($organisation)
+        ->hasOrganisationRole(Role::CHIEF_PRIVACY_OFFICER, $organisation)
         ->create();
-    $chiefPrivacyOfficer->assignGlobalRole(Role::CHIEF_PRIVACY_OFFICER);
 
     $dataProtectionOfficial = User::factory()
         ->hasAttached($organisation)
+        ->hasOrganisationRole(Role::DATA_PROTECTION_OFFICIAL, $organisation)
         ->create();
-    $dataProtectionOfficial->assignOrganisationRole(Role::DATA_PROTECTION_OFFICIAL, $organisation);
 
     $dataBreachRecord = DataBreachRecord::factory()
         ->for($organisation)
@@ -34,14 +34,24 @@ it('will notify the chief privacy officer', function (): void {
 
     Mail::assertQueued(
         DataBreachRecordApReportedNotification::class,
-        static function (DataBreachRecordApReportedNotification $mail) use ($chiefPrivacyOfficer): bool {
-            return $mail->to[0]['address'] === $chiefPrivacyOfficer->email;
+        static function (DataBreachRecordApReportedNotification $mail) use ($dataBreachRecord, $chiefPrivacyOfficer): bool {
+            if ($mail->to[0]['address'] !== $chiefPrivacyOfficer->email) {
+                return false;
+            }
+
+            $logContext = $mail->getLogContext();
+            return $logContext['data_breach_record_id'] === $dataBreachRecord->id->toString();
         },
     );
     Mail::assertQueued(
         DataBreachRecordApReportedNotification::class,
-        static function (DataBreachRecordApReportedNotification $mail) use ($dataProtectionOfficial): bool {
-            return $mail->to[0]['address'] === $dataProtectionOfficial->email;
+        static function (DataBreachRecordApReportedNotification $mail) use ($dataBreachRecord, $dataProtectionOfficial): bool {
+            if ($mail->to[0]['address'] !== $dataProtectionOfficial->email) {
+                return false;
+            }
+
+            $logContext = $mail->getLogContext();
+            return $logContext['data_breach_record_id'] === $dataBreachRecord->id->toString();
         },
     );
 });

@@ -20,7 +20,6 @@ class RemarkFactory extends Factory
     public function definition(): array
     {
         return [
-            'id' => $this->faker->uuid(),
             'body' => $this->faker->optional()->text(),
             'user_id' => User::factory(),
             'remark_relatable_id' => AvgProcessorProcessingRecord::factory(),

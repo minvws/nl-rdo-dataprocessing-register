@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Observers;
 
-use App\Events\Models\PublishableEvent;
 use App\Models\Stakeholder;
 use App\Models\StakeholderDataItem;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Event;
 
 use function expect;
 use function fake;
@@ -33,8 +31,6 @@ it('deletes stakeholder data items on delete', function (): void {
 });
 
 it('resets special_collected_data_explanation on save', function (): void {
-    Event::fake(PublishableEvent::class);
-
     $avgProcessorProcessingRecord = Stakeholder::factory()
         ->create([
             'biometric' => true,
@@ -64,8 +60,6 @@ it('resets special_collected_data_explanation on save', function (): void {
 });
 
 it('does not reset special_collected_data_explanation on save if one field true', function (): void {
-    Event::fake(PublishableEvent::class);
-
     $word = fake()->word();
 
     $avgProcessorProcessingRecord = Stakeholder::factory()
@@ -104,5 +98,5 @@ it('does not reset special_collected_data_explanation on save if one field true'
     $avgProcessorProcessingRecord->refresh();
 
     expect($avgProcessorProcessingRecord->special_collected_data_explanation)
-        ->toEqual($word);
+        ->toBe($word);
 });

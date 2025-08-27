@@ -13,7 +13,7 @@ use App\Models\Algorithm\AlgorithmTheme;
 use function expect;
 use function it;
 
-it("can have algorithm themes", function (): void {
+it('can have algorithm themes', function (): void {
     $algorithmRecord = AlgorithmRecord::factory()->create();
 
     expect($algorithmRecord->algorithmTheme)->toBeInstanceOf(AlgorithmTheme::class)

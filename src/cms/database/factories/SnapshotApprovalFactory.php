@@ -24,9 +24,8 @@ class SnapshotApprovalFactory extends Factory
         $snapshotApprovalStatus = $this->faker->randomElement(SnapshotApprovalStatus::cases());
 
         return [
-            'id' => $this->faker->uuid(),
             'snapshot_id' => Snapshot::factory(),
-            'requested_by' => User::factory(),
+            'requested_by' => $this->faker->optional()->passthrough(User::factory()),
             'assigned_to' => User::factory(),
             'status' => $snapshotApprovalStatus->value,
             'notified_at' => $this->faker->optional()->dateTime(),

@@ -25,7 +25,7 @@ abstract class RelationManager extends FilamentRelationManager
 
         return $resource::table($table)
             ->recordUrl(static function (Model $record) use ($resource): string {
-                return $resource::getUrl('edit', ['record' => $record]);
+                return $resource::getUrl($resource::canEdit($record) ? 'edit' : 'view', ['record' => $record]);
             });
     }
 

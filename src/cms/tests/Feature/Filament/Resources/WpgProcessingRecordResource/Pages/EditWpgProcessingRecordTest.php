@@ -2,28 +2,32 @@
 
 declare(strict_types=1);
 
+use App\Enums\RegisterLayout;
 use App\Filament\Resources\WpgProcessingRecordResource;
 use App\Filament\Resources\WpgProcessingRecordResource\Pages\EditWpgProcessingRecord;
 use App\Models\EntityNumber;
 use App\Models\Wpg\WpgProcessingRecord;
 use App\Services\EntityNumberService;
-use Mockery\MockInterface;
+use Tests\Helpers\Model\OrganisationTestHelper;
+use Tests\Helpers\Model\UserTestHelper;
 
-use function Pest\Livewire\livewire;
+it('loads the edit page with all layouts', function (RegisterLayout $registerLayout): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisation($organisation, ['register_layout' => $registerLayout]);
 
-it('loads the edit page', function (): void {
     $wpgProcessingRecord = WpgProcessingRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
 
-    $this->get(
-        WpgProcessingRecordResource::getUrl('edit', ['record' => $wpgProcessingRecord->id]),
-    )->assertSuccessful();
-});
+    $this->asFilamentUser($user)
+        ->get(WpgProcessingRecordResource::getUrl('edit', ['record' => $wpgProcessingRecord]))
+        ->assertSuccessful();
+})->with(RegisterLayout::cases());
 
 it('can be saved', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $wpgProcessingRecord = WpgProcessingRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create([
             'has_processors' => false,
             'article_17_a' => false,
@@ -31,9 +35,10 @@ it('can be saved', function (): void {
         ]);
     $name = fake()->uuid();
 
-    livewire(EditWpgProcessingRecord::class, [
-        'record' => $wpgProcessingRecord->getRouteKey(),
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditWpgProcessingRecord::class, [
+            'record' => $wpgProcessingRecord->getRouteKey(),
+        ])
         ->fillForm([
             'name' => $name,
         ])
@@ -46,17 +51,19 @@ it('can be saved', function (): void {
 });
 
 it('cannot be saved if no articles selected in wpggoal', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $wpgProcessingRecord = WpgProcessingRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create([
             'has_processors' => false,
             'article_17_a' => false,
             'third_parties' => false,
         ]);
 
-    livewire(EditWpgProcessingRecord::class, [
-        'record' => $wpgProcessingRecord->getRouteKey(),
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditWpgProcessingRecord::class, [
+            'record' => $wpgProcessingRecord->getRouteKey(),
+        ])
         ->fillForm([
             'wpgGoals' => [
                 [
@@ -89,8 +96,9 @@ it('cannot be saved if no articles selected in wpggoal', function (): void {
 });
 
 it('cant be saved if at least one article selected in wpggoal', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $wpgProcessingRecord = WpgProcessingRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create([
             'has_processors' => false,
             'article_17_a' => false,
@@ -113,9 +121,10 @@ it('cant be saved if at least one article selected in wpggoal', function (): voi
     // and set one random element to true
     $articles[array_rand($articles)] = true;
 
-    livewire(EditWpgProcessingRecord::class, [
-        'record' => $wpgProcessingRecord->getRouteKey(),
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditWpgProcessingRecord::class, [
+            'record' => $wpgProcessingRecord->getRouteKey(),
+        ])
         ->fillForm([
             'logic' => fake()->sentence(),
             'consequences' => fake()->sentence(),
@@ -133,22 +142,24 @@ it('cant be saved if at least one article selected in wpggoal', function (): voi
 });
 
 it('can be cloned', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $wpgProcessingRecord = WpgProcessingRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->withAllRelatedEntities()
         ->create();
 
     $entityNumber = EntityNumber::factory()
         ->create();
 
-    $this->mock(EntityNumberService::class, static function (MockInterface $mock) use ($entityNumber): void {
-        $mock->expects('generate')
-            ->andReturn($entityNumber);
-    });
+    $this->mock(EntityNumberService::class)
+        ->shouldReceive('generate')
+        ->once()
+        ->andReturn($entityNumber);
 
-    livewire(EditWpgProcessingRecord::class, [
-        'record' => $wpgProcessingRecord->getRouteKey(),
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditWpgProcessingRecord::class, [
+            'record' => $wpgProcessingRecord->getRouteKey(),
+        ])
         ->callAction('clone')
         ->assertRedirect();
 
@@ -164,7 +175,7 @@ it('can be cloned', function (): void {
     expect($wpgProcessingRecordClone->snapshots)->toBeEmpty();
 
     expect($wpgProcessingRecordClone->contactPersons->pluck('id')->toArray())
-        ->toBe($wpgProcessingRecord->contactPersons->pluck('id')->toArray());
+        ->toEqual($wpgProcessingRecord->contactPersons->pluck('id')->toArray());
 
     expect($wpgProcessingRecordClone->dataBreachRecords->pluck('id')->toArray())
         ->toBe($wpgProcessingRecord->dataBreachRecords->pluck('id')->toArray());
@@ -173,17 +184,17 @@ it('can be cloned', function (): void {
         ->toBe($wpgProcessingRecord->documents->pluck('id')->toArray());
 
     expect($wpgProcessingRecordClone->processors->pluck('id')->toArray())
-        ->toBe($wpgProcessingRecord->processors->pluck('id')->toArray());
+        ->toEqual($wpgProcessingRecord->processors->pluck('id')->toArray());
 
     expect($wpgProcessingRecordClone->remarks->pluck('body')->toArray())
         ->toBe($wpgProcessingRecord->remarks->pluck('body')->toArray());
 
     expect($wpgProcessingRecordClone->responsibles->pluck('id')->toArray())
-        ->toBe($wpgProcessingRecord->responsibles->pluck('id')->toArray());
+        ->toEqual($wpgProcessingRecord->responsibles->pluck('id')->toArray());
 
     expect($wpgProcessingRecordClone->systems->pluck('id')->toArray())
-        ->toBe($wpgProcessingRecord->systems->pluck('id')->toArray());
+        ->toEqual($wpgProcessingRecord->systems->pluck('id')->toArray());
 
     expect($wpgProcessingRecordClone->wpgGoals->pluck('id')->toArray())
-        ->toBe($wpgProcessingRecord->wpgGoals->pluck('id')->toArray());
+        ->toEqual($wpgProcessingRecord->wpgGoals->pluck('id')->toArray());
 });

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models\Contracts;
 
+use App\Collections\SnapshotCollection;
 use App\Models\Organisation;
 use App\Models\Snapshot;
 use App\Models\States\SnapshotState;
@@ -18,7 +19,10 @@ interface SnapshotSource
      */
     public function snapshots(): MorphMany;
 
-    public function getId(): string;
+    /**
+     * @param class-string<SnapshotState> $state
+     */
+    public function getSnapshotsWithState(string $state): SnapshotCollection;
 
     /**
      * @param array<class-string<SnapshotState>> $snapshotStates

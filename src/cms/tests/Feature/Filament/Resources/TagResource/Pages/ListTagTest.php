@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 use App\Filament\Resources\TagResource\Pages\ListTags;
 use App\Models\Tag;
-
-use function Pest\Livewire\livewire;
+use Tests\Helpers\Model\OrganisationTestHelper;
 
 it('loads the list page', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $tags = Tag::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->count(5)
         ->create();
 
-    livewire(ListTags::class)
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ListTags::class)
         ->assertCanSeeTableRecords($tags);
 });

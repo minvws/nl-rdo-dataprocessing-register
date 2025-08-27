@@ -2,6 +2,7 @@
 /public/build
 /public/hot
 /public/public-website
+/public/static-website
 /storage/*.key
 /storage/phpunit
 /vendor
@@ -19,3 +20,4 @@ yarn-error.log
 # php pest coverage-html output
 /coverage
 /reports
+docker-compose.override.yml

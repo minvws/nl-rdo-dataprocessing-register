@@ -2,23 +2,28 @@
 
 declare(strict_types=1);
 
+use App\Enums\RegisterLayout;
 use App\Filament\Resources\DataBreachRecord\Pages\CreateDataBreachRecord;
 use App\Filament\Resources\DataBreachRecordResource;
 use App\Models\DataBreachRecord;
 use App\Services\Notification\DataBreachNotificationService;
-use Mockery\MockInterface;
+use Tests\Helpers\Model\OrganisationTestHelper;
+use Tests\Helpers\Model\UserTestHelper;
 
-use function Pest\Livewire\livewire;
+it('loads the create page with all layouts', function (RegisterLayout $registerLayout): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisation($organisation, ['register_layout' => $registerLayout]);
 
-it('loads the create page', function (): void {
-    $this->get(DataBreachRecordResource::getUrl('create'))
+    $this->asFilamentUser($user)
+        ->get(DataBreachRecordResource::getUrl('create'))
         ->assertSuccessful();
-});
+})->with(RegisterLayout::cases());
 
 it('can create an entry', function (): void {
     $name = fake()->uuid();
 
-    livewire(CreateDataBreachRecord::class)
+    $this->asFilamentUser()
+        ->createLivewireTestable(CreateDataBreachRecord::class)
         ->fillForm([
             'name' => $name,
             'discovered_at' => fake()->date(),
@@ -36,12 +41,12 @@ it('can create an entry', function (): void {
 });
 
 it('will send notifications if ap_reported', function (): void {
-    $this->mock(DataBreachNotificationService::class, static function (MockInterface $mock): void {
-        $mock->shouldReceive('sendNotifications')
-            ->once();
-    });
+    $this->mock(DataBreachNotificationService::class)
+        ->shouldReceive('sendNotifications')
+        ->once();
 
-    livewire(CreateDataBreachRecord::class)
+    $this->asFilamentUser()
+        ->createLivewireTestable(CreateDataBreachRecord::class)
         ->fillForm([
             'number' => fake()->uuid(),
             'name' => fake()->uuid(),
@@ -56,12 +61,12 @@ it('will send notifications if ap_reported', function (): void {
 });
 
 it('will not send notifications if not ap_reported', function (): void {
-    $this->mock(DataBreachNotificationService::class, static function (MockInterface $mock): void {
-        $mock->shouldReceive('sendNotifications')
-            ->never();
-    });
+    $this->mock(DataBreachNotificationService::class)
+        ->shouldReceive('sendNotifications')
+        ->never();
 
-    livewire(CreateDataBreachRecord::class)
+    $this->asFilamentUser()
+        ->createLivewireTestable(CreateDataBreachRecord::class)
         ->fillForm([
             'number' => fake()->uuid(),
             'name' => fake()->uuid(),

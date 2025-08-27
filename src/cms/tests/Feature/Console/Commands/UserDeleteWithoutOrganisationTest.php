@@ -1,0 +1,18 @@
+<?php
+
+declare(strict_types=1);
+
+use App\Models\User;
+
+it('can run the command', function (): void {
+    $user = User::factory()
+        ->create();
+
+    $this->artisan('user:delete-without-organisation')
+        ->assertSuccessful();
+
+    $user->refresh();
+
+    expect($user->trashed())
+        ->toBeTrue();
+});

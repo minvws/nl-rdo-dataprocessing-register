@@ -6,7 +6,6 @@ namespace Feature\Config;
 
 use App\Config\Environment;
 use Illuminate\Support\Facades\App;
-use RuntimeException;
 
 use function fake;
 use function it;
@@ -18,7 +17,7 @@ it('is development', function (): void {
         ->with(['dev', 'development', 'local'])
         ->andReturn($isEnvironment);
 
-    $this->assertEquals($isEnvironment, Environment::isDevelopment());
+    $this->assertSame($isEnvironment, Environment::isDevelopment());
 });
 
 it('is production', function (): void {
@@ -28,7 +27,7 @@ it('is production', function (): void {
         ->with(['production'])
         ->andReturn($isEnvironment);
 
-    $this->assertEquals($isEnvironment, Environment::isProduction());
+    $this->assertSame($isEnvironment, Environment::isProduction());
 });
 
 it('is testing', function (): void {
@@ -38,13 +37,5 @@ it('is testing', function (): void {
         ->with(['test', 'testing'])
         ->andReturn($isEnvironment);
 
-    $this->assertEquals($isEnvironment, Environment::isTesting());
-});
-
-it('fails on an unknown enviroment', function (): void {
-    App::expects('environment')
-        ->andReturn(fake()->word());
-
-    $this->expectException(RuntimeException::class);
-    Environment::isTesting();
+    $this->assertSame($isEnvironment, Environment::isTesting());
 });

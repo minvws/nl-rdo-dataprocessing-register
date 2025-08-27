@@ -4,12 +4,17 @@ declare(strict_types=1);
 
 use App\Filament\Resources\AlgorithmPublicationCategoryResource;
 use App\Models\Algorithm\AlgorithmPublicationCategory;
+use Tests\Helpers\Model\OrganisationTestHelper;
 
 it('can load the view page', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $algorithmPublicationCategory = AlgorithmPublicationCategory::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
 
-    $this->get(AlgorithmPublicationCategoryResource::getUrl('view', ['record' => $algorithmPublicationCategory->id]))
+    $this->asFilamentOrganisationUser($organisation)
+        ->get(AlgorithmPublicationCategoryResource::getUrl('view', [
+            'record' => $algorithmPublicationCategory,
+        ]))
         ->assertSuccessful();
 });

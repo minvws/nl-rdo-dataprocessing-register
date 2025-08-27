@@ -6,6 +6,11 @@ namespace App\Services\Virusscanner;
 
 class FakeVirusscanner implements Virusscanner
 {
+    public function isHealthy(): bool
+    {
+        return true;
+    }
+
     /**
      * @param resource $stream
      */

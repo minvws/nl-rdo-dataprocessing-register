@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Console;
 
-use App\Console\Commands\DeleteNonOrganisationUsers;
 use App\Console\Commands\DocumentNotificationsSend;
-use App\Console\Commands\PruneExpiredUserLoginTokens;
 use App\Console\Commands\PublicWebsiteRefresh;
+use App\Console\Commands\SnapshotApprovalBatchNotifications;
+use App\Console\Commands\UserDeleteExpiredLoginTokens;
+use App\Console\Commands\UserDeleteWithoutOrganisation;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
-use function base_path;
 use function sprintf;
 
 class Kernel extends ConsoleKernel
@@ -19,14 +19,12 @@ class Kernel extends ConsoleKernel
     protected function commands(): void
     {
         $this->load(sprintf('%s/Commands', __DIR__));
-
-        require_once base_path('routes/console.php');
     }
 
     protected function schedule(Schedule $schedule): void
     {
         // every fifteen minutes
-        $schedule->command(PruneExpiredUserLoginTokens::class)
+        $schedule->command(UserDeleteExpiredLoginTokens::class)
             ->everyFifteenMinutes();
 
         // daily
@@ -34,7 +32,11 @@ class Kernel extends ConsoleKernel
             ->dailyAt('01:00');
         $schedule->command(DocumentNotificationsSend::class)
             ->dailyAt('09:00');
-        $schedule->command(DeleteNonOrganisationUsers::class)
+        $schedule->command(UserDeleteWithoutOrganisation::class)
             ->daily();
+
+        // weekly
+        $schedule->command(SnapshotApprovalBatchNotifications::class)
+            ->weeklyOn(Schedule::MONDAY, '09:00');
     }
 }

@@ -19,7 +19,6 @@ class SnapshotDataFactory extends Factory
     public function definition(): array
     {
         return [
-            'id' => $this->faker->uuid(),
             'snapshot_id' => Snapshot::factory(),
 
             'private_markdown' => $this->faker->optional()->markdown(),

@@ -8,6 +8,7 @@ use App\Components\Uuid\Uuid;
 use App\Config\Config;
 use App\Enums\Queue;
 use App\Mail\Authentication\PasswordLessLoginLink;
+use App\Mail\Authentication\SnapshotSignLoginLink;
 use App\Models\User;
 use App\Models\UserLoginToken;
 use Illuminate\Support\Facades\Mail;
@@ -17,7 +18,20 @@ use function now;
 
 class UserLoginService
 {
-    public function sendLoginLink(User $user, string $destination): void
+    public function sendPasswordLessLoginLink(User $user, string $destination): void
+    {
+        $this->sendLoginLink($user, $destination, PasswordLessLoginLink::class);
+    }
+
+    public function sendSnapshotSignLoginLink(User $user, string $destination): void
+    {
+        $this->sendLoginLink($user, $destination, SnapshotSignLoginLink::class);
+    }
+
+    /**
+     * @param class-string<PasswordLessLoginLink|SnapshotSignLoginLink> $mailableClass
+     */
+    public function sendLoginLink(User $user, string $destination, string $mailableClass): void
     {
         $user->userLoginTokens()->delete();
 
@@ -28,11 +42,10 @@ class UserLoginService
             'destination' => $this->removeAppUrlFromDestination($destination),
         ]);
 
-        $mailable = (new PasswordLessLoginLink($userLoginToken))
+        $mailable = new $mailableClass($userLoginToken)
             ->onQueue(Queue::HIGH);
 
-        Mail::to($user->email)
-            ->queue($mailable);
+        Mail::to($user->email)->queue($mailable);
     }
 
     private function removeAppUrlFromDestination(string $destination): string

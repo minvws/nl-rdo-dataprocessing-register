@@ -7,7 +7,9 @@ namespace App\Services\Snapshot;
 use App\Models;
 use App\Models\Snapshot;
 use App\Models\SnapshotData;
+use Illuminate\Database\Eloquent\Model;
 use InvalidArgumentException;
+use Webmozart\Assert\Assert;
 
 class SnapshotDataFactory
 {
@@ -26,6 +28,7 @@ class SnapshotDataFactory
     private function getSnapshotDataFactory(Snapshot $snapshot): SnapshotSourceDataFactory
     {
         $snapshotSource = $snapshot->snapshotSource;
+        Assert::isInstanceOf($snapshotSource, Model::class);
         $className = $snapshotSource::class;
 
         $snapshotSourceDataFactory = match ($className) {

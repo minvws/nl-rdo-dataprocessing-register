@@ -11,8 +11,8 @@ use Illuminate\Database\Eloquent\Scope;
 
 class TenantScope implements Scope
 {
-    public function apply(Builder $builder, Model $model): Builder
+    public function apply(Builder $builder, Model $model): void
     {
-        return $builder->whereBelongsTo(Authentication::organisation());
+        $builder->whereBelongsTo(Authentication::organisation());
     }
 }

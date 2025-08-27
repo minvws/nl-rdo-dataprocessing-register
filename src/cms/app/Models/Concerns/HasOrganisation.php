@@ -4,30 +4,33 @@ declare(strict_types=1);
 
 namespace App\Models\Concerns;
 
+use App\Components\Uuid\UuidInterface;
+use App\Models\Casts\UuidCast;
 use App\Models\Organisation;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * @property string $organisation_id
- * @property Organisation $organisation
+ * @property UuidInterface $organisation_id
+ *
+ * @property-read Organisation $organisation
  */
 trait HasOrganisation
 {
-    public function initializeHasOrganisation(): void
+    final public function initializeHasOrganisation(): void
     {
-        $this->mergeCasts(['organisation_id' => 'string']);
+        $this->mergeCasts(['organisation_id' => UuidCast::class]);
         $this->mergeFillable(['organisation_id']);
     }
 
     /**
      * @return BelongsTo<Organisation, $this>
      */
-    public function organisation(): BelongsTo
+    final public function organisation(): BelongsTo
     {
         return $this->belongsTo(Organisation::class);
     }
 
-    public function getOrganisation(): Organisation
+    final public function getOrganisation(): Organisation
     {
         return $this->organisation;
     }

@@ -6,12 +6,8 @@ namespace Tests\Feature\Http\Middleware;
 
 use App\Http\Middleware\EnforceOneTimePassword;
 use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Routing\Route;
-use Mockery;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Response;
-use Tests\Helpers\ConfigHelper;
+use Tests\Helpers\ConfigTestHelper;
 
 use function expect;
 use function fake;
@@ -22,7 +18,7 @@ it('allows access when two-factor disabled', function (): void {
     $user = User::factory()->create();
     $this->be($user);
 
-    $request = mockEnforceOneTimePasswordRequest('profile');
+    $request = mockRequest(fake()->slug);
 
     $middleware = new EnforceOneTimePassword();
     $response = $middleware->handle($request, function (): Response {
@@ -36,7 +32,7 @@ it('allows access on logout', function (): void {
     $user = User::factory()->create();
     $this->be($user);
 
-    $request = mockEnforceOneTimePasswordRequest('logout');
+    $request = mockRequest(fake()->slug);
 
     $middleware = new EnforceOneTimePassword();
     $response = $middleware->handle($request, function (): Response {
@@ -54,8 +50,9 @@ it('allows access on profile', function (): void {
 
     $slug = $user->organisations()->first()->slug;
 
-    $request = mockEnforceOneTimePasswordRequest('profile', ['tenant' => $slug]);
+    $request = mockRequest(fake()->slug, ['tenant' => $slug]);
     $request->shouldReceive('routeIs')
+        ->once()
         ->andReturn('profile');
 
     $middleware = new EnforceOneTimePassword();
@@ -70,7 +67,7 @@ it('allows access if no tenant-id', function (): void {
     $user = User::factory()->create();
     $this->be($user);
 
-    $request = mockEnforceOneTimePasswordRequest('no-tenant', ['tenant' => null]);
+    $request = mockRequest(fake()->slug, ['tenant' => null]);
 
     $middleware = new EnforceOneTimePassword();
     $response = $middleware->handle($request, function (): Response {
@@ -88,8 +85,9 @@ it('redirects to profile page if two-factor is not confirmed', function (): void
 
     $slug = $user->organisations()->first()->slug;
 
-    $request = mockEnforceOneTimePasswordRequest(sprintf('%s/%s', $slug, fake()->slug()), ['tenant' => $slug]);
+    $request = mockRequest(sprintf('%s/%s', $slug, fake()->slug()), ['tenant' => $slug]);
     $request->shouldReceive('routeIs')
+        ->once()
         ->with('filament.admin.pages.profile')
         ->andReturn(false);
 
@@ -100,20 +98,20 @@ it('redirects to profile page if two-factor is not confirmed', function (): void
 
     expect($response->getStatusCode())
         ->toBe(302)
-        ->and($response->isRedirect(sprintf('%s/%s/profile', ConfigHelper::get('app.url'), $slug)))
+        ->and($response->isRedirect(sprintf('%s/%s/profile', ConfigTestHelper::get('app.url'), $slug)))
         ->toBeTrue();
 });
 
 it('redirects to two-factor page if no valid session', function (): void {
-    $user = User::factory()->withOrganisation()->withValidOtpRegistration()->create();
+    $user = User::factory()
+        ->withOrganisation()
+        ->withValidOtpRegistration()
+        ->create();
     $this->be($user);
 
     $slug = $user->organisations()->first()->slug;
 
-    $request = mockEnforceOneTimePasswordRequest(sprintf('%s/%s', $slug, fake()->slug()), ['tenant' => $slug]);
-    $request->shouldReceive('routeIs')
-        ->with('filament.admin.pages.profile')
-        ->andReturn(false);
+    $request = mockRequest(sprintf('%s/%s', $slug, fake()->slug()), ['tenant' => $slug]);
 
     $middleware = new EnforceOneTimePassword();
     $response = $middleware->handle($request, function (): Response {
@@ -122,22 +120,6 @@ it('redirects to two-factor page if no valid session', function (): void {
 
     expect($response->getStatusCode())
         ->toBe(302)
-        ->and($response->isRedirect(sprintf('%s/%s/two-factor-authentication?next=%%2F', ConfigHelper::get('app.url'), $slug)))
+        ->and($response->isRedirect(sprintf('%s/%s/two-factor-authentication?next=%%2F', ConfigTestHelper::get('app.url'), $slug)))
         ->toBeTrue();
 });
-
-/**
- * @param array<string> $parameters
- */
-function mockEnforceOneTimePasswordRequest(string $uri, array $parameters = []): Request
-{
-    $route = new Route('get', $uri, ['as' => $uri]);
-    $route->parameters = $parameters;
-
-    /** @var Request|MockObject $request */
-    $request = Mockery::mock(Request::class);
-    $request->shouldReceive('route')
-        ->andReturn($route);
-
-    return $request;
-}

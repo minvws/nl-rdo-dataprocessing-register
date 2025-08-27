@@ -5,8 +5,7 @@ declare(strict_types=1);
 use App\Enums\Authorization\Role;
 use App\Enums\Snapshot\SnapshotApprovalLogMessageType;
 use App\Enums\Snapshot\SnapshotApprovalStatus;
-use App\Mail\SnapshotApprovalNotification;
-use App\Mail\SnapshotApprovalRequest;
+use App\Mail\SnapshotApproval\ApprovalNotification;
 use App\Models\Organisation;
 use App\Models\Snapshot;
 use App\Models\SnapshotApproval;
@@ -33,9 +32,9 @@ it('can create', function (): void {
 
 it('can delete', function (): void {
     $snapshot = Snapshot::factory()->create();
-    $snapshotApproval = SnapshotApproval::factory()->create([
-        'snapshot_id' => $snapshot->id,
-    ]);
+    $snapshotApproval = SnapshotApproval::factory()
+        ->for($snapshot)
+        ->create();
     $user = User::factory()->create();
 
     /** @var SnapshotApprovalService $snapshotApprovalService */
@@ -50,30 +49,13 @@ it('can delete', function (): void {
     ]);
 });
 
-it('will notify on request', function (): void {
-    $snapshot = Snapshot::factory()->create();
-    $snapshotApproval = SnapshotApproval::factory()->create([
-        'snapshot_id' => $snapshot->id,
-    ]);
-    $user = User::factory()->create();
-    Mail::fake();
-
-    /** @var SnapshotApprovalService $snapshotApprovalService */
-    $snapshotApprovalService = $this->app->get(SnapshotApprovalService::class);
-    $snapshotApprovalService->notify($snapshotApproval, $user);
-
-    $this->assertDatabaseHas(SnapshotApprovalLog::class, [
-        'snapshot_id' => $snapshot->id,
-    ]);
-    Mail::assertQueued(SnapshotApprovalRequest::class);
-});
-
 it('can set status to approved', function (): void {
     $snapshot = Snapshot::factory()->create();
-    $snapshotApproval = SnapshotApproval::factory()->create([
-        'snapshot_id' => $snapshot->id,
-        'status' => SnapshotApprovalStatus::UNKNOWN,
-    ]);
+    $snapshotApproval = SnapshotApproval::factory()
+        ->for($snapshot)
+        ->create([
+            'status' => SnapshotApprovalStatus::UNKNOWN,
+        ]);
     $user = User::factory()->create();
     Mail::fake();
 
@@ -90,11 +72,7 @@ it('can set status to approved', function (): void {
         'message->type' => SnapshotApprovalLogMessageType::APPROVAL_UPDATE,
     ]);
 
-    Mail::assertNotSent(SnapshotApprovalNotification::class);
-    $this->assertDatabaseMissing(SnapshotApprovalLog::class, [
-        'snapshot_id' => $snapshot->id,
-        'message->type' => SnapshotApprovalLogMessageType::APPROVAL_NOTIFY,
-    ]);
+    Mail::assertNotSent(ApprovalNotification::class);
 });
 
 it('can set status to approved with notification to other approvals', function (): void {
@@ -103,47 +81,38 @@ it('can set status to approved with notification to other approvals', function (
     $snapshot = Snapshot::factory()
         ->for($organisation)
         ->create();
-    $snapshotApproval = SnapshotApproval::factory()->create([
-        'snapshot_id' => $snapshot->id,
-        'status' => SnapshotApprovalStatus::UNKNOWN,
-    ]);
-    $user1 = User::factory()->hasAttached($organisation)->create();
-    $user2 = User::factory()->hasAttached($organisation)->create();
-    $user2->assignOrganisationRole(Role::PRIVACY_OFFICER, $organisation);
+    $snapshotApproval = SnapshotApproval::factory()
+        ->for($snapshot)
+        ->create([
+            'status' => SnapshotApprovalStatus::UNKNOWN,
+        ]);
+    $user = User::factory()
+        ->hasAttached($organisation)
+        ->create();
+    User::factory()
+        ->hasAttached($organisation)
+        ->hasOrganisationRole(Role::PRIVACY_OFFICER, $organisation)
+        ->create();
     Mail::fake();
 
     /** @var SnapshotApprovalService $snapshotApprovalService */
     $snapshotApprovalService = $this->app->get(SnapshotApprovalService::class);
-    $snapshotApprovalService->setStatus($user1, $snapshotApproval, SnapshotApprovalStatus::APPROVED);
+    $snapshotApprovalService->setStatus($user, $snapshotApproval, SnapshotApprovalStatus::APPROVED);
 
     $snapshotApproval->refresh();
     expect($snapshotApproval->status)
         ->toBe(SnapshotApprovalStatus::APPROVED);
-    $this->assertDatabaseHas(SnapshotApprovalLog::class, [
-        'snapshot_id' => $snapshot->id,
-        'user_id' => $user1->id,
-        'message->type' => SnapshotApprovalLogMessageType::APPROVAL_UPDATE,
-    ]);
 
-    Mail::assertQueued(
-        SnapshotApprovalNotification::class,
-        static function (SnapshotApprovalNotification $mail) use ($user2): bool {
-            return $mail->hasTo($user2->email);
-        },
-    );
-    $this->assertDatabaseHas(SnapshotApprovalLog::class, [
-        'snapshot_id' => $snapshot->id,
-        'user_id' => $user1->id,
-        'message->type' => SnapshotApprovalLogMessageType::APPROVAL_NOTIFY,
-    ]);
+    Mail::assertQueued(ApprovalNotification::class);
 });
 
 it('can set status to declined', function (): void {
     $snapshot = Snapshot::factory()->create();
-    $snapshotApproval = SnapshotApproval::factory()->create([
-        'snapshot_id' => $snapshot->id,
-        'status' => SnapshotApprovalStatus::UNKNOWN,
-    ]);
+    $snapshotApproval = SnapshotApproval::factory()
+        ->for($snapshot)
+        ->create([
+            'status' => SnapshotApprovalStatus::UNKNOWN,
+        ]);
     $user = User::factory()->create();
 
     /** @var SnapshotApprovalService $snapshotApprovalService */
@@ -153,7 +122,4 @@ it('can set status to declined', function (): void {
     $snapshotApproval->refresh();
     expect($snapshotApproval->status)
         ->toBe(SnapshotApprovalStatus::DECLINED);
-    $this->assertDatabaseHas(SnapshotApprovalLog::class, [
-        'snapshot_id' => $snapshot->id,
-    ]);
 });

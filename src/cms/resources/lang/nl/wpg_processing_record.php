@@ -70,4 +70,7 @@ return [
     'has_pseudonymization' => 'Gebruikt u pseudonimisering?',
     'number' => 'Nummer',
     'security' => 'Beveiliging',
+    'measures_implemented' => 'Vastgesteld beveiligingsbeleid dat ook is geïmplementeerd',
+    'other_measures' => 'Overige maatregelen',
+    'measures_description' => 'Toelichting maatregelen',
 ];

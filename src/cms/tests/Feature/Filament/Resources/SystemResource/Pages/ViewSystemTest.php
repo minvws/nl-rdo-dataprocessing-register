@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 use App\Filament\Resources\SystemResource;
 use App\Models\System;
+use Tests\Helpers\Model\OrganisationTestHelper;
 
 it('can load the ViewSystem page', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $system = System::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
 
-    $this->get(SystemResource::getUrl('view', ['record' => $system->id]))
+    $this->asFilamentOrganisationUser($organisation)
+        ->get(SystemResource::getUrl('view', ['record' => $system]))
         ->assertSuccessful();
 });

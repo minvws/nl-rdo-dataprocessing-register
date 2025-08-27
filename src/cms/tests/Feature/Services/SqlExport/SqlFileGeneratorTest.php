@@ -6,32 +6,33 @@ use App\Services\SqlExport\Migrator;
 use App\Services\SqlExport\SqlFileGenerator;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Storage;
-use Mockery\MockInterface;
 use Symfony\Component\Console\Output\NullOutput;
-use Tests\Helpers\ConfigHelper;
+use Tests\Helpers\ConfigTestHelper;
 
 it('outputs to default folder', function (): void {
-    $sqlGenerationFilesystem = Storage::fake(ConfigHelper::get('sql-generator.filesystem_disk'));
-    $sqlGenerationManagementFilesystem = Storage::fake(ConfigHelper::get('sql-generator.filesystem_management_disk'));
+    $sqlGenerationFilesystem = Storage::fake(ConfigTestHelper::get('sql-generator.filesystem_disk'));
+    Storage::fake(ConfigTestHelper::get('sql-generator.filesystem_management_disk'));
 
     $version = fake()->slug(1);
     $migrationName = fake()->slug();
     // using e.g. fake()->word() sometimes generates sql-keywords that will be capitalized (and therefore differs from the expected outout)
     $migrationContent = fake()->randomElement(['foo', 'bar', 'baz']);
 
-    /** @var Migrator&MockInterface $migrator */
-    $migrator = $this->mock(Migrator::class);
-    $migrator->shouldReceive([
-        'getMigrationFiles' => [$migrationName => $migrationName],
-        'getMigrationName' => sprintf('%s_%s', now()->format('Y_m_d_His'), $migrationName),
-        'getMigratorQueries' => collect([$migrationContent]),
-    ]);
+    $this->mock(Migrator::class)
+        ->shouldReceive('getMigrationFiles')
+        ->once()
+        ->with([])
+        ->andReturn([$migrationName => $migrationName])
+        ->shouldReceive('getMigrationName')
+        ->times(2)
+        ->with($migrationName)
+        ->andReturn(sprintf('%s_%s', now()->format('Y_m_d_His'), $migrationName))
+        ->shouldReceive('getMigratorQueries')
+        ->once()
+        ->with($migrationName, 'up')
+        ->andReturn(collect([$migrationContent]));
 
-    /** @var SqlFileGenerator $sqlFileGenerator */
-    $sqlFileGenerator = $this->app->make(SqlFileGenerator::class, [
-        'sqlGenerationFilesystem' => $sqlGenerationFilesystem,
-        'sqlGenerationManagementFilesystem' => $sqlGenerationManagementFilesystem,
-    ]);
+    $sqlFileGenerator = $this->app->get(SqlFileGenerator::class);
     $sqlFileGenerator->generateSqlFilesFromMigrations(
         [],
         new NullOutput(),
@@ -44,8 +45,8 @@ it('outputs to default folder', function (): void {
 });
 
 it('regenerates existing files', function (): void {
-    $sqlGenerationFilesystem = Storage::fake(ConfigHelper::get('sql-generator.filesystem_disk'));
-    $sqlGenerationManagementFilesystem = Storage::fake(ConfigHelper::get('sql-generator.filesystem_management_disk'));
+    $sqlGenerationFilesystem = Storage::fake(ConfigTestHelper::get('sql-generator.filesystem_disk'));
+    Storage::fake(ConfigTestHelper::get('sql-generator.filesystem_management_disk'));
 
     $version = fake()->slug(1);
     $migrationName = fake()->slug();
@@ -55,19 +56,22 @@ it('regenerates existing files', function (): void {
     // create file with random contents
     $sqlGenerationFilesystem->put(sprintf('%s/0001-%s.sql', $version, $migrationName), fake()->sentence());
 
-    /** @var Migrator&MockInterface $migrator */
-    $migrator = $this->mock(Migrator::class);
-    $migrator->shouldReceive([
-        'getMigrationFiles' => [$migrationName => $migrationContent],
-        'getMigrationName' => sprintf('%s_%s', now()->format('Y_m_d_His'), $migrationName),
-        'getMigratorQueries' => collect([$migrationContent]),
-    ]);
+    $this->mock(Migrator::class)
+        ->shouldReceive('getMigrationFiles')
+        ->once()
+        ->with([])
+        ->andReturn([$migrationName => $migrationName])
+        ->shouldReceive('getMigrationName')
+        ->times(2)
+        ->with($migrationName)
+        ->andReturn(sprintf('%s_%s', now()->format('Y_m_d_His'), $migrationName))
+        ->shouldReceive('getMigratorQueries')
+        ->once()
+        ->with($migrationName, 'up')
+        ->andReturn(collect([$migrationContent]));
 
     /** @var SqlFileGenerator $sqlFileGenerator */
-    $sqlFileGenerator = $this->app->make(SqlFileGenerator::class, [
-        'sqlGenerationFilesystem' => $sqlGenerationFilesystem,
-        'sqlGenerationManagementFilesystem' => $sqlGenerationManagementFilesystem,
-    ]);
+    $sqlFileGenerator = $this->app->get(SqlFileGenerator::class);
     $sqlFileGenerator->generateSqlFilesFromMigrations(
         [],
         new NullOutput(),
@@ -80,8 +84,8 @@ it('regenerates existing files', function (): void {
 });
 
 it('generates line to set owner on create table', function (): void {
-    $sqlGenerationFilesystem = Storage::fake(ConfigHelper::get('sql-generator.filesystem_disk'));
-    $sqlGenerationManagementFilesystem = Storage::fake(ConfigHelper::get('sql-generator.filesystem_management_disk'));
+    $sqlGenerationFilesystem = Storage::fake(ConfigTestHelper::get('sql-generator.filesystem_disk'));
+    Storage::fake(ConfigTestHelper::get('sql-generator.filesystem_management_disk'));
 
     $version = fake()->slug(1);
     $migrationName = fake()->slug();
@@ -91,19 +95,22 @@ it('generates line to set owner on create table', function (): void {
     // create file with random contents
     $sqlGenerationFilesystem->put(sprintf('%s/0001-%s.sql', $version, $migrationName), fake()->sentence());
 
-    /** @var Migrator&MockInterface $migrator */
-    $migrator = $this->mock(Migrator::class);
-    $migrator->shouldReceive([
-        'getMigrationFiles' => [$migrationName => $migrationContent],
-        'getMigrationName' => sprintf('%s_%s', now()->format('Y_m_d_His'), $migrationName),
-        'getMigratorQueries' => collect([$migrationContent]),
-    ]);
+    $this->mock(Migrator::class)
+        ->shouldReceive('getMigrationFiles')
+        ->once()
+        ->with([])
+        ->andReturn([$migrationName => $migrationName])
+        ->shouldReceive('getMigrationName')
+        ->times(2)
+        ->with($migrationName)
+        ->andReturn(sprintf('%s_%s', now()->format('Y_m_d_His'), $migrationName))
+        ->shouldReceive('getMigratorQueries')
+        ->once()
+        ->with($migrationName, 'up')
+        ->andReturn(collect([$migrationContent]));
 
     /** @var SqlFileGenerator $sqlFileGenerator */
-    $sqlFileGenerator = $this->app->make(SqlFileGenerator::class, [
-        'sqlGenerationFilesystem' => $sqlGenerationFilesystem,
-        'sqlGenerationManagementFilesystem' => $sqlGenerationManagementFilesystem,
-    ]);
+    $sqlFileGenerator = $this->app->get(SqlFileGenerator::class);
     $sqlFileGenerator->generateSqlFilesFromMigrations(
         [],
         new NullOutput(),
@@ -116,28 +123,30 @@ it('generates line to set owner on create table', function (): void {
 });
 
 it('appends an insert query to log the executed migration in admin_log_entries', function (): void {
-    $sqlGenerationFilesystem = Storage::fake(ConfigHelper::get('sql-generator.filesystem_disk'));
-    $sqlGenerationManagementFilesystem = Storage::fake(ConfigHelper::get('sql-generator.filesystem_management_disk'));
+    $sqlGenerationFilesystem = Storage::fake(ConfigTestHelper::get('sql-generator.filesystem_disk'));
+    Storage::fake(ConfigTestHelper::get('sql-generator.filesystem_management_disk'));
 
-    ConfigHelper::set('sql-generator.migration_admin_log_start', now()->subHour()->toDateTimeString());
+    ConfigTestHelper::set('sql-generator.migration_admin_log_start', now()->subHour()->toDateTimeString());
     $migrationName = fake()->slug();
     $migrationFullName = sprintf('%s_%s', now()->format('Y_m_d_His'), $migrationName);
     $migrationContent = fake()->sentence();
     $version = fake()->slug(1);
 
-    /** @var Migrator&MockInterface $migrator */
-    $migrator = $this->mock(Migrator::class);
-    $migrator->shouldReceive([
-        'getMigrationFiles' => [$migrationName => $migrationContent],
-        'getMigrationName' => $migrationFullName,
-        'getMigratorQueries' => collect([$migrationContent]),
-    ]);
+    $this->mock(Migrator::class)
+        ->shouldReceive('getMigrationFiles')
+        ->once()
+        ->with([])
+        ->andReturn([$migrationName => $migrationName])
+        ->shouldReceive('getMigrationName')
+        ->times(2)
+        ->with($migrationName)
+        ->andReturn(sprintf('%s_%s', now()->format('Y_m_d_His'), $migrationName))
+        ->shouldReceive('getMigratorQueries')
+        ->once()
+        ->with($migrationName, 'up')
+        ->andReturn(collect([$migrationContent]));
 
-    /** @var SqlFileGenerator $sqlFileGenerator */
-    $sqlFileGenerator = $this->app->make(SqlFileGenerator::class, [
-        'sqlGenerationFilesystem' => $sqlGenerationFilesystem,
-        'sqlGenerationManagementFilesystem' => $sqlGenerationManagementFilesystem,
-    ]);
+    $sqlFileGenerator = $this->app->get(SqlFileGenerator::class);
     $sqlFileGenerator->generateSqlFilesFromMigrations(
         [],
         new NullOutput(),
@@ -151,28 +160,30 @@ it('appends an insert query to log the executed migration in admin_log_entries',
 });
 
 it('does not append an admin log insert statement if the migration is older than the configured start date', function (): void {
-    $sqlGenerationFilesystem = Storage::fake(ConfigHelper::get('sql-generator.filesystem_disk'));
-    $sqlGenerationManagementFilesystem = Storage::fake(ConfigHelper::get('sql-generator.filesystem_management_disk'));
+    $sqlGenerationFilesystem = Storage::fake(ConfigTestHelper::get('sql-generator.filesystem_disk'));
+    Storage::fake(ConfigTestHelper::get('sql-generator.filesystem_management_disk'));
 
-    ConfigHelper::set('sql-generator.migration_admin_log_start', now()->addHour()->toDateTimeString());
+    ConfigTestHelper::set('sql-generator.migration_admin_log_start', now()->addHour()->toDateTimeString());
     $migrationName = fake()->slug();
     $migrationFullName = sprintf('%s_%s', now()->format('Y_m_d_His'), $migrationName);
     $migrationContent = fake()->sentence();
     $version = fake()->slug(1);
 
-    /** @var Migrator&MockInterface $migrator */
-    $migrator = $this->mock(Migrator::class);
-    $migrator->shouldReceive([
-        'getMigrationFiles' => [$migrationName => $migrationContent],
-        'getMigrationName' => $migrationFullName,
-        'getMigratorQueries' => collect([$migrationContent]),
-    ]);
+    $this->mock(Migrator::class)
+        ->shouldReceive('getMigrationFiles')
+        ->once()
+        ->with([])
+        ->andReturn([$migrationName => $migrationFullName])
+        ->shouldReceive('getMigrationName')
+        ->times(2)
+        ->with($migrationFullName)
+        ->andReturn(sprintf('%s_%s', now()->format('Y_m_d_His'), $migrationName))
+        ->shouldReceive('getMigratorQueries')
+        ->once()
+        ->with($migrationFullName, 'up')
+        ->andReturn(collect([$migrationContent]));
 
-    /** @var SqlFileGenerator $sqlFileGenerator */
-    $sqlFileGenerator = $this->app->make(SqlFileGenerator::class, [
-        'sqlGenerationFilesystem' => $sqlGenerationFilesystem,
-        'sqlGenerationManagementFilesystem' => $sqlGenerationManagementFilesystem,
-    ]);
+    $sqlFileGenerator = $this->app->get(SqlFileGenerator::class);
     $sqlFileGenerator->generateSqlFilesFromMigrations(
         [],
         new NullOutput(),
@@ -186,26 +197,28 @@ it('does not append an admin log insert statement if the migration is older than
 });
 
 it('generates the db-requirements file with the correct contents if there are new migrations', function (): void {
-    $sqlGenerationFilesystem = Storage::fake(ConfigHelper::get('sql-generator.filesystem_disk'));
-    $sqlGenerationManagementFilesystem = Storage::fake(ConfigHelper::get('sql-generator.filesystem_management_disk'));
+    Storage::fake(ConfigTestHelper::get('sql-generator.filesystem_disk'));
+    $sqlGenerationManagementFilesystem = Storage::fake(ConfigTestHelper::get('sql-generator.filesystem_management_disk'));
 
     $migrationName = sprintf('%s_%s.sql', CarbonImmutable::now()->format('Y_m_d_His'), fake()->slug());
     $migrationContent = fake()->sentence();
 
-    /** @var Migrator&MockInterface $migrator */
-    $migrator = $this->mock(Migrator::class);
-    $migrator->shouldReceive([
-        'getMigrationFiles' => [$migrationName => $migrationContent],
-        'getMigrationName' => $migrationName,
-        'getMigratorQueries' => collect([$migrationContent]),
-    ]);
+    $this->mock(Migrator::class)
+        ->shouldReceive('getMigrationFiles')
+        ->once()
+        ->with([])
+        ->andReturn([$migrationName => $migrationName])
+        ->shouldReceive('getMigrationName')
+        ->times(2)
+        ->with($migrationName)
+        ->andReturn(sprintf('%s_%s', now()->format('Y_m_d_His'), $migrationName))
+        ->shouldReceive('getMigratorQueries')
+        ->once()
+        ->with($migrationName, 'up')
+        ->andReturn(collect([$migrationContent]));
 
     $newVersion = fake()->unique()->slug(1);
-    /** @var SqlFileGenerator $sqlFileGenerator */
-    $sqlFileGenerator = $this->app->make(SqlFileGenerator::class, [
-        'sqlGenerationFilesystem' => $sqlGenerationFilesystem,
-        'sqlGenerationManagementFilesystem' => $sqlGenerationManagementFilesystem,
-    ]);
+    $sqlFileGenerator = $this->app->get(SqlFileGenerator::class);
     $sqlFileGenerator->generateSqlFilesFromMigrations(
         [],
         new NullOutput(),

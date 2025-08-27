@@ -4,44 +4,49 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Models\Concerns\HasUuidAsKey;
-use Carbon\CarbonImmutable;
+use App\Collections\RemarkCollection;
+use App\Components\Uuid\UuidInterface;
+use App\Models\Casts\UuidCast;
+use App\Models\Concerns\HasSoftDeletes;
+use App\Models\Concerns\HasTimestamps;
+use App\Models\Concerns\HasUuidAsId;
+use Database\Factories\RemarkFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * @property string $id
- * @property string|null $user_id
+ * @property ?UuidInterface $user_id
  * @property string $remark_relatable_type
- * @property string $remark_relatable_id
+ * @property UuidInterface $remark_relatable_id
  * @property string $body
- * @property CarbonImmutable|null $created_at
- * @property CarbonImmutable|null $updated_at
- * @property CarbonImmutable|null $deleted_at
  *
  * @property-read User|null $user
  */
 class Remark extends Model
 {
+    /** @use HasFactory<RemarkFactory> */
     use HasFactory;
-    use HasUuidAsKey;
-    use SoftDeletes;
+    use HasTimestamps;
+    use HasSoftDeletes;
+    use HasUuidAsId;
 
-    protected $casts = [
-        'id' => 'string',
-        'remark_relatable_id' => 'string',
-        'user_id' => 'string',
-    ];
-
+    protected static string $collectionClass = RemarkCollection::class;
     protected $fillable = [
         'user_id',
         'remark_relatable_id',
         'remark_relatable_type',
         'body',
     ];
+
+    public function casts(): array
+    {
+        return [
+            'remark_relatable_id' => UuidCast::class,
+            'user_id' => UuidCast::class,
+        ];
+    }
 
     /**
      * @return BelongsTo<User, $this>

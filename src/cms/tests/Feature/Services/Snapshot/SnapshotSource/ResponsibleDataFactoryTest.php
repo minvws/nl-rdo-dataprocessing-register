@@ -8,12 +8,17 @@ use App\Models\Snapshot;
 use App\Services\Snapshot\SnapshotSource\ResponsibleDataFactory;
 
 it('can generate private markdown', function (): void {
+    $responsible = Responsible::factory()
+        ->create([
+            'name' => '45e7bdb1-6c59-3090-81c1-144012593ece',
+        ]);
     $snapshot = Snapshot::factory()
+        ->for($responsible, 'snapshotSource')
         ->create();
 
     $responsibleDataFactory = new ResponsibleDataFactory();
     expect($responsibleDataFactory->generatePrivateMarkdown($snapshot))
-        ->toBeNull();
+        ->toMatchSnapshot();
 });
 
 it('can generate public frontmatter', function (): void {

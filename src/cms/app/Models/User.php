@@ -4,70 +4,94 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Collections\OrganisationCollection;
+use App\Collections\OrganisationUserRoleCollection;
+use App\Collections\SnapshotApprovalCollection;
+use App\Collections\UserCollection;
+use App\Collections\UserGlobalRoleCollection;
+use App\Collections\UserLoginTokenCollection;
+use App\Enums\RegisterLayout;
+use App\Enums\Snapshot\MandateholderNotifyBatch;
+use App\Enums\Snapshot\MandateholderNotifyDirectly;
+use App\Models\Builders\UserBuilder;
 use App\Models\Concerns\HasRoles;
-use App\Models\Concerns\HasUuidAsKey;
+use App\Models\Concerns\HasSoftDeletes;
+use App\Models\Concerns\HasTimestamps;
+use App\Models\Concerns\HasUuidAsId;
 use Carbon\CarbonImmutable;
+use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasTenants;
 use Filament\Panel;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Attributes\UseEloquentBuilder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Notifications\DatabaseNotificationCollection;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Collection as SupportCollection;
 use MinVWS\Logging\Laravel\Contracts\LoggableUser;
+use Webmozart\Assert\Assert;
+
+use function sprintf;
 
 /**
- * @property string $id
- * @property string $name
  * @property string $email
- * @property string|null $remember_token
- * @property CarbonImmutable|null $created_at
- * @property CarbonImmutable|null $updated_at
- * @property CarbonImmutable|null $deleted_at
+ * @property string $logName
+ * @property MandateholderNotifyBatch $mandateholder_notify_batch
+ * @property MandateholderNotifyDirectly $mandateholder_notify_directly
+ * @property string $name
  * @property mixed|null $otp_secret
  * @property CarbonImmutable|null $otp_confirmed_at
  * @property mixed $password
+ * @property RegisterLayout $register_layout
+ * @property string|null $remember_token
  *
- * @property-read Collection<int, UserGlobalRole> $globalRoles
+ * @property-read UserGlobalRoleCollection $globalRoles
  * @property-read DatabaseNotificationCollection<int, DatabaseNotification> $notifications
- * @property-read Collection<int, UserOrganisationRole> $organisationRoles
- * @property-read Collection<int, Organisation> $organisations
- * @property-read Collection<int, UserLoginToken> $userLoginTokens
+ * @property-read OrganisationUserRoleCollection $organisationRoles
+ * @property-read OrganisationCollection $organisations
+ * @property-read SnapshotApprovalCollection $snapshotApprovals
+ * @property-read UserLoginTokenCollection $userLoginTokens
  */
-class User extends Authenticatable implements FilamentUser, LoggableUser, MustVerifyEmail, HasTenants
+#[UseEloquentBuilder(UserBuilder::class)]
+class User extends Authenticatable implements FilamentUser, HasTenants, LoggableUser, MustVerifyEmail
 {
     use HasRoles;
+    /** @use HasFactory<UserFactory> */
     use HasFactory;
+    use HasSoftDeletes;
+    use HasTimestamps;
+    use HasUuidAsId;
     use Notifiable;
-    use HasUuidAsKey;
-    use SoftDeletes;
 
-    /** @var array<string, string> */
-    protected $casts = [
-        'id' => 'string',
-        'otp_secret' => 'encrypted',
-        'otp_confirmed_at' => 'datetime',
-    ];
-
-    /** @var array<int, string> */
+    protected static string $collectionClass = UserCollection::class;
     protected $fillable = [
-        'name',
         'email',
+        'mandateholder_notify_batch',
+        'mandateholder_notify_directly',
+        'name',
+        'register_layout',
+    ];
+    protected $hidden = [
+        'otp_secret',
+        'remember_token',
     ];
 
-    /** @var array<int, string> */
-    protected $hidden = [
-        'remember_token',
-        'otp_secret',
-    ];
+    public function casts(): array
+    {
+        return [
+            'mandateholder_notify_batch' => MandateholderNotifyBatch::class,
+            'mandateholder_notify_directly' => MandateholderNotifyDirectly::class,
+            'otp_secret' => 'encrypted',
+            'otp_confirmed_at' => 'datetime',
+            'register_layout' => RegisterLayout::class,
+        ];
+    }
 
     public function canAccessPanel(Panel $panel): bool
     {
@@ -75,7 +99,7 @@ class User extends Authenticatable implements FilamentUser, LoggableUser, MustVe
     }
 
     /**
-     * @return BelongsToMany<Organisation, $this>
+     * @return BelongsToMany<Organisation, $this, OrganisationUser>
      */
     public function organisations(): BelongsToMany
     {
@@ -90,13 +114,13 @@ class User extends Authenticatable implements FilamentUser, LoggableUser, MustVe
             return false;
         }
 
-        return $this->organisations->contains($tenant);
+        return $this->organisations->pluck('id')->contains($tenant->id);
     }
 
     /**
-     * @return SupportCollection<int, Organisation>|array<Organisation>
+     * @return OrganisationCollection|array<Organisation>
      */
-    public function getTenants(Panel $panel): array|SupportCollection
+    public function getTenants(Panel $panel): array|OrganisationCollection
     {
         return $this->organisations;
     }
@@ -110,11 +134,19 @@ class User extends Authenticatable implements FilamentUser, LoggableUser, MustVe
     }
 
     /**
-     * @return HasMany<UserOrganisationRole, $this>
+     * @return HasMany<OrganisationUserRole, $this>
      */
     public function organisationRoles(): HasMany
     {
-        return $this->hasMany(UserOrganisationRole::class);
+        return $this->hasMany(OrganisationUserRole::class);
+    }
+
+    /**
+     * @return HasMany<SnapshotApproval, $this>
+     */
+    public function snapshotApprovals(): HasMany
+    {
+        return $this->hasMany(SnapshotApproval::class, 'assigned_to');
     }
 
     /**
@@ -123,5 +155,21 @@ class User extends Authenticatable implements FilamentUser, LoggableUser, MustVe
     public function userLoginTokens(): HasMany
     {
         return $this->hasMany(UserLoginToken::class);
+    }
+
+    /**
+     * @return Attribute<string, never>
+     */
+    public function logName(): Attribute
+    {
+        return Attribute::make(static function (mixed $value, array $attributes): string {
+            $name = $attributes['name'];
+            Assert::string($name);
+
+            $email = $attributes['email'];
+            Assert::string($email);
+
+            return sprintf('%s (%s)', $name, $email);
+        });
     }
 }

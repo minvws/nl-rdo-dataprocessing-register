@@ -6,7 +6,7 @@ namespace App\Console\Commands;
 
 use App\Config\Config;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\DatabaseManager;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Webmozart\Assert\Assert;
@@ -20,7 +20,7 @@ class SqlExecute extends Command
     protected $signature = 'sql-execute {version?}';
     protected $description = 'Execute sql-files instead of laravel migrations';
 
-    public function handle(): int
+    public function handle(DatabaseManager $databaseManager): int
     {
         $version = $this->argument('version');
         Assert::nullOrStringNotEmpty($version);
@@ -35,7 +35,7 @@ class SqlExecute extends Command
                 $query = $fileSystem->get($file);
                 Assert::string($query);
 
-                DB::unprepared($query);
+                $databaseManager->unprepared($query);
                 $this->output->writeln(sprintf('Executed %s', $file));
             }
         }

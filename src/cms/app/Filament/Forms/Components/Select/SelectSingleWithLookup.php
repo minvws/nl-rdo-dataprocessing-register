@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Forms\Components\Select;
 
+use App\Components\Uuid\UuidInterface;
 use App\Enums\Authorization\Permission;
 use App\Facades\Authentication;
 use App\Facades\Authorization;
@@ -13,6 +14,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Webmozart\Assert\Assert;
 
 use function array_keys;
 
@@ -38,22 +40,38 @@ class SelectSingleWithLookup extends Select
             ->required()
             ->relationship($relationshipName, $relatedField, TenantScoped::getAsClosure())
             ->in(static function (SelectSingleWithLookup $select): array {
-                return array_keys($select->getOptions());
+                return array_keys($select->getEnabledOptions());
             })
             ->visible(Authorization::hasPermission(Permission::LOOKUP_LIST_VIEW))
             ->createOptionForm([
-                TextInput::make('name')
+                TextInput::make($relatedField)
                     ->required(),
                 Hidden::make('enabled')
                     ->default(true),
                 Hidden::make('organisation_id')
-                    ->default(Authentication::organisation()->id),
+                    ->default(Authentication::organisation()->id->toString()),
             ])
+            ->formatStateUsing(static function (string|UuidInterface|null $state): ?string {
+                if ($state === null) {
+                    return null;
+                }
+
+                if ($state instanceof UuidInterface) {
+                    return $state->toString();
+                }
+
+                return $state;
+            })
+            ->createOptionUsing(static function (array $data) use ($relatedModel): string {
+                Assert::isMap($data);
+
+                $key = $relatedModel::create($data)->getKey();
+                Assert::isInstanceOf($key, UuidInterface::class);
+
+                return $key->toString();
+            })
             ->disableOptionWhen(static function (string $value) use ($disabled): bool {
                 return $disabled->contains($value);
-            })
-            ->in(static function (Select $component): array {
-                return array_keys($component->getEnabledOptions());
             });
     }
 }

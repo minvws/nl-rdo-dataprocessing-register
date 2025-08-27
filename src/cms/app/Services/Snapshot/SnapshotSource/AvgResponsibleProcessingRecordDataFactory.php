@@ -18,9 +18,11 @@ class AvgResponsibleProcessingRecordDataFactory extends DataFactory implements S
         return $this->render('snapshot-data-create.avg-responsible-processing-record.private-markdown', $snapshot);
     }
 
+    /**
+     * @return array<string, string|array<string, string>>
+     */
     public function generatePublicFrontmatter(Snapshot $snapshot): array
     {
-        /** @var AvgResponsibleProcessingRecord $record */
         $record = $snapshot->snapshotSource;
         Assert::isInstanceOf($record, AvgResponsibleProcessingRecord::class);
 
@@ -30,7 +32,7 @@ class AvgResponsibleProcessingRecordDataFactory extends DataFactory implements S
 
         return [
             'title' => $record->name,
-            'type' => SitemapType::PROCESSING_RECORD,
+            'type' => SitemapType::PROCESSING_RECORD->value,
             'record' => [
                 'reference' => $record->getNumber(),
                 'title' => $record->name,

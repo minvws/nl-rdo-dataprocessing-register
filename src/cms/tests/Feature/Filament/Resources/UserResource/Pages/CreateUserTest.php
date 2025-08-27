@@ -2,27 +2,22 @@
 
 declare(strict_types=1);
 
-use App\Enums\Authorization\Role;
 use App\Filament\Resources\UserResource;
 use App\Filament\Resources\UserResource\Pages\CreateUser;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 
-use function Pest\Livewire\livewire;
-
-beforeEach(function (): void {
-    $this->user->assignGlobalRole(Role::FUNCTIONAL_MANAGER);
-});
-
 it('loads the create page', function (): void {
-    $this->get(UserResource::getUrl('create'))
+    $this->asFilamentUser()
+        ->get(UserResource::getUrl('create'))
         ->assertSuccessful();
 });
 
 it('can create an entry', function (): void {
     $name = fake()->uuid();
 
-    livewire(CreateUser::class)
+    $this->asFilamentUser()
+        ->createLivewireTestable(CreateUser::class)
         ->fillForm([
             'name' => $name,
             'email' => fake()->safeEmail(),
@@ -42,7 +37,8 @@ it('cannot create an entry with a duplicate emailaddress', function (): void {
             'email' => $email,
         ]);
 
-    livewire(CreateUser::class)
+    $this->asFilamentUser()
+        ->createLivewireTestable(CreateUser::class)
         ->fillForm([
             'name' => fake()->name(),
             'email' => ucfirst($email),
@@ -59,7 +55,8 @@ it('can create an entry with a duplicate emailaddress if deleted', function (): 
             'deleted_at' => CarbonImmutable::yesterday(),
         ]);
 
-    livewire(CreateUser::class)
+    $this->asFilamentUser()
+        ->createLivewireTestable(CreateUser::class)
         ->fillForm([
             'name' => fake()->name(),
             'email' => ucfirst($email),

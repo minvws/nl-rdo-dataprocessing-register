@@ -13,4 +13,9 @@ class ResponsibleDataFactory extends DataFactory implements SnapshotSourceDataFa
     {
         return $this->render('snapshot-data-create.responsible.public-markdown', $snapshot);
     }
+
+    public function generatePrivateMarkdown(Snapshot $snapshot): ?string
+    {
+        return $this->render('snapshot-data-create.responsible.private-markdown', $snapshot);
+    }
 }

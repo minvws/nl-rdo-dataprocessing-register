@@ -3,13 +3,17 @@
 declare(strict_types=1);
 
 use App\Jobs\PublicWebsite\ContentGeneratorJob;
+use App\Repositories\AdminLogRepository;
 use App\Services\PublicWebsite\ContentGenerator;
 
 it('can run the job', function (): void {
-    $contentGenerator = $this->createMock(ContentGenerator::class);
-    $contentGenerator->expects($this->once())
-        ->method('generate');
+    $adminLogRepository = $this->app->get(AdminLogRepository::class);
+
+    $contentGenerator = $this->mock(ContentGenerator::class)
+        ->shouldReceive('generate')
+        ->once()
+        ->getMock();
 
     $contentGeneratorJob = new ContentGeneratorJob();
-    $contentGeneratorJob->handle($contentGenerator);
+    $contentGeneratorJob->handle($adminLogRepository, $contentGenerator);
 });

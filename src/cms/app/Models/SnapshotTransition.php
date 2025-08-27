@@ -4,46 +4,49 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Collections\SnapshotTransitionCollection;
+use App\Components\Uuid\UuidInterface;
+use App\Models\Casts\UuidCast;
 use App\Models\Concerns\BelongsToSnapshot;
-use App\Models\Concerns\HasUuidAsKey;
+use App\Models\Concerns\HasTimestamps;
+use App\Models\Concerns\HasUuidAsId;
 use App\Models\States\SnapshotState;
-use Carbon\CarbonImmutable;
+use Database\Factories\SnapshotTransitionFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Spatie\ModelStates\HasStates;
 
 /**
- * @property string $id
- * @property string $snapshot_id
- * @property string $created_by
+ * @property UuidInterface $snapshot_id
+ * @property UuidInterface $created_by
  * @property SnapshotState $state
- * @property CarbonImmutable|null $created_at
- * @property CarbonImmutable|null $updated_at
  *
  * @property-read User $creator
- * @property-read Snapshot $snapshot
  */
 class SnapshotTransition extends Model
 {
     use BelongsToSnapshot;
+    /** @use HasFactory<SnapshotTransitionFactory> */
     use HasFactory;
-    use HasStates;
-    use HasUuidAsKey;
+    use HasTimestamps;
+    use HasUuidAsId;
 
-    protected $casts = [
-        'created_by' => 'string',
-        'id' => 'string',
-        'snapshot_id' => 'string',
-        'state' => SnapshotState::class,
-    ];
-
+    protected static string $collectionClass = SnapshotTransitionCollection::class;
     protected $fillable = [
         'snapshot_id',
         'created_by',
 
         'state',
     ];
+
+    public function casts(): array
+    {
+        return [
+            'created_by' => UuidCast::class,
+            'snapshot_id' => UuidCast::class,
+            'state' => SnapshotState::class,
+        ];
+    }
 
     /**
      * @return BelongsTo<User, $this>

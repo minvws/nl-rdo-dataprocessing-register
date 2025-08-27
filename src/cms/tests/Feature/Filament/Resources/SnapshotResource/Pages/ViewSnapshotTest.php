@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Enums\Authorization\Role;
+use App\Enums\Authorization\Permission;
 use App\Enums\Snapshot\SnapshotApprovalStatus;
 use App\Filament\Resources\SnapshotResource;
 use App\Filament\Resources\SnapshotResource\Pages\ViewSnapshot;
@@ -18,39 +18,68 @@ use App\Models\States\Snapshot\Established;
 use App\Models\States\Snapshot\InReview;
 use App\Models\States\Snapshot\Obsolete;
 use App\Models\Wpg\WpgProcessingRecord;
-
-use function Pest\Livewire\livewire;
+use Tests\Helpers\Model\OrganisationTestHelper;
+use Tests\Helpers\Model\UserTestHelper;
 
 it('loads the snapshot', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $snapshot = Snapshot::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
 
-    livewire(ViewSnapshot::class, [
-        'record' => $snapshot->getRouteKey(),
-    ])->assertSee($snapshot->name);
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ViewSnapshot::class, [
+            'record' => $snapshot->getRouteKey(),
+        ])
+        ->assertSee($snapshot->name);
 });
 
 it('loads the view page', function (): void {
-    $this->user->assignOrganisationRole(Role::MANDATE_HOLDER, $this->organisation);
-
+    $organisation = OrganisationTestHelper::create();
     $snapshot = Snapshot::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
     SnapshotApproval::factory()
         ->create(['snapshot_id' => $snapshot->id]);
     SnapshotApprovalLog::factory()
         ->create(['snapshot_id' => $snapshot->id]);
 
-    $this->get(SnapshotResource::getUrl('view', ['record' => $snapshot]))
+    $this->asFilamentOrganisationUser($organisation)
+        ->get(SnapshotResource::getUrl('view', [
+            'record' => $snapshot,
+        ]))
+        ->assertSuccessful();
+});
+
+it('loads the view page if snapshotSource is deleted', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisationWithPermissions($organisation, [
+        Permission::SNAPSHOT_VIEW,
+    ]);
+
+    $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->create([
+            'deleted_at' => fake()->dateTime(),
+        ]);
+    $snapshot = Snapshot::factory()
+        ->recycle($organisation)
+        ->for($avgResponsibleProcessingRecord, 'snapshotSource')
+        ->create();
+    SnapshotApproval::factory()
+        ->create(['snapshot_id' => $snapshot->id]);
+    SnapshotApprovalLog::factory()
+        ->create(['snapshot_id' => $snapshot->id]);
+
+    $this->withFilamentSession($user, $organisation)
+        ->get(SnapshotResource::getUrl('view', ['record' => $snapshot]))
         ->assertSuccessful();
 });
 
 it('displays the snapshot approval count', function (): void {
-    $this->user->assignOrganisationRole(Role::MANDATE_HOLDER, $this->organisation);
-
+    $organisation = OrganisationTestHelper::create();
     $snapshot = Snapshot::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
     SnapshotApproval::factory([
         'snapshot_id' => $snapshot->id,
@@ -61,68 +90,142 @@ it('displays the snapshot approval count', function (): void {
         'status' => SnapshotApprovalStatus::UNKNOWN,
     ])->create();
 
-    livewire(ViewSnapshot::class, [
-        'record' => $snapshot->getRouteKey(),
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ViewSnapshot::class, [
+            'record' => $snapshot->getRouteKey(),
+        ])
         ->assertSee('Ondertekeningen')
         ->assertSee('1 / 2');
 });
 
 it('can approve a snapshotApproval', function (): void {
-    $this->user->assignOrganisationRole(Role::MANDATE_HOLDER, $this->organisation);
-
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisation($organisation);
     $snapshot = Snapshot::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
     $snapshotApproval = SnapshotApproval::factory()
         ->create([
             'snapshot_id' => $snapshot->id,
-            'assigned_to' => $this->user->id,
+            'assigned_to' => $user->id,
             'status' => SnapshotApprovalStatus::UNKNOWN,
         ]);
 
-    livewire(ViewSnapshot::class, [
-        'record' => $snapshotApproval->snapshot->getRouteKey(),
-    ])
+    $this->asFilamentUser($user)
+        ->createLivewireTestable(ViewSnapshot::class, [
+            'record' => $snapshotApproval->snapshot->getRouteKey(),
+        ])
         ->mountInfolistAction('snapshot_approval_actions', 'snapshot_approval_approve_action')
-        ->callInfolistAction('snapshot_approval_actions', 'snapshot_approval_approve_action');
+        ->callInfolistAction('snapshot_approval_actions', 'snapshot_approval_approve_action', [], ['next' => false]);
 
     $this->assertDatabaseHas(SnapshotApproval::class, [
-        'assigned_to' => $this->user->id,
+        'assigned_to' => $user->id,
+        'status' => SnapshotApprovalStatus::APPROVED,
+    ]);
+});
+
+it('can approve a snapshotApproval and view next', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisation($organisation);
+    $snapshot = Snapshot::factory()
+        ->recycle($organisation)
+        ->create();
+    $snapshotApproval = SnapshotApproval::factory()
+        ->for($snapshot)
+        ->for($user, 'assignedTo')
+        ->create([
+            'status' => SnapshotApprovalStatus::UNKNOWN,
+        ]);
+    $nextSnapshot = Snapshot::factory()
+        ->recycle($organisation)
+        ->create();
+    SnapshotApproval::factory()
+        ->for($nextSnapshot)
+        ->for($user, 'assignedTo')
+        ->create([
+            'status' => SnapshotApprovalStatus::UNKNOWN,
+        ]);
+
+    $this->asFilamentUser($user)
+        ->createLivewireTestable(ViewSnapshot::class, [
+            'record' => $snapshotApproval->snapshot->getRouteKey(),
+        ])
+        ->mountInfolistAction('snapshot_approval_actions', 'snapshot_approval_approve_action')
+        ->callInfolistAction('snapshot_approval_actions', 'snapshot_approval_approve_action', [], ['next' => true])
+        ->assertRedirect(ViewSnapshot::getUrl(['record' => $nextSnapshot]));
+
+    $this->assertDatabaseHas(SnapshotApproval::class, [
+        'assigned_to' => $user->id,
         'status' => SnapshotApprovalStatus::APPROVED,
     ]);
 });
 
 it('can decline a snapshotApproval', function (): void {
-    $this->user->assignOrganisationRole(Role::MANDATE_HOLDER, $this->organisation);
-
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisation($organisation);
     $snapshot = Snapshot::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
     $snapshotApproval = SnapshotApproval::factory()
         ->create([
             'snapshot_id' => $snapshot->id,
-            'assigned_to' => $this->user->id,
+            'assigned_to' => $user->id,
             'status' => SnapshotApprovalStatus::UNKNOWN,
         ]);
 
-    livewire(ViewSnapshot::class, [
-        'record' => $snapshotApproval->snapshot->getRouteKey(),
-    ])
+    $this->asFilamentUser($user)
+        ->createLivewireTestable(ViewSnapshot::class, [
+            'record' => $snapshotApproval->snapshot->getRouteKey(),
+        ])
         ->mountInfolistAction('snapshot_approval_actions', 'snapshot_approval_decline_action')
-        ->callInfolistAction('snapshot_approval_actions', 'snapshot_approval_decline_action');
+        ->callInfolistAction('snapshot_approval_actions', 'snapshot_approval_decline_action', [], ['next' => false]);
 
     $this->assertDatabaseHas(SnapshotApproval::class, [
-        'assigned_to' => $this->user->id,
+        'assigned_to' => $user->id,
+        'status' => SnapshotApprovalStatus::DECLINED,
+    ]);
+});
+
+it('can decline a snapshotApproval and view next', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisation($organisation);
+    $snapshot = Snapshot::factory()
+        ->recycle($organisation)
+        ->create();
+    $snapshotApproval = SnapshotApproval::factory()
+        ->for($snapshot)
+        ->for($user, 'assignedTo')
+        ->create([
+            'status' => SnapshotApprovalStatus::UNKNOWN,
+        ]);
+    $nextSnapshot = Snapshot::factory()
+        ->recycle($organisation)
+        ->create();
+    SnapshotApproval::factory()
+        ->for($nextSnapshot)
+        ->for($user, 'assignedTo')
+        ->create([
+            'status' => SnapshotApprovalStatus::UNKNOWN,
+        ]);
+
+    $this->asFilamentUser($user)
+        ->createLivewireTestable(ViewSnapshot::class, [
+            'record' => $snapshotApproval->snapshot->getRouteKey(),
+        ])
+        ->mountInfolistAction('snapshot_approval_actions', 'snapshot_approval_decline_action')
+        ->callInfolistAction('snapshot_approval_actions', 'snapshot_approval_decline_action', [], ['next' => true])
+        ->assertRedirect(ViewSnapshot::getUrl(['record' => $nextSnapshot]));
+
+    $this->assertDatabaseHas(SnapshotApproval::class, [
+        'assigned_to' => $user->id,
         'status' => SnapshotApprovalStatus::DECLINED,
     ]);
 });
 
 it('can transition to a new state with all approved', function (): void {
-    $this->user->assignOrganisationRole(Role::PRIVACY_OFFICER, $this->organisation);
-
+    $organisation = OrganisationTestHelper::create();
     $snapshot = Snapshot::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create([
             'state' => InReview::class,
         ]);
@@ -131,9 +234,10 @@ it('can transition to a new state with all approved', function (): void {
         'status' => SnapshotApprovalStatus::APPROVED,
     ]);
 
-    livewire(ViewSnapshot::class, [
-        'record' => $snapshot->getRouteKey(),
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ViewSnapshot::class, [
+            'record' => $snapshot->getRouteKey(),
+        ])
         ->callAction('snapshot_transition_to_approved');
 
     $this->assertDatabaseHas(Snapshot::class, [
@@ -142,10 +246,9 @@ it('can transition to a new state with all approved', function (): void {
 });
 
 it('can transition to a new state with not all approved', function (): void {
-    $this->user->assignOrganisationRole(Role::PRIVACY_OFFICER, $this->organisation);
-
+    $organisation = OrganisationTestHelper::create();
     $snapshot = Snapshot::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create([
             'state' => InReview::class,
         ]);
@@ -158,9 +261,10 @@ it('can transition to a new state with not all approved', function (): void {
         'status' => SnapshotApprovalStatus::APPROVED,
     ]);
 
-    livewire(ViewSnapshot::class, [
-        'record' => $snapshot->getRouteKey(),
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ViewSnapshot::class, [
+            'record' => $snapshot->getRouteKey(),
+        ])
         ->callAction('snapshot_transition_to_approved');
 
     $this->assertDatabaseHas(Snapshot::class, [
@@ -169,15 +273,17 @@ it('can transition to a new state with not all approved', function (): void {
 });
 
 it('shows the transition button for all states', function (string $currentState, string $expectedState): void {
+    $organisation = OrganisationTestHelper::create();
     $snapshot = Snapshot::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create([
             'state' => $currentState,
         ]);
 
-    livewire(ViewSnapshot::class, [
-        'record' => $snapshot->getRouteKey(),
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ViewSnapshot::class, [
+            'record' => $snapshot->getRouteKey(),
+        ])
         ->assertActionExists(sprintf('snapshot_transition_to_%s', $expectedState));
 })->with([
     [InReview::$name, Approved::$name],
@@ -188,38 +294,37 @@ it('shows the transition button for all states', function (string $currentState,
 ]);
 
 it('does not display approval-data if none given', function (): void {
-    $this->user->assignOrganisationRole(Role::MANDATE_HOLDER, $this->organisation);
-
+    $organisation = OrganisationTestHelper::create();
     $snapshot = Snapshot::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create([
             'state' => InReview::class,
         ]);
 
-    livewire(ViewSnapshot::class, [
-        'record' => $snapshot->getRouteKey(),
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ViewSnapshot::class, [
+            'record' => $snapshot->getRouteKey(),
+        ])
         ->assertDontSee(__('snapshot_approval.reviewed_at'));
 });
 
 it('can render the page if snapshot has no snapshot-data', function (): void {
-    $this->user->assignOrganisationRole(Role::MANDATE_HOLDER, $this->organisation);
-
+    $organisation = OrganisationTestHelper::create();
     $snapshot = Snapshot::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
 
-    livewire(ViewSnapshot::class, [
-        'record' => $snapshot->getRouteKey(),
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ViewSnapshot::class, [
+            'record' => $snapshot->getRouteKey(),
+        ])
         ->assertOk();
 });
 
 it('can render the page if snapshot-data has no public_markdown', function (): void {
-    $this->user->assignOrganisationRole(Role::MANDATE_HOLDER, $this->organisation);
-
+    $organisation = OrganisationTestHelper::create();
     $snapshot = Snapshot::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
     SnapshotData::factory()
         ->for($snapshot)
@@ -227,23 +332,23 @@ it('can render the page if snapshot-data has no public_markdown', function (): v
             'public_markdown' => null,
         ]);
 
-    livewire(ViewSnapshot::class, [
-        'record' => $snapshot->getRouteKey(),
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ViewSnapshot::class, [
+            'record' => $snapshot->getRouteKey(),
+        ])
         ->assertOk();
 });
 
 it('can render related entities in public markdown', function (): void {
-    $this->user->assignOrganisationRole(Role::MANDATE_HOLDER, $this->organisation);
-
     $repsonsiblePublicMarkdown = fake()->sentence();
     $avgResponsibleProcessingRecordPublicMarkdown = fake()->sentence();
 
+    $organisation = OrganisationTestHelper::create();
     $responsible = Responsible::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
     $responsibleSnapshot = Snapshot::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->for($responsible, 'snapshotSource')
         ->create([
             'state' => Established::class,
@@ -255,10 +360,10 @@ it('can render related entities in public markdown', function (): void {
         ]);
 
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
     $avgResponsibleProcessingRecordSnapshot = Snapshot::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->for($avgResponsibleProcessingRecord, 'snapshotSource')
         ->create([
             'state' => Established::class,
@@ -277,22 +382,22 @@ it('can render related entities in public markdown', function (): void {
             'snapshot_source_type' => $responsible::class,
         ]);
 
-    livewire(ViewSnapshot::class, [
-        'record' => $avgResponsibleProcessingRecordSnapshot->getRouteKey(),
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ViewSnapshot::class, [
+            'record' => $avgResponsibleProcessingRecordSnapshot->getRouteKey(),
+        ])
         ->assertSee([$avgResponsibleProcessingRecordPublicMarkdown, $repsonsiblePublicMarkdown]);
 });
 
 it('will not render related entities without public markdown', function (): void {
-    $this->user->assignOrganisationRole(Role::MANDATE_HOLDER, $this->organisation);
-
     $avgResponsibleProcessingRecordPublicMarkdown = fake()->sentence();
 
+    $organisation = OrganisationTestHelper::create();
     $responsible = Responsible::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
     $responsibleSnapshot = Snapshot::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->for($responsible, 'snapshotSource')
         ->create([
             'state' => Established::class,
@@ -304,10 +409,10 @@ it('will not render related entities without public markdown', function (): void
         ]);
 
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
     $avgResponsibleProcessingRecordSnapshot = Snapshot::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->for($avgResponsibleProcessingRecord, 'snapshotSource')
         ->create([
             'state' => Established::class,
@@ -325,23 +430,23 @@ it('will not render related entities without public markdown', function (): void
             'snapshot_source_type' => $responsible::class,
         ]);
 
-    livewire(ViewSnapshot::class, [
-        'record' => $avgResponsibleProcessingRecordSnapshot->getRouteKey(),
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ViewSnapshot::class, [
+            'record' => $avgResponsibleProcessingRecordSnapshot->getRouteKey(),
+        ])
         ->assertSee([$avgResponsibleProcessingRecordPublicMarkdown]);
 });
 
 it('will not fail if no template is specified for a related entity', function (): void {
-    $this->user->assignOrganisationRole(Role::MANDATE_HOLDER, $this->organisation);
-
     $wpgProcessingRecordPublicMarkdown = fake()->sentence();
     $avgResponsibleProcessingRecordPublicMarkdown = fake()->sentence();
 
+    $organisation = OrganisationTestHelper::create();
     $wpgProcessingRecord = WpgProcessingRecord::factory() // assuming this will never be related to an avg-record, I can abuse it here
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
     $wpgProcessingRecordSnapshot = Snapshot::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->for($wpgProcessingRecord, 'snapshotSource')
         ->create([
             'state' => Established::class,
@@ -353,10 +458,10 @@ it('will not fail if no template is specified for a related entity', function ()
         ]);
 
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
     $avgResponsibleProcessingRecordSnapshot = Snapshot::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->for($avgResponsibleProcessingRecord, 'snapshotSource')
         ->create([
             'state' => Established::class,
@@ -377,41 +482,161 @@ it('will not fail if no template is specified for a related entity', function ()
             'snapshot_source_type' => $wpgProcessingRecord::class,
         ]);
 
-    livewire(ViewSnapshot::class, [
-        'record' => $avgResponsibleProcessingRecordSnapshot->getRouteKey(),
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ViewSnapshot::class, [
+            'record' => $avgResponsibleProcessingRecordSnapshot->getRouteKey(),
+        ])
         ->assertSee([$avgResponsibleProcessingRecordPublicMarkdown])
         ->assertDontSee([$wpgProcessingRecordPublicMarkdown]);
 });
 
 it('can export to pdf', function (): void {
-    $this->user->assignOrganisationRole(Role::PRIVACY_OFFICER, $this->organisation);
-
+    $organisation = OrganisationTestHelper::create();
     $snapshot = Snapshot::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->withSnapshotData()
         ->create([
             'state' => InReview::class,
         ]);
 
-    livewire(ViewSnapshot::class, [
-        'record' => $snapshot->getRouteKey(),
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ViewSnapshot::class, [
+            'record' => $snapshot->getRouteKey(),
+        ])
         ->callAction('export_to_pdf')
         ->assertFileDownloaded();
 });
 
 it('can not export to pdf is no snapshot-data available', function (): void {
-    $this->user->assignOrganisationRole(Role::PRIVACY_OFFICER, $this->organisation);
-
+    $organisation = OrganisationTestHelper::create();
     $snapshot = Snapshot::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create([
             'state' => InReview::class,
         ]);
 
-    livewire(ViewSnapshot::class, [
-        'record' => $snapshot->getRouteKey(),
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ViewSnapshot::class, [
+            'record' => $snapshot->getRouteKey(),
+        ])
         ->assertActionDisabled('export_to_pdf');
+});
+
+it('has a next button if available', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisation($organisation);
+    $snapshot = Snapshot::factory()
+        ->recycle($organisation)
+        ->create([
+            'state' => InReview::class,
+        ]);
+    SnapshotApproval::factory()
+        ->for($snapshot)
+        ->for($user, 'assignedTo')
+        ->create([
+            'status' => SnapshotApprovalStatus::UNKNOWN,
+        ]);
+    $nextSnapshot = Snapshot::factory()
+        ->recycle($organisation)
+        ->create([
+            'state' => InReview::class,
+        ]);
+    SnapshotApproval::factory()
+        ->for($nextSnapshot)
+        ->for($user, 'assignedTo')
+        ->create([
+            'status' => SnapshotApprovalStatus::UNKNOWN,
+        ]);
+
+    $this->asFilamentUser($user)
+        ->createLivewireTestable(ViewSnapshot::class, [
+            'record' => $snapshot->getRouteKey(),
+        ])
+        ->assertActionEnabled('approve_view_next');
+});
+
+it('has no next button if none available', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisation($organisation);
+    $snapshot = Snapshot::factory()
+        ->recycle($organisation)
+        ->create([
+            'state' => InReview::class,
+        ]);
+    SnapshotApproval::factory()
+        ->for($snapshot)
+        ->for($user, 'assignedTo')
+        ->create([
+            'status' => SnapshotApprovalStatus::UNKNOWN,
+        ]);
+
+    $this->asFilamentUser($user)
+        ->createLivewireTestable(ViewSnapshot::class, [
+            'record' => $snapshot->getRouteKey(),
+        ])
+        ->assertActionDisabled('approve_view_next');
+});
+
+it('has no next button if no permission', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisationWithPermissions($organisation, [Permission::SNAPSHOT_VIEW]);
+    $snapshot = Snapshot::factory()
+        ->recycle($organisation)
+        ->create([
+            'state' => InReview::class,
+        ]);
+    SnapshotApproval::factory()
+        ->for($snapshot)
+        ->for($user, 'assignedTo')
+        ->create([
+            'status' => SnapshotApprovalStatus::UNKNOWN,
+        ]);
+    $nextSnapshot = Snapshot::factory()
+        ->recycle($organisation)
+        ->create([
+            'state' => InReview::class,
+        ]);
+    SnapshotApproval::factory()
+        ->for($nextSnapshot)
+        ->for($user, 'assignedTo')
+        ->create([
+            'status' => SnapshotApprovalStatus::UNKNOWN,
+        ]);
+
+    $this->withFilamentSession($user, $organisation)
+        ->createLivewireTestable(ViewSnapshot::class, [
+            'record' => $snapshot->getRouteKey(),
+        ])
+        ->assertActionDisabled('approve_view_next');
+});
+
+it('shows button to view all snapshot approvals', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $snapshot = Snapshot::factory()
+        ->recycle($organisation)
+        ->create([
+            'state' => InReview::class,
+        ]);
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ViewSnapshot::class, [
+            'record' => $snapshot->getRouteKey(),
+        ])
+        ->assertActionEnabled('approve_view_all');
+});
+
+it('does not show button to view all snapshot approvales if no permission', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisationWithPermissions($organisation, [Permission::SNAPSHOT_VIEW]);
+    $snapshot = Snapshot::factory()
+        ->recycle($organisation)
+        ->create([
+            'state' => InReview::class,
+        ]);
+
+    $this->withFilamentSession($user, $organisation)
+        ->createLivewireTestable(ViewSnapshot::class, [
+            'record' => $snapshot->getRouteKey(),
+        ])
+        ->assertActionDisabled('approve_view_all');
 });

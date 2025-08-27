@@ -2,39 +2,23 @@
 
 declare(strict_types=1);
 
-use App\Enums\Authorization\Role;
+use App\Filament\Resources\AvgProcessorProcessingRecordResource;
 use App\Import\Factories\Avg\AvgProcessorProcessingRecordFactory;
 use App\Models\Avg\AvgProcessorProcessingRecord;
-use App\Models\Organisation;
 use App\Models\Snapshot;
 use App\Models\States\Snapshot\Approved;
-use App\Models\User;
-use Filament\Facades\Filament;
-use Illuminate\Testing\TestResponse;
-use Tests\Helpers\ConfigHelper;
-
-beforeEach(function (): void {
-    $user = User::factory()
-        ->withOrganisation()
-        ->withValidOtpRegistration()
-        ->create();
-    /** @var Organisation $organisation */
-    $organisation = $user->organisations()->firstOrFail();
-
-    $user->assignGlobalRole(Role::FUNCTIONAL_MANAGER);
-    $user->assignOrganisationRole(Role::INPUT_PROCESSOR, $organisation);
-
-    $this->be($user);
-    Filament::setTenant($organisation);
-
-    $this->organisation = $organisation;
-    setOtpValidSessionValue(true);
-});
+use App\Models\States\Snapshot\Established;
+use App\Models\States\Snapshot\InReview;
+use App\Models\States\Snapshot\Obsolete;
+use Carbon\CarbonImmutable;
+use Tests\Helpers\ConfigTestHelper;
+use Tests\Helpers\Model\OrganisationTestHelper;
 
 it('imports the model', function (): void {
     $importId = fake()->slug();
     $data = getAvgProcessorProcessingRecordFactoryImportData($importId);
 
+    $organisation = OrganisationTestHelper::create();
     $avgProcessorProcessingRecordCount = AvgProcessorProcessingRecord::query()
         ->where(['import_id' => $importId])
         ->count();
@@ -42,9 +26,8 @@ it('imports the model', function (): void {
     expect($avgProcessorProcessingRecordCount)
         ->toBe(0);
 
-    /** @var AvgProcessorProcessingRecordFactory $avgProcessorProcessingRecordFactory */
     $avgProcessorProcessingRecordFactory = $this->app->get(AvgProcessorProcessingRecordFactory::class);
-    $avgResponsibleProcessingRecord = $avgProcessorProcessingRecordFactory->create($data, $this->organisation->id);
+    $avgResponsibleProcessingRecord = $avgProcessorProcessingRecordFactory->create($data, $organisation->id);
 
     $avgProcessorProcessingRecordCount = AvgProcessorProcessingRecord::query()
         ->where(['import_id' => $importId])
@@ -53,12 +36,12 @@ it('imports the model', function (): void {
     expect($avgProcessorProcessingRecordCount)
         ->toBe(1);
 
-    /** @var TestResponse $response */
-    $response = $this->get(route('filament.admin.resources.avg-processor-processing-records.edit', [
-        'tenant' => $this->organisation,
-        'record' => $avgResponsibleProcessingRecord->id,
-    ]));
-    $response->assertOk();
+    $this->asFilamentOrganisationUser($organisation)
+        ->get(AvgProcessorProcessingRecordResource::getUrl('edit', [
+            'tenant' => $organisation,
+            'record' => $avgResponsibleProcessingRecord,
+        ]))
+        ->assertOk();
 });
 
 it('skips the import when model with import_id exists', function (): void {
@@ -71,7 +54,6 @@ it('skips the import when model with import_id exists', function (): void {
             'name' => $name,
         ]);
 
-    /** @var AvgProcessorProcessingRecordFactory $avgProcessorProcessingRecordFactory */
     $avgProcessorProcessingRecordFactory = $this->app->get(AvgProcessorProcessingRecordFactory::class);
     $avgProcessorProcessingRecordFactory->create([
         'Id' => $importId, // same import_id
@@ -84,16 +66,15 @@ it('skips the import when model with import_id exists', function (): void {
 });
 
 it('skips the import when model with specified state to skip', function (): void {
-    $organisation = Organisation::factory()->create();
+    $organisation = OrganisationTestHelper::create();
     $importId = fake()->slug();
     $status = fake()->word();
 
-    ConfigHelper::set('import.states_to_skip_import', [$status]);
+    ConfigTestHelper::set('import.states_to_skip_import', [$status]);
 
     $data = getAvgProcessorProcessingRecordFactoryImportData($importId);
     $data['Status'] = $status;
 
-    /** @var AvgProcessorProcessingRecordFactory $avgProcessorProcessingRecordFactory */
     $avgProcessorProcessingRecordFactory = $this->app->get(AvgProcessorProcessingRecordFactory::class);
     $avgProcessorProcessingRecordFactory->create($data, $organisation->id);
 
@@ -103,7 +84,7 @@ it('skips the import when model with specified state to skip', function (): void
 });
 
 it('imports the measures & description correctly', function (): void {
-    $organisation = Organisation::factory()->create();
+    $organisation = OrganisationTestHelper::create();
     $importId = fake()->slug();
     $data = getAvgProcessorProcessingRecordFactoryImportData($importId);
     $data['Beveiliging'] = [
@@ -124,11 +105,9 @@ it('imports the measures & description correctly', function (): void {
         'HasBeveiliging' => true,
     ];
 
-    /** @var AvgProcessorProcessingRecordFactory $avgProcessorProcessingRecordFactory */
     $avgProcessorProcessingRecordFactory = $this->app->get(AvgProcessorProcessingRecordFactory::class);
     $avgProcessorProcessingRecordFactory->create($data, $organisation->id);
 
-    /** @var AvgProcessorProcessingRecord $avgProcessorProcessingRecord */
     $avgProcessorProcessingRecord = AvgProcessorProcessingRecord::query()
         ->where(['import_id' => $importId])
         ->firstOrFail();
@@ -148,7 +127,7 @@ Overige beveiligingsmaatregelen: Slechts een beperkt aantal mensen heeft toegang
 });
 
 it('imports the measures & description correctly even when values for Beveiliging are null', function (): void {
-    $organisation = Organisation::factory()->create();
+    $organisation = OrganisationTestHelper::create();
     $importId = fake()->slug();
     $data = getAvgProcessorProcessingRecordFactoryImportData($importId);
     $data['Beveiliging'] = [
@@ -162,11 +141,9 @@ it('imports the measures & description correctly even when values for Beveiligin
         'HasBeveiliging' => null,
     ];
 
-    /** @var AvgProcessorProcessingRecordFactory $avgProcessorProcessingRecordFactory */
     $avgProcessorProcessingRecordFactory = $this->app->get(AvgProcessorProcessingRecordFactory::class);
     $avgProcessorProcessingRecordFactory->create($data, $organisation->id);
 
-    /** @var AvgProcessorProcessingRecord $avgProcessorProcessingRecord */
     $avgProcessorProcessingRecord = AvgProcessorProcessingRecord::query()
         ->where(['import_id' => $importId])
         ->firstOrFail();
@@ -179,17 +156,15 @@ it('imports the measures & description correctly even when values for Beveiligin
 
 it('can import the model & snapshot', function (): void {
     $status = 'Vastgesteld';
-    $version = fake()->randomDigit();
-
-    ConfigHelper::set(sprintf('import.value_converters.snapshot_state.%s', $status), Approved::class);
-
-    $organisation = Organisation::factory()->create();
     $importId = fake()->slug();
+
+    ConfigTestHelper::set(sprintf('import.value_converters.snapshot_state.%s', $status), Approved::class);
+
+    $organisation = OrganisationTestHelper::create();
     $data = getAvgProcessorProcessingRecordFactoryImportData($importId);
     $data['Status'] = $status;
-    $data['Versie'] = $version;
+    $data['Versie'] = fake()->randomDigit();
 
-    /** @var AvgProcessorProcessingRecordFactory $avgProcessorProcessingRecordFactory */
     $avgProcessorProcessingRecordFactory = $this->app->get(AvgProcessorProcessingRecordFactory::class);
     $avgProcessorProcessingRecordFactory->create($data, $organisation->id);
 
@@ -199,6 +174,70 @@ it('can import the model & snapshot', function (): void {
     $this->assertDatabaseHas(Snapshot::class, [
         'snapshot_source_id' => $avgProcessorProcessingRecord->id,
         'snapshot_source_type' => AvgProcessorProcessingRecord::class,
+    ]);
+});
+
+it('will set the review_at based on LaatsteWijzigDatum if snapshot-state is established', function (): void {
+    $status = fake()->randomElement([
+        'TerReview',
+        'VaststellingAangevraagd',
+        'Vastgesteld',
+    ]);
+    $lastChangeDate = fake()->dateTime()->format('d-m-Y');
+
+    ConfigTestHelper::set(sprintf('import.value_converters.snapshot_state.%s', $status), Established::class);
+    ConfigTestHelper::set('import.date.expectedFormats', ['Y-m-d\TH:i:s.v', 'd-m-Y']);
+
+    $reviewAtDefaultInMonths = fake()->numberBetween(0, 10);
+    $organisation = OrganisationTestHelper::create([
+        'review_at_default_in_months' => $reviewAtDefaultInMonths,
+    ]);
+    $importId = fake()->slug();
+    $data = getAvgProcessorProcessingRecordFactoryImportData($importId);
+    $data['Status'] = $status;
+    $data['Versie'] = fake()->randomDigit();
+    $data['LaatsteWijzigDatum'] = $lastChangeDate;
+
+    $avgProcessorProcessingRecordFactory = $this->app->get(AvgProcessorProcessingRecordFactory::class);
+    $avgProcessorProcessingRecordFactory->create($data, $organisation->id);
+
+    $this->assertDatabaseHas(AvgProcessorProcessingRecord::class, [
+        'import_id' => $importId,
+        'review_at' => CarbonImmutable::createFromFormat('d-m-Y', $lastChangeDate)->addMonths($reviewAtDefaultInMonths),
+    ]);
+});
+
+it('will not set the review_at if snapshot-state is not approved', function (): void {
+    $status = fake()->randomElement([
+        'TerReview',
+        'VaststellingAangevraagd',
+        'Vastgesteld',
+    ]);
+    $lastChangeDate = fake()->dateTime()->format('d-m-Y');
+
+    ConfigTestHelper::set(sprintf('import.value_converters.snapshot_state.%s', $status), fake()->randomElement([
+        InReview::class,
+        Approved::class,
+        Obsolete::class,
+    ]));
+    ConfigTestHelper::set('import.date.expectedFormats', ['Y-m-d\TH:i:s.v', 'd-m-Y']);
+
+    $reviewAtDefaultInMonths = fake()->numberBetween(0, 10);
+    $organisation = OrganisationTestHelper::create([
+        'review_at_default_in_months' => $reviewAtDefaultInMonths,
+    ]);
+    $importId = fake()->slug();
+    $data = getAvgProcessorProcessingRecordFactoryImportData($importId);
+    $data['Status'] = $status;
+    $data['Versie'] = fake()->randomDigit();
+    $data['LaatsteWijzigDatum'] = $lastChangeDate;
+
+    $avgProcessorProcessingRecordFactory = $this->app->get(AvgProcessorProcessingRecordFactory::class);
+    $avgProcessorProcessingRecordFactory->create($data, $organisation->id);
+
+    $this->assertDatabaseHas(AvgProcessorProcessingRecord::class, [
+        'import_id' => $importId,
+        'review_at' => null,
     ]);
 });
 

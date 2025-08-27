@@ -2,34 +2,41 @@
 
 declare(strict_types=1);
 
+use App\Enums\RegisterLayout;
 use App\Filament\Resources\AlgorithmRecordResource;
 use App\Filament\Resources\AlgorithmRecordResource\Pages\EditAlgorithmRecord;
 use App\Models\Algorithm\AlgorithmRecord;
 use App\Models\EntityNumber;
 use App\Services\EntityNumberService;
-use Mockery\MockInterface;
+use Tests\Helpers\Model\OrganisationTestHelper;
+use Tests\Helpers\Model\UserTestHelper;
 
-use function Pest\Livewire\livewire;
+it('loads the edit page with all layouts', function (RegisterLayout $registerLayout): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisation($organisation, ['register_layout' => $registerLayout]);
 
-it('loads the edit page', function (): void {
     $algorithmRecord = AlgorithmRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
 
-    $this->get(
-        AlgorithmRecordResource::getUrl('edit', ['record' => $algorithmRecord->id]),
-    )->assertSuccessful();
-});
+    $this->asFilamentUser($user)
+        ->get(AlgorithmRecordResource::getUrl('edit', [
+            'record' => $algorithmRecord,
+        ]))
+        ->assertSuccessful();
+})->with(RegisterLayout::cases());
 
 it('can be saved', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $algorithmRecord = AlgorithmRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
     $name = fake()->word();
 
-    livewire(EditAlgorithmRecord::class, [
-        'record' => $algorithmRecord->getRouteKey(),
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditAlgorithmRecord::class, [
+            'record' => $algorithmRecord->getRouteKey(),
+        ])
         ->fillForm([
             'name' => $name,
         ])
@@ -42,22 +49,24 @@ it('can be saved', function (): void {
 });
 
 it('can be cloned', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $algorithmRecord = AlgorithmRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->withAllRelatedEntities()
         ->create();
 
     $entityNumber = EntityNumber::factory()
         ->create();
 
-    $this->mock(EntityNumberService::class, static function (MockInterface $mock) use ($entityNumber): void {
-        $mock->expects('generate')
-            ->andReturn($entityNumber);
-    });
+    $this->mock(EntityNumberService::class)
+        ->shouldReceive('generate')
+        ->once()
+        ->andReturn($entityNumber);
 
-    livewire(EditAlgorithmRecord::class, [
-        'record' => $algorithmRecord->getRouteKey(),
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditAlgorithmRecord::class, [
+            'record' => $algorithmRecord->getRouteKey(),
+        ])
         ->callAction('clone')
         ->assertRedirect();
 
@@ -68,10 +77,10 @@ it('can be cloned', function (): void {
     expect($algorithmRecordClone->entity_number_id)->not()->toBe($algorithmRecord->entity_number_id)
         ->and($algorithmRecordClone->name)->toBe($algorithmRecord->name)
         ->and($algorithmRecordClone->public_from?->toJson())->toBe($algorithmRecord->public_from?->toJson())
-        ->and($algorithmRecordClone->algorithm_theme_id)->toBe($algorithmRecord->algorithm_theme_id)
-        ->and($algorithmRecordClone->algorithm_status_id)->toBe($algorithmRecord->algorithm_status_id)
-        ->and($algorithmRecordClone->algorithm_publication_category_id)->toBe($algorithmRecord->algorithm_publication_category_id)
-        ->and($algorithmRecordClone->algorithm_meta_schema_id)->toBe($algorithmRecord->algorithm_meta_schema_id);
+        ->and($algorithmRecordClone->algorithm_theme_id)->toEqual($algorithmRecord->algorithm_theme_id)
+        ->and($algorithmRecordClone->algorithm_status_id)->toEqual($algorithmRecord->algorithm_status_id)
+        ->and($algorithmRecordClone->algorithm_publication_category_id)->toEqual($algorithmRecord->algorithm_publication_category_id)
+        ->and($algorithmRecordClone->algorithm_meta_schema_id)->toEqual($algorithmRecord->algorithm_meta_schema_id);
 
     expect($algorithmRecordClone->fgRemark)->toBeNull();
     expect($algorithmRecordClone->snapshots)->toBeEmpty();

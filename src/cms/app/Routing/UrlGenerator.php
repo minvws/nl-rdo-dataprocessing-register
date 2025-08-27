@@ -11,10 +11,10 @@ use function is_string;
 class UrlGenerator extends IlluminateUrlGenerator
 {
     /**
-     * @param string|false $fallback
+     * @param mixed $fallback
      */
-    // phpcs:ignore SlevomatCodingStandard.TypeHints.ParameterTypeHint
-    public function previous($fallback = false): string
+    // phpcs:ignore
+    public function previous($fallback = false)
     {
         $url = $this->getPreviousUrlFromSession();
 

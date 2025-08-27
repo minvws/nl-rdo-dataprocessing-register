@@ -17,13 +17,14 @@ use function it;
 it('sets the contenthash on a media item when it receives a MediaHasBeenAddedEvent', function (): void {
     Event::fakeExcept([MediaHasBeenAddedEvent::class]);
 
-    $this->mock(PostMediaUploadHandler::class, function ($mock): void {
-        $mock->shouldReceive('handle')->once();
-    });
+    $this->mock(PostMediaUploadHandler::class)
+        ->shouldReceive('handle')
+        ->once();
 
-    $this->mock(MediaContentHasher::class, function ($mock): void {
-        $mock->shouldReceive('hash')->once()->andReturn('content-hash');
-    });
+    $this->mock(MediaContentHasher::class)
+        ->shouldReceive('hash')
+        ->once()
+        ->andReturn('content-hash');
 
     $media = Media::factory()->make([
         'content_hash' => null,

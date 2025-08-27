@@ -22,7 +22,7 @@ class DataBreachRecordExporter extends Exporter
             ExportColumn::make('organisation.responsibleLegalEntity.name')
                 ->label(__('responsible_legal_entity.model_singular')),
             ExportColumn::make('number')
-                ->label(__('data_breach_record.number')),
+                ->label(__('data_breach_record.entityNumber.number')),
             ExportColumn::make('name')
                 ->label(__('data_breach_record.name')),
             ExportColumn::make('reported_at')

@@ -4,24 +4,23 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Components\Uuid\UuidInterface;
 use App\Models\Algorithm\AlgorithmRecord;
 use App\Models\Avg\AvgProcessorProcessingRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
-use App\Models\Concerns\HasUuidAsKey;
+use App\Models\Casts\UuidCast;
+use App\Models\Concerns\HasTimestamps;
+use App\Models\Concerns\HasUuidAsId;
 use App\Models\Wpg\WpgProcessingRecord;
-use Carbon\CarbonImmutable;
 use Database\Factories\FgRemarkFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 /**
- * @property string $id
  * @property string $fg_remark_relatable_type
- * @property string $fg_remark_relatable_id
+ * @property UuidInterface $fg_remark_relatable_id
  * @property string $body
- * @property CarbonImmutable|null $created_at
- * @property CarbonImmutable|null $updated_at
  *
  * @property-read Model $fgRemarkRelatable
  */
@@ -29,18 +28,21 @@ class FgRemark extends Model
 {
     /** @use HasFactory<FgRemarkFactory> */
     use HasFactory;
-    use HasUuidAsKey;
-
-    protected $casts = [
-        'id' => 'string',
-        'fg_remark_relatable_id' => 'string',
-    ];
+    use HasTimestamps;
+    use HasUuidAsId;
 
     protected $fillable = [
         'fg_remark_relatable_id',
         'fg_remark_relatable_type',
         'body',
     ];
+
+    public function casts(): array
+    {
+        return [
+            'fg_remark_relatable_id' => UuidCast::class,
+        ];
+    }
 
     /**
      * @return MorphTo<Model, $this>

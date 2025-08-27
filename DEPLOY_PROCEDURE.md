@@ -13,13 +13,13 @@
 - Test if new SQL files generate errors on clean install
   - run `php artisan db:wipe` to remove all existing database-tables again
   - run `php artisan sql-execute` to re-build the database completely (there should be no errors)
-  - run `php artisan make:admin-user` to generate a user and test the application
+  - run `php artisan user:create-admin` to generate a user and test the application
 - Test if new SQL files generate errors on previous version
   - checkout previous version `v1.2.2`
   - run `composer install`
   - run `php artisan db:wipe` to remove all existing database-tables again
   - run `php artisan sql-execute` to re-build the database completely (there should be no errors)
-  - run `php artisan make:admin-user` to generate a user and organisation
+  - run `php artisan user:create-admin` to generate a user and organisation
   - run `php artisan app:core-entity-seeder` to seed the database with entities
   - checkout `release/v1.2.3` branch
   - run `composer install`

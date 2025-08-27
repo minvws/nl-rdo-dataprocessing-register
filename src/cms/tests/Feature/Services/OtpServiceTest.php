@@ -5,7 +5,11 @@ declare(strict_types=1);
 use App\Models\User;
 use App\Services\OneTimePassword\OneTimePassword;
 use App\Services\OtpService;
+use App\ValueObjects\OneTimePassword\Code;
+use App\ValueObjects\OneTimePassword\Secret;
 use Illuminate\Support\Facades\App;
+
+use function PHPUnit\Framework\equalTo;
 
 it('can enable two-factor authentication', function (): void {
     $user = User::factory()->create([
@@ -22,7 +26,9 @@ it('can enable two-factor authentication', function (): void {
 });
 
 it('can disable two-factor authentication', function (): void {
-    $user = User::factory()->withValidOtpRegistration()->create();
+    $user = User::factory()
+        ->withValidOtpRegistration()
+        ->create();
 
     getOtpService()->disable($user);
 
@@ -33,10 +39,12 @@ it('can disable two-factor authentication', function (): void {
 });
 
 it('can generate the qr-code', function (): void {
-    $user = User::factory()->withValidOtpRegistration()->create();
+    $user = User::factory()
+        ->withValidOtpRegistration()
+        ->create();
 
     $otpService = getOtpService();
-    $qrCode = $otpService->generateQRCodeInline(fake()->sentence(), $user->otp_secret);
+    $qrCode = $otpService->generateQRCodeInline(Secret::fromString(fake()->sentence()), $user->otp_secret);
 
     expect($qrCode)
         ->toStartWith('<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="150" height="150" viewBox="0 0 150 150">')
@@ -44,14 +52,13 @@ it('can generate the qr-code', function (): void {
 });
 
 it('can validate a code', function (): void {
-    $code = (string) fake()->randomNumber(6, true);
+    $code = Code::fromString(fake()->word());
     $user = User::factory()->withValidOtpRegistration()->create();
 
-    $this->mock(OneTimePassword::class, static function ($mock) use ($user, $code): void {
-        $mock->shouldReceive('isCodeValid')
-            ->with($code, $user->otp_secret)
-            ->andReturn(time());
-    });
+    $this->mock(OneTimePassword::class)
+        ->shouldReceive('isCodeValid')
+        ->with($code, equalTo(Secret::fromString($user->otp_secret)))
+        ->andReturn(time());
 
     $otpService = getOtpService();
     $isValid = $otpService->verifyCode($code, $user);
@@ -61,14 +68,15 @@ it('can validate a code', function (): void {
 });
 
 it('can not validate an invalid code', function (): void {
-    $invalidCode = (string) fake()->randomNumber(6);
-    $user = User::factory()->withValidOtpRegistration()->create();
+    $invalidCode = Code::fromString(fake()->word());
+    $user = User::factory()
+        ->withValidOtpRegistration()
+        ->create();
 
-    $this->mock(OneTimePassword::class, static function ($mock) use ($user, $invalidCode): void {
-        $mock->shouldReceive('isCodeValid')
-            ->with($invalidCode, $user->otp_secret)
-            ->andReturn(false);
-    });
+    $this->mock(OneTimePassword::class)
+        ->shouldReceive('isCodeValid')
+        ->with($invalidCode, equalTo(Secret::fromString($user->otp_secret)))
+        ->andReturn(false);
 
     $otpService = getOtpService();
     $isValid = $otpService->verifyCode($invalidCode, $user);
@@ -78,10 +86,11 @@ it('can not validate an invalid code', function (): void {
 });
 
 it('can not validate if no two-factor secret', function (): void {
-    $invalidCode = (string) fake()->randomNumber(6);
-    $user = User::factory()->create([
-        'otp_secret' => null,
-    ]);
+    $invalidCode = Code::fromString(fake()->word());
+    $user = User::factory()
+        ->create([
+            'otp_secret' => null,
+        ]);
 
     $otpService = getOtpService();
     $isValid = $otpService->verifyCode($invalidCode, $user);

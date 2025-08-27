@@ -9,6 +9,7 @@ enum Permission: string
     case ADMIN_LOG_ENTRY_VIEW = 'admin_log_entry.view';
     case CORE_ENTITY_CREATE = 'core_entity.create';
     case CORE_ENTITY_DELETE = 'core_entity.delete';
+    case CORE_ENTITY_FG_REMARKS = 'core_entity.fg-remarks';
     case CORE_ENTITY_IMPORT = 'import';
     case CORE_ENTITY_UPDATE = 'core_entity.update';
     case CORE_ENTITY_VIEW = 'core_entity.view';
@@ -16,6 +17,10 @@ enum Permission: string
     case DATA_BREACH_RECORD_DELETE = 'data_breach_record.delete';
     case DATA_BREACH_RECORD_UPDATE = 'data_breach_record.update';
     case DATA_BREACH_RECORD_VIEW = 'data_breach_record.view';
+    case DOCUMENT_CREATE = 'document.create';
+    case DOCUMENT_DELETE = 'document.delete';
+    case DOCUMENT_UPDATE = 'document.update';
+    case DOCUMENT_VIEW = 'document.view';
     case EXPORT = 'export';
     case LOOKUP_LIST_CREATE = 'lookup_list.create';
     case LOOKUP_LIST_DELETE = 'lookup_list.delete';
@@ -30,7 +35,13 @@ enum Permission: string
     case ORGANISATION_UPDATE = 'organisation.update';
     case ORGANISATION_UPDATE_IP_WHITELIST = 'organisation.update_ip_whitelist';
     case ORGANISATION_VIEW = 'organisation.view';
+    case ORGANISATION_USER_VIEW = 'organisation_user.view';
+    case OTP_DISABLE = 'otp_disable';
     case PUBLIC_WEBSITE_UPDATE = 'public_website.edit';
+    case RESPONSIBLE_CREATE = 'responsible.create';
+    case RESPONSIBLE_DELETE = 'responsible.delete';
+    case RESPONSIBLE_UPDATE = 'responsible.update';
+    case RESPONSIBLE_VIEW = 'responsible.view';
     case RESPONSIBLE_LEGAL_ENTITY_CREATE = 'responsible_legal_entity.create';
     case RESPONSIBLE_LEGAL_ENTITY_DELETE = 'responsible_legal_entity.delete';
     case RESPONSIBLE_LEGAL_ENTITY_UPDATE = 'responsible_legal_entity.update';
@@ -39,7 +50,6 @@ enum Permission: string
     case SNAPSHOT_APPROVAL_CREATE = 'snapshot_approval.create';
     case SNAPSHOT_APPROVAL_DELETE = 'snapshot_approval.delete';
     case SNAPSHOT_APPROVAL_ORGANISATION_OVERVIEW = 'snapshot_approval.organisation_overview';
-    case SNAPSHOT_APPROVAL_REQUEST_NOTIFICATION = 'snapshot_approval.request_notification';
     case SNAPSHOT_APPROVAL_UPDATE_PERSONAL = 'snapshot_approval.update_personal';
     case SNAPSHOT_APPROVAL_VIEW = 'snapshot_approval.view';
     case SNAPSHOT_STATE_TO_APPROVE = 'snapshot_state.to_approve';
@@ -55,7 +65,7 @@ enum Permission: string
     case USER_IMPORT = 'user.import';
     case USER_UPDATE = 'user.update';
     case USER_VIEW = 'user.view';
-    case OTP_DISABLE = 'otp_disable';
+    case USER_PROFILE_SETTINGS_MANDATEHOLDER = 'user.profile.settings.mandateholder';
     case USER_ROLE_GLOBAL_MANAGE = 'user_role.global_manage';
     case USER_ROLE_ORGANISATION_CPO_MANAGE = 'user_role.organisation_cpo_manage';
     case USER_ROLE_ORGANISATION_MANAGE = 'user_role.organisation_manage';

@@ -4,37 +4,27 @@ declare(strict_types=1);
 
 namespace App\Services\User;
 
+use App\Collections\UserCollection;
 use App\Enums\Authorization\Role;
 use App\Models\Organisation;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Collection;
+use Webmozart\Assert\Assert;
 
 class UserByRoleService
 {
     /**
-     * @return Collection<int, User>
+     * @param array<Role> $roles
      */
-    public function getUsersByGlobalRole(Role $role): Collection
+    public function getUsersByOrganisationRole(Organisation $organisation, array $roles): UserCollection
     {
-        return User::whereHas('globalRoles', static function (Builder $query) use ($role): void {
-                $query->where(['role' => $role]);
-        })
-            ->get();
-    }
-
-    /**
-     * @return Collection<int, User>
-     */
-    public function getUsersByOrganisationRole(Organisation $organisation, Role $role): Collection
-    {
-        /** @var Collection<int, User> $users */
         $users = $organisation
             ->users()
-            ->whereHas('organisationRoles', static function (Builder $query) use ($role): void {
-                $query->where(['role' => $role]);
+            ->whereHas('organisationRoles', static function (Builder $query) use ($roles): void {
+                $query->whereIn('role', $roles);
             })
             ->get();
+
+        Assert::isInstanceOf($users, UserCollection::class);
 
         return $users;
     }

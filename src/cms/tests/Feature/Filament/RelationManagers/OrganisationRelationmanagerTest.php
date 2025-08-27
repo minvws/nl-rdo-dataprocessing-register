@@ -8,8 +8,6 @@ use App\Models\Organisation;
 use App\Models\User;
 use Filament\Tables\Actions\DetachAction;
 
-use function Pest\Livewire\livewire;
-
 it('loads the table', function (): void {
     $organisation = Organisation::factory()
         ->create();
@@ -17,10 +15,12 @@ it('loads the table', function (): void {
         ->hasAttached($organisation)
         ->create();
 
-    livewire(OrganisationRelationManager::class, [
-        'ownerRecord' => $user,
-        'pageClass' => EditUser::class,
-    ])->assertCanSeeTableRecords([$organisation]);
+    $this->asFilamentUser()
+        ->createLivewireTestable(OrganisationRelationManager::class, [
+            'ownerRecord' => $user,
+            'pageClass' => EditUser::class,
+        ])
+        ->assertCanSeeTableRecords([$organisation]);
 });
 
 it('does not delete the organisation if no longer attached to an user', function (): void {
@@ -30,10 +30,11 @@ it('does not delete the organisation if no longer attached to an user', function
         ->hasAttached($organisation)
         ->create();
 
-    livewire(OrganisationRelationManager::class, [
-        'ownerRecord' => $user,
-        'pageClass' => EditUser::class,
-    ])
+    $this->asFilamentUser()
+        ->createLivewireTestable(OrganisationRelationManager::class, [
+            'ownerRecord' => $user,
+            'pageClass' => EditUser::class,
+        ])
         ->callTableAction(DetachAction::getDefaultName(), $organisation);
 
     $organisation->refresh();
@@ -52,10 +53,11 @@ it('also does not delete the organisation if still attached to another user', fu
         ->hasAttached($organisation)
         ->create();
 
-    livewire(OrganisationRelationManager::class, [
-        'ownerRecord' => $user,
-        'pageClass' => EditUser::class,
-    ])
+    $this->asFilamentUser()
+        ->createLivewireTestable(OrganisationRelationManager::class, [
+            'ownerRecord' => $user,
+            'pageClass' => EditUser::class,
+        ])
         ->callTableAction(DetachAction::getDefaultName(), $organisation);
 
     $organisation->refresh();

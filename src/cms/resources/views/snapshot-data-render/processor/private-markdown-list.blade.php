@@ -1,13 +1,10 @@
 @php
-    /** @formatter:off */
     /** @var App\Models\Snapshot $snapshot */
 @endphp
-
-<strong>Verwerkers</strong>:
-<ul class="ml-5">
+<ul>
 @if($snapshots->count() > 0)
 @foreach ($snapshots as $snapshot)
-  <li><div class="related-record">{!! $snapshot->snapshotData->private_markdown !!}</div></li>
+  <li><div class="related-record">{!! $snapshot->snapshotData->private_markdown?->toHtml() !!}</div></li>
 @endforeach
 @else
   <li>geen</li>

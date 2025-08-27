@@ -15,6 +15,7 @@ return [
     'measures_implemented' => 'Vastgesteld beveiligingsbeleid dat ook is geïmplementeerd',
 
     'other_measures' => 'Overige maatregelen',
+    'outside_eu_protection_level_description' => 'Toelichting bescherming',
     'measures_description' => 'Toelichting maatregelen',
     'security_access_options' => [
         'Personeel dat onder leiding van de verantwoordelijke staat',

@@ -86,7 +86,7 @@ class Login extends FilamentLogin
         $destination = Session::get('url.intended', '/');
         Assert::string($destination);
 
-        $userLoginService->sendLoginLink($user, $destination);
+        $userLoginService->sendPasswordLessLoginLink($user, $destination);
         $this->sendNotification();
 
         return null;

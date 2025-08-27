@@ -12,8 +12,8 @@ use function Laravel\Prompts\text;
 
 class UserDisableOtp extends Command
 {
+    protected $signature = 'user:disable-otp';
     protected $description = 'Disable one-time-password for an existing user';
-    protected $signature = 'app:user-disable-otp';
 
     public function handle(OtpService $otpService): int
     {

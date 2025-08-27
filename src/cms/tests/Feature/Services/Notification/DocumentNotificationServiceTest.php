@@ -17,10 +17,10 @@ it('will notify the chief privacy officer', function (): void {
     $organisation = Organisation::factory()->create();
     $user = User::factory()
         ->hasAttached($organisation)
+        ->hasOrganisationRole(Role::PRIVACY_OFFICER, $organisation)
         ->create();
-    $user->assignOrganisationRole(Role::PRIVACY_OFFICER, $organisation);
 
-    Document::factory()
+    $document = Document::factory()
         ->recycle($organisation)
         ->create([
             'notify_at' => CarbonImmutable::today(),
@@ -32,8 +32,13 @@ it('will notify the chief privacy officer', function (): void {
 
     Mail::assertQueued(
         DocumentNotification::class,
-        static function (DocumentNotification $mail) use ($user): bool {
-            return $mail->to[0]['address'] === $user->email;
+        static function (DocumentNotification $mail) use ($document, $user): bool {
+            if ($mail->to[0]['address'] !== $user->email) {
+                return false;
+            }
+
+            $logContext = $mail->getLogContext();
+            return $logContext['document_id'] === $document->id->toString();
         },
     );
 });

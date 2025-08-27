@@ -19,7 +19,7 @@
   ],
   "require": {
     "php": "^8.0",
-    "laravel/framework": "^7.30.6|^8.75.0|^9.0|^10.0|^11.0",
+    "laravel/framework": "^7.30.6|^8.75.0|^9.0|^10.0|^11.0|^12.0",
     "nuwber/rabbitevents": "^7.0|^8.0",
     "nesbot/carbon": "^2.0|^3.0"
   },

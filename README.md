@@ -16,6 +16,12 @@ This contains the configuration for generating a static website using [Hugo](htt
 
 Directory: `/src/public-website/`
 
+**Static website**
+
+This contains the configuration for generating a static website using [Hugo](https://gohugo.io/). It uses JSON and markdown data as its input to generate static html files.
+
+Directory: `/src/static-website/`
+
 ## Documentation
 
 - See [docs/environment_variables.md](docs/environment_variables.md) for an overview of all environment variables that can be set in the `.env` file.
@@ -88,7 +94,7 @@ B. Disable 2FA for the added user
 
 C. Create a new admin user with 2FA disabled
    1. `sail shell` to enter the Shell
-   2. `php artisan make:admin-user`
+   2. `php artisan user:create-admin`
    3. add the name and desired (fake) email you want to use to login
    4. Visit your local default project url again and login (with the email you just added)
 

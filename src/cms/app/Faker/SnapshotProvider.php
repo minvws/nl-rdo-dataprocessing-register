@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Faker;
 
+use App\Components\Uuid\UuidInterface;
 use App\Models\States\Snapshot\Obsolete;
 use App\Models\States\SnapshotState;
 use Closure;
@@ -40,10 +41,13 @@ class SnapshotProvider extends Miscellaneous
                 return $state;
             }
 
-            Assert::string($attributes['snapshot_source_type']);
-            Assert::string($attributes['snapshot_source_id']);
+            $snapshotSourceId = $attributes['snapshot_source_id'];
+            $snapshotSourceType = $attributes['snapshot_source_type'];
 
-            $group = sprintf('%s-%s', $attributes['snapshot_source_type'], $attributes['snapshot_source_id']);
+            Assert::string($snapshotSourceType);
+            Assert::isInstanceOf($snapshotSourceId, UuidInterface::class);
+
+            $group = sprintf('%s-%s', $snapshotSourceType, $snapshotSourceId->toString());
             if (array_key_exists($group, $this->groups) && in_array($state, $this->groups[$group], true)) {
                 return SnapshotState::OBSOLETE_STATE;
             }

@@ -6,28 +6,63 @@ use App\Enums\Authorization\Role;
 use App\Filament\Resources\UserResource;
 use App\Filament\Resources\UserResource\Pages\EditUser;
 use App\Models\User;
-
-use function Pest\Livewire\livewire;
-
-beforeEach(function (): void {
-    $this->user->assignGlobalRole(Role::FUNCTIONAL_MANAGER);
-});
+use Tests\Helpers\Model\OrganisationTestHelper;
+use Tests\Helpers\Model\UserTestHelper;
 
 it('loads the edit page', function (): void {
-    $this->get(UserResource::getUrl('edit', ['record' => $this->user->id]))
+    $user = User::factory()
+        ->create();
+
+    $this->asFilamentUser()
+        ->get(UserResource::getUrl('edit', ['record' => $user]))
+        ->assertSuccessful()
+        ->assertDontSeeText(__('user.password'));
+});
+
+it('loads the edit page if user has a global role', function (): void {
+    $user = User::factory()
+        ->hasGlobalRole(fake()->randomElement(Role::cases()))
+        ->create();
+
+    $this->asFilamentUser()
+        ->get(UserResource::getUrl('edit', ['record' => $user]))
+        ->assertSuccessful()
+        ->assertDontSeeText(__('user.password'));
+});
+
+it('loads the edit page if user has an organisation role', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = User::factory()
+        ->hasOrganisationRole(fake()->randomElement(Role::cases()), $organisation)
+        ->create();
+
+    $this->asFilamentUser()
+        ->get(UserResource::getUrl('edit', ['record' => $user]))
+        ->assertSuccessful()
+        ->assertDontSeeText(__('user.password'));
+});
+
+it('loads the edit page if user has both a global role and an organisation role', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = User::factory()
+        ->hasGlobalRole(fake()->randomElement(Role::cases()))
+        ->hasOrganisationRole(fake()->randomElement(Role::cases()), $organisation)
+        ->create();
+
+    $this->asFilamentUser()
+        ->get(UserResource::getUrl('edit', ['record' => $user]))
         ->assertSuccessful()
         ->assertDontSeeText(__('user.password'));
 });
 
 it('saves global roles', function (bool $setChiefPrivacyOfficer, bool $setFunctionalManager): void {
-    $user = User::factory()
-        ->hasAttached($this->organisation)
-        ->create();
+    $user = UserTestHelper::create();
 
     expect($user->globalRoles()->get()->count())
         ->toBe(0);
 
-    livewire(EditUser::class, ['record' => $user->id])
+    $this->asFilamentUser()
+        ->createLivewireTestable(EditUser::class, ['record' => $user->id])
         ->fillForm([
             'user_global_roles.chief-privacy-officer' => $setChiefPrivacyOfficer,
             'user_global_roles.functional-manager' => $setFunctionalManager,
@@ -49,21 +84,21 @@ it('saves global roles', function (bool $setChiefPrivacyOfficer, bool $setFuncti
 ]);
 
 it('saves organisation roles', function (bool $isInputProcessor, bool $isPrivacyOfficer, bool $isDataProtectionOfficial): void {
-    $user = User::factory()
-        ->hasAttached($this->organisation)
-        ->create();
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisation($organisation);
 
     expect($user->organisationRoles()->get()->count())
         ->toBe(0);
 
-    livewire(EditUser::class, ['record' => $user->id])
+    $this->asFilamentUser()
+        ->createLivewireTestable(EditUser::class, ['record' => $user->id])
         ->fillForm([
-            sprintf('user_organisation_roles.%s.organisation_id', $this->organisation->id) => $this->organisation->id,
-            sprintf('user_organisation_roles.%s.user_organisation_roles.input-processor', $this->organisation->id) => $isInputProcessor,
-            sprintf('user_organisation_roles.%s.user_organisation_roles.privacy-officer', $this->organisation->id) => $isPrivacyOfficer,
+            sprintf('organisation_user_roles.%s.organisation_id', $organisation->id->toString()) => $organisation->id->toString(),
+            sprintf('organisation_user_roles.%s.organisation_user_roles.input-processor', $organisation->id) => $isInputProcessor,
+            sprintf('organisation_user_roles.%s.organisation_user_roles.privacy-officer', $organisation->id) => $isPrivacyOfficer,
             sprintf(
-                'user_organisation_roles.%s.user_organisation_roles.data-protection-official',
-                $this->organisation->id,
+                'organisation_user_roles.%s.organisation_user_roles.data-protection-official',
+                $organisation->id->toString(),
             ) => $isDataProtectionOfficial,
         ])
         ->call('save')
@@ -88,13 +123,12 @@ it('saves organisation roles', function (bool $isInputProcessor, bool $isPrivacy
 ]);
 
 it('can edit an entry', function (): void {
-    $user = User::factory()
-        ->hasAttached($this->organisation)
-        ->create();
+    $user = UserTestHelper::create();
     $name = fake()->unique()->name();
     $email = fake()->unique()->safeEmail();
 
-    livewire(EditUser::class, ['record' => $user->id])
+    $this->asFilamentUser()
+        ->createLivewireTestable(EditUser::class, ['record' => $user->id])
         ->fillForm([
             'name' => $name,
             'email' => $email,
@@ -113,11 +147,10 @@ it('cannot edit an entry with a duplicate emailaddress', function (): void {
     User::factory()->create([
         'email' => $email,
     ]);
-    $user = User::factory()
-        ->hasAttached($this->organisation)
-        ->create();
+    $user = User::factory()->create();
 
-    livewire(EditUser::class, ['record' => $user->id])
+    $this->asFilamentUser()
+        ->createLivewireTestable(EditUser::class, ['record' => $user->id])
         ->fillForm([
             'name' => fake()->name(),
             'email' => $email,
@@ -130,7 +163,6 @@ it('can reset the otp', function (): void {
     $otpSecret = fake()->regexify('[A-Z]{16}');
 
     $user = User::factory()
-        ->hasAttached($this->organisation)
         ->create([
             'otp_secret' => $otpSecret,
         ]);
@@ -138,9 +170,10 @@ it('can reset the otp', function (): void {
     expect($user->otp_secret)
         ->toBe($otpSecret);
 
-    livewire(EditUser::class, [
-        'record' => $user->id,
-    ])
+    $this->asFilamentUser()
+        ->createLivewireTestable(EditUser::class, [
+            'record' => $user->id,
+        ])
         ->callAction('otp_disable')
         ->assertHasNoErrors()
         ->assertNotified(__('user.one_time_password.disabled'));

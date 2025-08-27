@@ -20,7 +20,7 @@ it('shows 403 when no organisation', function (): void {
         ->withValidOtpRegistration()
         ->create();
 
-    $this->actingAs($user)
+    $this->asFilamentUser($user)
         ->get('/')
         ->assertStatus(403);
 });
@@ -32,7 +32,7 @@ it('shows 403 when no role in organisation', function (): void {
         ->withValidOtpRegistration()
         ->create();
 
-    $this->actingAs($user)
+    $this->withFilamentSession($user, $organisation)
         ->get('/')
         ->assertStatus(403);
 });
@@ -40,12 +40,11 @@ it('shows 403 when no role in organisation', function (): void {
 it('redirects to organisation when user has organisation role', function (): void {
     $organisation = Organisation::factory()->create();
     $user = User::factory()
-        ->hasAttached($organisation)
+        ->hasOrganisationRole(Role::PRIVACY_OFFICER, $organisation)
         ->withValidOtpRegistration()
         ->create();
-    $user->assignOrganisationRole(Role::PRIVACY_OFFICER, $organisation);
 
-    $this->actingAs($user)
+    $this->withFilamentSession($user, $organisation)
         ->get('/')
         ->assertRedirect(sprintf('%s/avg-responsible-processing-records', $organisation->slug));
 });
@@ -55,11 +54,11 @@ it('redirects to organisation when user has global role', function (): void {
     $organisation = Organisation::factory()->create();
     $user = User::factory()
         ->hasAttached($organisation)
+        ->hasGlobalRole(Role::CHIEF_PRIVACY_OFFICER)
         ->withValidOtpRegistration()
         ->create();
-    $user->assignGlobalRole(Role::CHIEF_PRIVACY_OFFICER);
 
-    $this->actingAs($user)
+    $this->withFilamentSession($user, $organisation)
         ->get('/')
         ->assertRedirect(sprintf('%s/avg-responsible-processing-records', $organisation->slug));
 });

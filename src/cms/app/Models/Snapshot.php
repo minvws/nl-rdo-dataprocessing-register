@@ -4,58 +4,72 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Collections\RelatedSnapshotSourceCollection;
+use App\Collections\SnapshotApprovalCollection;
+use App\Collections\SnapshotApprovalLogCollection;
+use App\Collections\SnapshotCollection;
+use App\Components\Uuid\UuidInterface;
+use App\Models\Builders\SnapshotBuilder;
+use App\Models\Casts\UuidCast;
 use App\Models\Concerns\HasOrganisation;
-use App\Models\Concerns\HasUuidAsKey;
+use App\Models\Concerns\HasTimestamps;
+use App\Models\Concerns\HasUuidAsId;
 use App\Models\Contracts\SnapshotSource;
+use App\Models\Contracts\TenantAware;
 use App\Models\Scopes\OrderByCreatedAtAscScope;
 use App\Models\States\SnapshotState;
 use Carbon\CarbonImmutable;
+use Database\Factories\SnapshotFactory;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Attributes\UseEloquentBuilder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Spatie\ModelStates\HasStates;
+use Spatie\ModelStates\HasStatesContract;
 
 /**
- * @property string $id
  * @property string $name
  * @property int $version
  * @property SnapshotState $state
  * @property CarbonImmutable|null $replaced_at
- * @property CarbonImmutable|null $created_at
- * @property CarbonImmutable|null $updated_at
  * @property string $snapshot_source_type
- * @property string $snapshot_source_id
+ * @property UuidInterface $snapshot_source_id
  *
- * @property-read Collection<int, SnapshotApprovalLog> $snapshotApprovalLogs
+ * @property-read SnapshotApprovalCollection $snapshotApprovals
+ * @property-read SnapshotApprovalLogCollection $snapshotApprovalLogs
  * @property-read SnapshotData|null $snapshotData
- * @property-read SnapshotSource&Model $snapshotSource
- * @property-read Collection<int, RelatedSnapshotSource> $relatedSnapshotSources
+ * @property-read (SnapshotSource&Model)|null $snapshotSource
+ * @property-read RelatedSnapshotSourceCollection $relatedSnapshotSources
  */
 #[ScopedBy([OrderByCreatedAtAscScope::class])]
-class Snapshot extends Model
+#[UseEloquentBuilder(SnapshotBuilder::class)]
+class Snapshot extends Model implements HasStatesContract, TenantAware
 {
+    /** @use HasFactory<SnapshotFactory> */
     use HasFactory;
     use HasOrganisation;
     use HasStates;
-    use HasUuidAsKey;
+    use HasTimestamps;
+    use HasUuidAsId;
 
-    protected $casts = [
-        'id' => 'string',
-        'snapshot_source_id' => 'string',
-        'replaced_at' => 'datetime',
-        'state' => SnapshotState::class,
-    ];
-
+    protected static string $collectionClass = SnapshotCollection::class;
     protected $fillable = [
         'name',
         'version',
         'state',
     ];
+
+    public function casts(): array
+    {
+        return [
+            'snapshot_source_id' => UuidCast::class,
+            'replaced_at' => 'datetime',
+            'state' => SnapshotState::class,
+        ];
+    }
 
     /**
      * @return HasMany<SnapshotApproval, $this>
@@ -86,7 +100,7 @@ class Snapshot extends Model
      */
     public function snapshotSource(): MorphTo
     {
-        return $this->morphTo('snapshot_source');
+        return $this->morphTo(SnapshotSource::class, 'snapshot_source_type', 'snapshot_source_id', 'id');
     }
 
     /**
@@ -95,13 +109,5 @@ class Snapshot extends Model
     public function relatedSnapshotSources(): HasMany
     {
         return $this->hasMany(RelatedSnapshotSource::class);
-    }
-
-    /**
-     * @param Builder<Snapshot> $query
-     */
-    public function scopeOrderByVersion(Builder $query): void
-    {
-        $query->orderBy('version', 'desc');
     }
 }

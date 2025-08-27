@@ -2,36 +2,16 @@
 
 declare(strict_types=1);
 
-use App\Enums\Authorization\Role;
+use App\Filament\Resources\WpgProcessingRecordResource;
 use App\Import\Factories\Wpg\WpgProcessingRecordFactory;
-use App\Models\Organisation;
-use App\Models\User;
 use App\Models\Wpg\WpgProcessingRecord;
-use Filament\Facades\Filament;
-use Illuminate\Testing\TestResponse;
-use Tests\Helpers\ConfigHelper;
-
-beforeEach(function (): void {
-    $user = User::factory()
-        ->withOrganisation()
-        ->withValidOtpRegistration()
-        ->create();
-    /** @var Organisation $organisation */
-    $organisation = $user->organisations()->firstOrFail();
-
-    $user->assignGlobalRole(Role::FUNCTIONAL_MANAGER);
-    $user->assignOrganisationRole(Role::INPUT_PROCESSOR, $organisation);
-
-    $this->be($user);
-    Filament::setTenant($organisation);
-
-    $this->organisation = $organisation;
-    setOtpValidSessionValue(true);
-});
+use Tests\Helpers\ConfigTestHelper;
+use Tests\Helpers\Model\OrganisationTestHelper;
 
 it('imports the model', function (): void {
     $importId = fake()->slug();
 
+    $organisation = OrganisationTestHelper::create();
     $wpgProcessingRecordCount = WpgProcessingRecord::query()
         ->where(['import_id' => $importId])
         ->count();
@@ -41,9 +21,8 @@ it('imports the model', function (): void {
 
     $data = getWpgProcessingRecordFactoryImportData($importId);
 
-    /** @var WpgProcessingRecordFactory $wpgProcessingRecordFactory */
     $wpgProcessingRecordFactory = $this->app->get(WpgProcessingRecordFactory::class);
-    $wpgProcessingRecord = $wpgProcessingRecordFactory->create($data, $this->organisation->id);
+    $wpgProcessingRecord = $wpgProcessingRecordFactory->create($data, $organisation->id);
 
     $wpgProcessingRecordCount = WpgProcessingRecord::query()
         ->where(['import_id' => $importId])
@@ -52,12 +31,12 @@ it('imports the model', function (): void {
     expect($wpgProcessingRecordCount)
         ->toBe(1);
 
-    /** @var TestResponse $response */
-    $response = $this->get(route('filament.admin.resources.wpg-processing-records.edit', [
-        'tenant' => $this->organisation,
-        'record' => $wpgProcessingRecord->id,
-    ]));
-    $response->assertOk();
+    $this->asFilamentOrganisationUser($organisation)
+        ->get(WpgProcessingRecordResource::getUrl('edit', [
+            'tenant' => $organisation,
+            'record' => $wpgProcessingRecord,
+        ]))
+        ->assertOk();
 });
 
 it('skips the import when model with import_id exists', function (): void {
@@ -70,7 +49,6 @@ it('skips the import when model with import_id exists', function (): void {
             'name' => $name,
         ]);
 
-    /** @var WpgProcessingRecordFactory $wpgProcessingRecordFactory */
     $wpgProcessingRecordFactory = $this->app->get(WpgProcessingRecordFactory::class);
     $wpgProcessingRecordFactory->create([
         'Id' => $importId, // same import_id
@@ -83,16 +61,15 @@ it('skips the import when model with import_id exists', function (): void {
 });
 
 it('skips the import when model with specified state to skip', function (): void {
-    $organisation = Organisation::factory()->create();
+    $organisation = OrganisationTestHelper::create();
     $importId = fake()->slug();
     $status = fake()->word();
 
-    ConfigHelper::set('import.states_to_skip_import', [$status]);
+    ConfigTestHelper::set('import.states_to_skip_import', [$status]);
 
     $data = getWpgProcessingRecordFactoryImportData($importId);
     $data['Status'] = $status;
 
-    /** @var WpgProcessingRecordFactory $wpgProcessingRecordFactory */
     $wpgProcessingRecordFactory = $this->app->get(WpgProcessingRecordFactory::class);
     $wpgProcessingRecordFactory->create($data, $organisation->id);
 

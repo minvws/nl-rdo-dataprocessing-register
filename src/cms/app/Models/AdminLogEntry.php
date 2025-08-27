@@ -4,29 +4,33 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use Carbon\CarbonImmutable;
-use Illuminate\Database\Eloquent\Concerns\HasTimestamps;
+use App\Collections\AdminLogEntryCollection;
+use App\Models\Concerns\HasTimestamps;
+use Database\Factories\AdminLogEntryFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property int $id
  * @property string $message
- * @property array $context
- * @property CarbonImmutable|null $created_at
- * @property CarbonImmutable|null $updated_at
+ * @property array<string, mixed> $context
  */
 class AdminLogEntry extends Model
 {
-    use HasTimestamps;
+    /** @use HasFactory<AdminLogEntryFactory> */
     use HasFactory;
+    use HasTimestamps;
 
-    protected $casts = [
-        'context' => 'array',
-    ];
-
+    protected static string $collectionClass = AdminLogEntryCollection::class;
     protected $fillable = [
         'message',
         'context',
     ];
+
+    public function casts(): array
+    {
+        return [
+            'context' => 'array',
+        ];
+    }
 }

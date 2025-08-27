@@ -14,7 +14,7 @@ use App\Providers\AuthServiceProvider;
 use App\Providers\EntityNumberServiceProvider;
 use App\Providers\EventServiceProvider;
 use App\Providers\FakerServiceProvider;
-use App\Providers\Filament\AdminPanelProvider;
+use App\Providers\FilamentServiceProvider;
 use App\Providers\FilesystemServiceProvider;
 use App\Providers\ImportServiceProvider;
 use App\Providers\PublicWebsiteServiceProvider;
@@ -22,6 +22,7 @@ use App\Providers\RepositoryServiceProvider;
 use App\Providers\RouteServiceProvider;
 use App\Providers\SnapshotDataServiceProvider;
 use App\Providers\SqlGeneratorServiceProvider;
+use App\Providers\StaticWebsiteServiceProvider;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\ServiceProvider;
 
@@ -151,6 +152,16 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | IP Allowed
+    |--------------------------------------------------------------------------
+    |
+    | List of allowed ip's for organisation access (see \App\Http\Middleware\IpAllowFilter)
+    |
+    */
+    'allowed_ips' => env('IP_WHITELIST_DEFAULTS'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Maintenance Mode Driver
     |--------------------------------------------------------------------------
     |
@@ -192,13 +203,14 @@ return [
         RouteServiceProvider::class,
         RepositoryServiceProvider::class,
 
-        AdminPanelProvider::class,
         EntityNumberServiceProvider::class,
         FakerServiceProvider::class,
-        ImportServiceProvider::class,
+        FilamentServiceProvider::class,
         FilesystemServiceProvider::class,
+        ImportServiceProvider::class,
         PublicWebsiteServiceProvider::class,
         SnapshotDataServiceProvider::class,
+        StaticWebsiteServiceProvider::class,
         SqlGeneratorServiceProvider::class,
     ])->toArray(),
 

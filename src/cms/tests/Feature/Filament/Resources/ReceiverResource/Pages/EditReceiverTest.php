@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 use App\Filament\Resources\ReceiverResource;
 use App\Models\Receiver;
+use Tests\Helpers\Model\OrganisationTestHelper;
 
 it('loads the edit page', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $receiver = Receiver::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
 
-    $this->get(ReceiverResource::getUrl('edit', ['record' => $receiver->id]))
+    $this->asFilamentOrganisationUser($organisation)
+        ->get(ReceiverResource::getUrl('edit', ['record' => $receiver]))
         ->assertSuccessful();
 });

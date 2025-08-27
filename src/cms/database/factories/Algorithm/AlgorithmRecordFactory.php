@@ -28,7 +28,6 @@ class AlgorithmRecordFactory extends Factory
     public function definition(): array
     {
         return [
-            'id' => $this->faker->uuid(),
             'organisation_id' => Organisation::factory(),
             'import_id' => $this->faker->optional()->importId(),
 
@@ -51,6 +50,7 @@ class AlgorithmRecordFactory extends Factory
             'resp_considerations' => $this->faker->optional()->sentence(),
             'resp_human_intervention' => $this->faker->optional()->sentence(),
             'resp_risk_analysis' => $this->faker->optional()->sentence(),
+            'resp_legal_base_title' => $this->faker->optional()->sentence(),
             'resp_legal_base' => $this->faker->optional()->sentence(),
             'resp_legal_base_link' => $this->faker->optional()->url(),
             'resp_processor_registry_link' => $this->faker->optional()->url(),
@@ -58,6 +58,7 @@ class AlgorithmRecordFactory extends Factory
             'resp_impact_test_links' => $this->faker->optional()->url(),
             'resp_impact_tests_description' => $this->faker->optional()->sentence(),
 
+            'oper_data_title' => $this->faker->optional()->sentence(),
             'oper_data' => $this->faker->optional()->sentence(),
             'oper_links' => $this->faker->optional()->url(),
             'oper_technical_operation' => $this->faker->optional()->sentence(),

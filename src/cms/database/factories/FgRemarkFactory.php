@@ -19,7 +19,6 @@ class FgRemarkFactory extends Factory
     public function definition(): array
     {
         return [
-            'id' => $this->faker->uuid(),
             'body' => $this->faker->optional()->text(),
             'fg_remark_relatable_id' => AvgProcessorProcessingRecord::factory(),
             'fg_remark_relatable_type' => AvgProcessorProcessingRecord::class,

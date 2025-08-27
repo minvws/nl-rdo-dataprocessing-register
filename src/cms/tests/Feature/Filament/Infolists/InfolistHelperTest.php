@@ -7,7 +7,6 @@ namespace Tests\Feature\Filament\Resources\AvgProcessorProcessingRecordResource;
 use App\Filament\Infolists\InfolistHelper;
 use Illuminate\Database\Eloquent\Model;
 use InvalidArgumentException;
-use Mockery;
 
 use function expect;
 use function fake;
@@ -16,10 +15,12 @@ use function it;
 it('returns false when attribute not available with fieldValuesContainValue', function (): void {
     $modelAttribute = fake()->word();
 
-    $modelMock = Mockery::mock(Model::class);
-    $modelMock->shouldReceive('getAttribute')
+    $modelMock = $this->mock(Model::class)
+        ->shouldReceive('getAttribute')
+        ->once()
         ->with($modelAttribute)
-        ->andReturn(null);
+        ->andReturn(null)
+        ->getMock();
 
     $fieldValuesContainValued = InfolistHelper::fieldValuesContainValue($modelAttribute, fake()->word());
 
@@ -30,10 +31,12 @@ it('returns false when attribute not available with fieldValuesContainValue', fu
 it('returns false when attribute not in results with fieldValuesContainValue', function (): void {
     $fieldName = fake()->word();
 
-    $modelMock = Mockery::mock(Model::class);
-    $modelMock->shouldReceive('getAttribute')
+    $modelMock = $this->mock(Model::class)
+        ->shouldReceive('getAttribute')
+        ->once()
         ->with($fieldName)
-        ->andReturn([fake()->word(), fake()->word()]);
+        ->andReturn([fake()->word(), fake()->word()])
+        ->getMock();
 
     $fieldValuesContainValued = InfolistHelper::fieldValuesContainValue($fieldName, fake()->uuid());
 
@@ -45,10 +48,12 @@ it('returns true when attribute in results with fieldValuesContainValue', functi
     $fieldName = fake()->word();
     $valueToFind = fake()->word();
 
-    $modelMock = Mockery::mock(Model::class);
-    $modelMock->shouldReceive('getAttribute')
+    $modelMock = $this->mock(Model::class)
+        ->shouldReceive('getAttribute')
+        ->once()
         ->with($fieldName)
-        ->andReturn([fake()->word(), fake()->word(), $valueToFind]);
+        ->andReturn([fake()->word(), fake()->word(), $valueToFind])
+        ->getMock();
 
     $fieldValuesContainValued = InfolistHelper::fieldValuesContainValue($fieldName, $valueToFind);
 
@@ -57,13 +62,16 @@ it('returns true when attribute in results with fieldValuesContainValue', functi
 });
 
 it('returns true when all field values egual with fieldValueEquals', function (bool $value1, bool $value2, bool $expectedResult): void {
-    $modelMock = Mockery::mock(Model::class);
-    $modelMock->shouldReceive('getAttribute')
+    $modelMock = $this->mock(Model::class)
+        ->shouldReceive('getAttribute')
+        ->once()
         ->with('attribute1')
-        ->andReturn($value1);
-    $modelMock->shouldReceive('getAttribute')
+        ->andReturn($value1)
+        ->shouldReceive('getAttribute')
+        ->times($value1 ? 1 : 0)
         ->with('attribute2')
-        ->andReturn($value2);
+        ->andReturn($value2)
+        ->getMock();
 
     $fieldValueEquals = InfolistHelper::fieldValueEquals([
         'attribute1' => true,
@@ -80,10 +88,12 @@ it('returns true when all field values egual with fieldValueEquals', function (b
 ]);
 
 it('returns true when field is disabled with isFieldDisabled', function (bool $value, bool $expectedResult): void {
-    $modelMock = Mockery::mock(Model::class);
-    $modelMock->shouldReceive('getAttribute')
+    $modelMock = $this->mock(Model::class)
+        ->shouldReceive('getAttribute')
         ->with('attribute')
-        ->andReturn($value);
+        ->once()
+        ->andReturn($value)
+        ->getMock();
 
     $fieldValueEquals = InfolistHelper::isFieldDisabled('attribute');
 
@@ -95,10 +105,12 @@ it('returns true when field is disabled with isFieldDisabled', function (bool $v
 ]);
 
 it('fails when field is not a boolean with isFieldDisabled', function (): void {
-    $modelMock = Mockery::mock(Model::class);
-    $modelMock->shouldReceive('getAttribute')
+    $modelMock = $this->mock(Model::class)
+        ->shouldReceive('getAttribute')
         ->with('attribute')
-        ->andReturn(fake()->word());
+        ->once()
+        ->andReturn(fake()->word())
+        ->getMock();
 
     expect(static function () use ($modelMock): void {
         InfolistHelper::isFieldDisabled('attribute')($modelMock);
@@ -106,10 +118,12 @@ it('fails when field is not a boolean with isFieldDisabled', function (): void {
 });
 
 it('returns true when field is enabled with isFieldEnabled', function (bool $value, bool $expectedResult): void {
-    $modelMock = Mockery::mock(Model::class);
-    $modelMock->shouldReceive('getAttribute')
+    $modelMock = $this->mock(Model::class)
+        ->shouldReceive('getAttribute')
         ->with('attribute')
-        ->andReturn($value);
+        ->once()
+        ->andReturn($value)
+        ->getMock();
 
     $fieldValueEquals = InfolistHelper::isFieldEnabled('attribute');
 
@@ -121,10 +135,12 @@ it('returns true when field is enabled with isFieldEnabled', function (bool $val
 ]);
 
 it('fails when field is not a boolean with isFieldEnabled', function (): void {
-    $modelMock = Mockery::mock(Model::class);
-    $modelMock->shouldReceive('getAttribute')
+    $modelMock = $this->mock(Model::class)
+        ->shouldReceive('getAttribute')
         ->with('attribute')
-        ->andReturn(fake()->word());
+        ->once()
+        ->andReturn(fake()->word())
+        ->getMock();
 
     expect(static function () use ($modelMock): void {
         InfolistHelper::isFieldEnabled('attribute')($modelMock);
@@ -132,13 +148,15 @@ it('fails when field is not a boolean with isFieldEnabled', function (): void {
 });
 
 it('returns true when any field is true with isAnyFieldEnabled', function (bool $value1, bool $value2, bool $expectedResult): void {
-    $modelMock = Mockery::mock(Model::class);
-    $modelMock->shouldReceive('getAttribute')
+    $modelMock = $this->mock(Model::class)
+        ->shouldReceive('getAttribute')
         ->with('attribute1')
-        ->andReturn($value1);
-    $modelMock->shouldReceive('getAttribute')
+        ->once()
+        ->andReturn($value1)
+        ->shouldReceive('getAttribute')
         ->with('attribute2')
-        ->andReturn($value2);
+        ->andReturn($value2)
+        ->getMock();
 
     $fieldValueEquals = InfolistHelper::isAnyFieldEnabled([
         'attribute1',

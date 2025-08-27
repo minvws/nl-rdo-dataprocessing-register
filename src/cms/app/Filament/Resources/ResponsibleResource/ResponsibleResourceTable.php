@@ -23,10 +23,6 @@ class ResponsibleResourceTable
                     ->label(__('responsible.name'))
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('email')
-                    ->label(__('responsible.email'))
-                    ->searchable()
-                    ->sortable(),
                 TextColumn::make('phone')
                     ->label(__('responsible.phone'))
                     ->sortable(),

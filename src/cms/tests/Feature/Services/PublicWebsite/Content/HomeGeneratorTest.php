@@ -2,16 +2,18 @@
 
 declare(strict_types=1);
 
+use App\Models\PublicWebsite;
 use App\Services\PublicWebsite\Content\HomeGenerator;
 use App\Services\PublicWebsite\PublicWebsiteFilesystem;
 
 it('will generate the index', function (): void {
-    $publicWebsiteFilesystem = $this->createMock(PublicWebsiteFilesystem::class);
-    $publicWebsiteFilesystem->expects($this->once())
-        ->method('write')
-        ->with('_index.html');
+    PublicWebsite::factory()->create();
 
-    /** @var HomeGenerator $homeGenerator */
-    $homeGenerator = $this->app->make(HomeGenerator::class, ['publicWebsiteFilesystem' => $publicWebsiteFilesystem]);
+    $this->mock(PublicWebsiteFilesystem::class)
+        ->shouldReceive('write')
+        ->once()
+        ->withSomeOfArgs('_index.html');
+
+    $homeGenerator = $this->app->get(HomeGenerator::class);
     $homeGenerator->generate();
 });

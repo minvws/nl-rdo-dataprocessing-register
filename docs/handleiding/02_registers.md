@@ -6,7 +6,7 @@ Na het inloggen komt u in het verwerkingsregister en ziet u links in het scherm 
 
 ## AVG Verantwoordelijke Verwerkingen, AVG Verwerker Verwerkingen, WPG Verantoordelijke Verwerkingen
 
-**Beschikbaar voor**: Invoerder, Privacy Officer, Raadpleger, Functionaris Gegevensbescherming, Mandaathouder
+**Beschikbaar voor**: Invoerder, (Chief) Privacy Officer, Raadpleger, Functionaris Gegevensbescherming, Mandaathouder
 
 In deze registers kunnen verwerkingen toegevoegd worden. Na het klikken op een register verschijnt er een overzicht van de verwerkingen in het register (Figuur \ref{fig:registers}) met de volgende kolommen waarop u de tabel kunt sorteren:
 
@@ -25,18 +25,19 @@ Op deze pagina zijn alle gegevens van een verwerking in te voeren en kunnen rela
 
 Eenmaal opgeslagen in het systeem zullen relaties met andere entiteiten zichtbaar zijn in de tabellen onderaan in het scherm. Hiermee kunt u snel navigeren naar de gerelateerde entiteiten.
 
-\newpage
+> **Hint**: Het is mogelijk om verwerkingen te dupliceren met de knop rechtsbovenin: er wordt een nieuwe verwerking aangemaakt met precies dezelfde waardes voor alle velden. Dit maakt het makkelijk om meerdere verwerkingen in te voeren met grotendeels dezelfde eigenschappen: u hoeft alleen maar de velden te wijzigen waar de verwerkingen niet overenkomen.
+
 ## Algoritmes
 
-**Beschikbaar voor**: Invoerder, Privacy Officer, Raadpleger, Functionaris Gegevensbescherming, Mandaathouder
+**Beschikbaar voor**: Invoerder, (Chief) Privacy Officer, Raadpleger, Functionaris Gegevensbescherming, Mandaathouder
 
 Het algoritmeregister werkt op identieke wijze als de verwerkingregisters. In de overzichtstabel zijn dezelfde kolommen zichtbaar omdat ze deze eigenschappen delen met de verwerkingen.
 
 ## Datalekken
 
-**Beschikbaar voor**: Privacy Officer
+**Beschikbaar voor**: Invoerder Datalekken, (Chief) Privacy Officer
 
-In dit register kunnen datalekken toegevoegd worden en het is alleen toegankelijk voor de Privacy Officers van de organisatie. Na het klikken op het datalekregister verschijnt er een overzicht van alle datalekken in het register met de volgende kolommen waarop u de tabel kunt sorteren:
+In dit register kunnen datalekken toegevoegd worden. Na het klikken op het datalekregister verschijnt er een overzicht van alle datalekken in het register met de volgende kolommen waarop u de tabel kunt sorteren:
 
 - *Nummer datalek*: het unieke nummer van de datalek;
 - *Naam datalek*: de naam van de datalek;
@@ -45,8 +46,4 @@ In dit register kunnen datalekken toegevoegd worden en het is alleen toegankelij
 
 Als u op een datalek klikt, of op de knop "Datalek aanmaken", komt u op het bijbehorende invoerformulier, ook wel de detailpagina genoemd.
 
-> **Hint**: U kunt op de detailpagina aangeven of een datalek gemeld is bij de autoriteit persoonsgegevens (AP). Indien u aangeeft dat u dat gedaan heeft en de datalek opslaat, dan krijgen de Chief Privacy Officers en Mandaathouders van de organisatie automatisch een email met daarin een link naar deze datalek in het portaal.
-
-
-
-
+> **Hint**: U kunt op de detailpagina aangeven of een datalek gemeld is bij de autoriteit persoonsgegevens (AP). Indien u aangeeft dat u dat gedaan heeft en de datalek opslaat, dan krijgen de Chief Privacy Officer(s) en Mandaathouder(s) van de organisatie automatisch een email met daarin een link naar deze datalek in het portaal.

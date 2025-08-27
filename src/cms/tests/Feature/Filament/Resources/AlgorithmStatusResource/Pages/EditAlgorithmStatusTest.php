@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 use App\Filament\Resources\AlgorithmStatusResource;
 use App\Models\Algorithm\AlgorithmStatus;
+use Tests\Helpers\Model\OrganisationTestHelper;
 
 it('can load the edit page', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $algorithmStatus = AlgorithmStatus::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
 
-    $this->get(AlgorithmStatusResource::getUrl('edit', ['record' => $algorithmStatus->id]))
+    $this->asFilamentOrganisationUser($organisation)
+        ->get(AlgorithmStatusResource::getUrl('edit', ['record' => $algorithmStatus]))
         ->assertSuccessful();
 });

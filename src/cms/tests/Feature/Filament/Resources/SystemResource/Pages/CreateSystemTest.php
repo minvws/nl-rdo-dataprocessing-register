@@ -4,19 +4,20 @@ declare(strict_types=1);
 
 use App\Filament\Resources\SystemResource;
 use App\Filament\Resources\SystemResource\Pages\CreateSystem;
+use App\Models\Organisation;
 use App\Models\System;
 
-use function Pest\Livewire\livewire;
-
 it('loads the create page', function (): void {
-    $this->get(SystemResource::getUrl('create'))
+    $this->asFilamentUser()
+        ->get(SystemResource::getUrl('create'))
         ->assertSuccessful();
 });
 
 it('can create an entry', function (): void {
     $description = fake()->uuid();
 
-    livewire(CreateSystem::class)
+    $this->asFilamentUser()
+        ->createLivewireTestable(CreateSystem::class)
         ->fillForm([
             'description' => $description,
         ])
@@ -28,19 +29,34 @@ it('can create an entry', function (): void {
     ]);
 });
 
-it('can not create an entry with an existing description', function (): void {
+it('can not create an entry with an existing description within same organisation', function (): void {
     $description = fake()->uuid();
 
-    System::factory()->create(['description' => $description]);
+    $organisation = Organisation::factory()->create();
+    System::factory()
+        ->for($organisation)
+        ->create(['description' => $description]);
 
-    livewire(CreateSystem::class)
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(CreateSystem::class)
         ->fillForm([
             'description' => $description,
         ])
         ->call('create')
         ->assertHasFormErrors(['description' => 'unique']);
+});
 
-    $this->assertDatabaseHas(System::class, [
-        'description' => $description,
-    ]);
+it('can create an entry with an existing description within other organisation', function (): void {
+    $description = fake()->uuid();
+
+    System::factory()
+        ->create(['description' => $description]);
+
+    $this->asFilamentUser()
+        ->createLivewireTestable(CreateSystem::class)
+        ->fillForm([
+            'description' => $description,
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors(['description' => 'unique']);
 });

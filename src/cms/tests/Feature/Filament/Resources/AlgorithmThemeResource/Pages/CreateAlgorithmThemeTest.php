@@ -6,17 +6,17 @@ use App\Filament\Resources\AlgorithmThemeResource;
 use App\Filament\Resources\AlgorithmThemeResource\Pages\CreateAlgorithmTheme;
 use App\Models\Algorithm\AlgorithmTheme;
 
-use function Pest\Livewire\livewire;
-
 it('loads the create page', function (): void {
-    $this->get(AlgorithmThemeResource::getUrl('create'))
+    $this->asFilamentUser()
+        ->get(AlgorithmThemeResource::getUrl('create'))
         ->assertSuccessful();
 });
 
 it('can create an entry', function (): void {
     $name = fake()->uuid();
 
-    livewire(CreateAlgorithmTheme::class)
+    $this->asFilamentUser()
+        ->createLivewireTestable(CreateAlgorithmTheme::class)
         ->fillForm([
             'name' => $name,
         ])

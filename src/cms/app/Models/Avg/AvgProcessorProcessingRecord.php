@@ -4,7 +4,16 @@ declare(strict_types=1);
 
 namespace App\Models\Avg;
 
+use App\Collections\Avg\AvgProcessorProcessingRecordCollection;
+use App\Collections\DataBreachRecordCollection;
+use App\Collections\DocumentCollection;
+use App\Collections\ProcessorCollection;
+use App\Collections\ReceiverCollection;
+use App\Collections\ResponsibleCollection;
+use App\Collections\SystemCollection;
+use App\Components\Uuid\UuidInterface;
 use App\Enums\CoreEntityDataCollectionSource;
+use App\Models\Casts\UuidCast;
 use App\Models\Concerns\HasAvgGoals;
 use App\Models\Concerns\HasChildren;
 use App\Models\Concerns\HasContactPersons;
@@ -18,31 +27,26 @@ use App\Models\Concerns\HasReceivers;
 use App\Models\Concerns\HasRemarks;
 use App\Models\Concerns\HasResponsibles;
 use App\Models\Concerns\HasSnapshots;
+use App\Models\Concerns\HasSoftDeletes;
 use App\Models\Concerns\HasStakeholders;
 use App\Models\Concerns\HasSystems;
-use App\Models\Concerns\HasUuidAsKey;
+use App\Models\Concerns\HasTimestamps;
+use App\Models\Concerns\HasUsers;
+use App\Models\Concerns\HasUuidAsId;
 use App\Models\Concerns\IsCloneable;
-use App\Models\ContactPerson;
+use App\Models\Concerns\IsReviewable;
 use App\Models\Contracts\Cloneable;
 use App\Models\Contracts\EntityNumerable;
+use App\Models\Contracts\Reviewable;
 use App\Models\Contracts\SnapshotSource;
-use App\Models\DataBreachRecord;
-use App\Models\Document;
-use App\Models\Processor;
-use App\Models\Receiver;
-use App\Models\Responsible;
-use App\Models\Snapshot;
-use App\Models\Stakeholder;
-use App\Models\System;
+use App\Models\Contracts\TenantAware;
 use Carbon\CarbonImmutable;
-use Illuminate\Database\Eloquent\Collection;
+use Database\Factories\Avg\AvgProcessorProcessingRecordFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * @property string $id
  * @property string $name
  * @property bool $outside_eu
  * @property string|null $country
@@ -50,11 +54,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property bool $decision_making
  * @property string|null $import_id
  * @property string|null $import_number
- * @property CarbonImmutable|null $created_at
- * @property CarbonImmutable|null $updated_at
  * @property bool $outside_eu_protection_level
- * @property CarbonImmutable|null $review_at
- * @property string|null $avg_processor_processing_record_service_id
+ * @property ?UuidInterface $avg_processor_processing_record_service_id
  * @property bool $has_processors
  * @property bool $has_pseudonymization
  * @property bool $has_goal
@@ -70,8 +71,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property bool $measures_implemented
  * @property bool $other_measures
  * @property string|null $measures_description
- * @property CarbonImmutable|null $deleted_at
- * @property string|null $parent_id
  * @property bool $geb_pia
  * @property string $pseudonymization
  * @property string $responsibility_distribution
@@ -83,28 +82,24 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property CoreEntityDataCollectionSource $data_collection_source
  * @property bool $has_systems
  *
- * @property-read Collection<int, AvgGoal> $avgGoals
  * @property-read AvgProcessorProcessingRecordService|null $avgProcessorProcessingRecordService
- * @property-read Collection<int, AvgProcessorProcessingRecord> $children
- * @property-read Collection<int, ContactPerson> $contactPersons
- * @property-read Collection<int, Document> $documents
- * @property-read AvgProcessorProcessingRecord|null $parent
- * @property-read Collection<int, Processor> $processors
- * @property-read Collection<int, Receiver> $receivers
- * @property-read Collection<int, Responsible> $responsibles
- * @property-read Collection<int, Snapshot> $snapshots
- * @property-read Collection<int, System> $systems
- * @property-read Collection<int, DataBreachRecord> $dataBreachRecords
- * @property-read Collection<int, Stakeholder> $stakeholders
+ * @property-read DataBreachRecordCollection $dataBreachRecords
+ * @property-read DocumentCollection $documents
+ * @property-read ProcessorCollection $processors
+ * @property-read ReceiverCollection $receivers
+ * @property-read ResponsibleCollection $responsibles
+ * @property-read SystemCollection $systems
  */
-class AvgProcessorProcessingRecord extends Model implements EntityNumerable, SnapshotSource, Cloneable
+class AvgProcessorProcessingRecord extends Model implements Cloneable, EntityNumerable, Reviewable, SnapshotSource, TenantAware
 {
     use HasAvgGoals;
+    /** @use HasChildren<AvgProcessorProcessingRecord, AvgProcessorProcessingRecordCollection> */
     use HasChildren;
     use HasContactPersons;
     use HasDataBreachRecords;
     use HasDocuments;
     use HasEntityNumber;
+    /** @use HasFactory<AvgProcessorProcessingRecordFactory> */
     use HasFactory;
     use HasFgRemark;
     use HasOrganisation;
@@ -114,37 +109,17 @@ class AvgProcessorProcessingRecord extends Model implements EntityNumerable, Sna
     use HasResponsibles;
     use HasSnapshots;
     use HasStakeholders;
+    use HasSoftDeletes;
     use HasSystems;
-    use HasUuidAsKey;
+    use HasTimestamps;
+    use HasUsers;
+    use HasUuidAsId;
     use IsCloneable;
-    use SoftDeletes;
+    use IsReviewable;
 
-    protected $casts = [
-        'convicts' => 'bool',
-        'decision_making' => 'bool',
-        'has_goal' => 'bool',
-        'has_involved' => 'bool',
-        'has_pseudonymization' => 'bool',
-        'has_security' => 'bool',
-        'has_processors' => 'bool',
-        'id' => 'string',
-        'measures_implemented' => 'bool',
-        'other_measures' => 'bool',
-        'outside_eu' => 'bool',
-        'outside_eu_protection_level' => 'bool',
-        'review_at' => 'date',
-        'suspects' => 'bool',
-        'third_parties' => 'bool',
-        'victims' => 'bool',
-        'geb_pia' => 'bool',
-        'public_from' => 'datetime',
-        'has_systems' => 'bool',
-        'data_collection_source' => CoreEntityDataCollectionSource::class,
-    ];
-
+    protected static string $collectionClass = AvgProcessorProcessingRecordCollection::class;
     protected $fillable = [
         'avg_processor_processing_record_service_id',
-        'parent_id',
 
         'data_collection_source',
         'name',
@@ -175,10 +150,34 @@ class AvgProcessorProcessingRecord extends Model implements EntityNumerable, Sna
         'suspects',
         'victims',
         'convicts',
-        'review_at',
         'public_from',
         'has_systems',
     ];
+
+    public function casts(): array
+    {
+        return [
+            'avg_processor_processing_record_service_id' => UuidCast::class,
+            'convicts' => 'bool',
+            'decision_making' => 'bool',
+            'has_goal' => 'bool',
+            'has_involved' => 'bool',
+            'has_pseudonymization' => 'bool',
+            'has_security' => 'bool',
+            'has_processors' => 'bool',
+            'measures_implemented' => 'bool',
+            'other_measures' => 'bool',
+            'outside_eu' => 'bool',
+            'outside_eu_protection_level' => 'bool',
+            'suspects' => 'bool',
+            'third_parties' => 'bool',
+            'victims' => 'bool',
+            'geb_pia' => 'bool',
+            'public_from' => 'datetime',
+            'has_systems' => 'bool',
+            'data_collection_source' => CoreEntityDataCollectionSource::class,
+        ];
+    }
 
     /**
      * @return BelongsTo<AvgProcessorProcessingRecordService, $this>

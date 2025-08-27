@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Enums\RegisterLayout;
 use App\Filament\Resources\AlgorithmRecordResource;
 use App\Filament\Resources\AlgorithmRecordResource\Pages\CreateAlgorithmRecord;
 use App\Models\Algorithm\AlgorithmMetaSchema;
@@ -9,30 +10,35 @@ use App\Models\Algorithm\AlgorithmPublicationCategory;
 use App\Models\Algorithm\AlgorithmRecord;
 use App\Models\Algorithm\AlgorithmStatus;
 use App\Models\Algorithm\AlgorithmTheme;
+use Tests\Helpers\Model\OrganisationTestHelper;
+use Tests\Helpers\Model\UserTestHelper;
 
-use function Pest\Livewire\livewire;
+it('loads the create page with all layouts', function (RegisterLayout $registerLayout): void {
+    $user = UserTestHelper::create(['register_layout' => $registerLayout]);
 
-it('loads the create page', function (): void {
-    $this->get(AlgorithmRecordResource::getUrl('create'))
+    $this->asFilamentUser($user)
+        ->get(AlgorithmRecordResource::getUrl('create'))
         ->assertSuccessful();
-});
+})->with(RegisterLayout::cases());
 
 it('can create an entry', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $algorithmMetaSchema = AlgorithmMetaSchema::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create(['enabled' => true]);
     $algorithmPublicationCategory = AlgorithmPublicationCategory::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create(['enabled' => true]);
     $algorithmStatus = AlgorithmStatus::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create(['enabled' => true]);
     $algorithmTheme = AlgorithmTheme::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create(['enabled' => true]);
     $name = fake()->uuid();
 
-    livewire(CreateAlgorithmRecord::class)
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(CreateAlgorithmRecord::class)
         ->fillForm([
             'name' => $name,
             'algorithm_meta_schema_id' => $algorithmMetaSchema->id,

@@ -8,7 +8,7 @@ use App\Facades\Authentication;
 use App\Models\User;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
-use Filament\Forms;
+use Filament\Forms\Components\Group;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
@@ -28,7 +28,10 @@ class PersonalInfo extends Component implements HasActions, HasForms
     use InteractsWithActions;
     use InteractsWithForms;
 
+    /** @var ?array<array-key, string> $data */
     public ?array $data = [];
+
+    /** @var array<array-key, string> $only */
     public array $only = ['name', 'email'];
     public User $user;
     protected string $view = 'livewire.personal-info';
@@ -50,9 +53,12 @@ class PersonalInfo extends Component implements HasActions, HasForms
         return view('livewire.user.profile.personal-info');
     }
 
-    protected function getProfileFormSchema(): array
+    /**
+     * @return array<array-key, Group>
+     */
+    protected function getPersonalInfoFormSchema(): array
     {
-        $groupFields = Forms\Components\Group::make([
+        $groupFields = Group::make([
             $this->getNameComponent(),
             $this->getEmailComponent(),
         ])->columnSpan(2);
@@ -78,7 +84,7 @@ class PersonalInfo extends Component implements HasActions, HasForms
     public function form(Form $form): Form
     {
         return $form
-            ->schema($this->getProfileFormSchema())->columns(3)
+            ->schema($this->getPersonalInfoFormSchema())->columns(3)
             ->statePath('data');
     }
 

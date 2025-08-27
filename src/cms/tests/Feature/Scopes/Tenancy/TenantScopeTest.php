@@ -19,7 +19,7 @@ class TenantScopeTest extends FeatureTestCase
             ->create();
 
         $user = $organisation->users->first();
-        $this->actingAs($user);
+        $this->be($user);
         Filament::setTenant($organisation);
 
         $organisation2 = Organisation::factory()->create();

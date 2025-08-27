@@ -7,7 +7,9 @@ namespace Database\Factories\Vendor\MediaLibrary;
 use App\Config\Config;
 use App\Enums\Media\MediaGroup;
 use App\Models\Avg\AvgProcessorProcessingRecord;
+use App\Models\Document;
 use App\Models\Organisation;
+use App\Models\PublicWebsiteTree;
 use App\Models\Wpg\WpgProcessingRecord;
 use App\Vendor\MediaLibrary\Media;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -26,8 +28,10 @@ class MediaFactory extends Factory
     {
         /** @var class-string<AvgProcessorProcessingRecord>|class-string<WpgProcessingRecord> $modelToCreate */
         $modelToCreate = $this->faker->randomElement([
-            AvgProcessorProcessingRecord::class,
-            WpgProcessingRecord::class,
+            // make sure to only use models that implement the \Spatie\MediaLibrary\HasMedia interface!
+            Document::class,
+            Organisation::class,
+            PublicWebsiteTree::class,
         ]);
 
         /** @var MediaGroup $mediaGroup */

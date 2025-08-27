@@ -15,10 +15,7 @@ class EditAvgResponsibleProcessingRecordService extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            DeleteActionWithRelationChecks::make()
-                ->relations([
-                    'avgResponsibleProcessingRecords',
-                ]),
+            DeleteActionWithRelationChecks::make(),
         ];
     }
 }

@@ -72,3 +72,13 @@ it('will send email on user creation', function (): void {
 
     Mail::assertQueued(UserCreatedMailable::class);
 });
+
+it('will return the correct value for logName', function (): void {
+    $user = User::factory()->create([
+        'name' => 'foo',
+        'email' => 'bar@baz.com',
+    ]);
+
+    expect($user->logName)
+        ->toBe('foo (bar@baz.com)');
+});

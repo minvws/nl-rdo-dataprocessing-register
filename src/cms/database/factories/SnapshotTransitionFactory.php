@@ -21,7 +21,6 @@ class SnapshotTransitionFactory extends Factory
     public function definition(): array
     {
         return [
-            'id' => $this->faker->uuid(),
             'snapshot_id' => Snapshot::factory(),
             'created_by' => User::factory(),
 

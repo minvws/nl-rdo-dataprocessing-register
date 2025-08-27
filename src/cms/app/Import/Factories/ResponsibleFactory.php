@@ -4,20 +4,29 @@ declare(strict_types=1);
 
 namespace App\Import\Factories;
 
-use App\Components\Uuid\Uuid;
+use App\Components\Uuid\UuidInterface;
+use App\Import\Factories\Concerns\DataConverters;
 use App\Import\Factory;
 use App\Models\Responsible;
-use Illuminate\Database\Eloquent\Model;
 
-class ResponsibleFactory extends AbstractFactory implements Factory
+/**
+ * @implements Factory<Responsible>
+ */
+class ResponsibleFactory implements Factory
 {
+    use DataConverters;
+
     public function __construct(
         private readonly AddressFactory $addressFactory,
     ) {
     }
 
-    public function create(array $data, string $organisationId): ?Model
+    /**
+     * @param array<string, mixed> $data
+     */
+    public function create(array $data, UuidInterface $organisationId): Responsible
     {
+        /** @var Responsible $responsible */
         $responsible = Responsible::firstOrNew([
             'import_id' => $data['Id'],
             'organisation_id' => $organisationId,
@@ -27,12 +36,9 @@ class ResponsibleFactory extends AbstractFactory implements Factory
             return $responsible;
         }
 
-        $responsible->id = Uuid::generate()->toString();
         $responsible->organisation_id = $organisationId;
-        $responsible->import_id = $data['Id'];
-
-        $responsible->name = $data['Naam'];
-
+        $responsible->import_id = $this->toStringOrNull($data, 'Id');
+        $responsible->name = $this->toString($data, 'Naam');
         $responsible->save();
 
         $address = $this->addressFactory->create($data, $organisationId);

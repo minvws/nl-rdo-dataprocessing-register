@@ -8,8 +8,8 @@ nieuwe omgevingsvariabelen zijn, actieve scripts enz.
 ## Initiele stappen:
 
 -   verwerk migraties in `database/sql` om de database-tabellen te maken
--   maak een admin-user: `php artisan make:admin-user` & deel dit wachtwoord met Jeroen Vloothuis & Tijn Schmits
--   maak de gedeelde storage-mappen aan die gedeeld zal worden bij alle releases, stel het pad in via `FILESYSTEM_SHARED_STORAGE_PATH`    
+-   maak een admin-user: `php artisan user:create-admin` & deel dit wachtwoord met Jeroen Vloothuis & Tijn Schmits
+-   maak de gedeelde storage-mappen aan die gedeeld zal worden bij alle releases, stel het pad in via `FILESYSTEM_SHARED_STORAGE_PATH`
 
 ### Publieke website
 
@@ -46,6 +46,82 @@ ze de code van de meest recente release uitvoeren.
 ## Changelog per Tag:
 
 ## DEVELOP
+
+- Na deployment moeten de bestaande caches verwijderd worden: `php artisan optimize:clear`
+- Na de deployment moeten voor deze release alle worker processen opnieuw opgestart worden
+- Na het herstarten van de worker moet eenmalig de publieke website opnieuw opgebouwd worden: `php artisan public-website:refresh`
+- Na het herstarten van de worker moet eenmalig de statische website opnieuw opgebouwd worden: `php artisan static-website:refresh`
+
+## 1.11.2
+
+- Na deployment moeten de bestaande caches verwijderd worden: `php artisan optimize:clear`
+- Na de deployment moeten voor deze release alle worker processen opnieuw opgestart worden
+- Na het herstarten van de worker moet eenmalig de publieke website opnieuw opgebouwd worden: `php artisan public-website:refresh`
+- Na het herstarten van de worker moet eenmalig de statische website opnieuw opgebouwd worden: `php artisan static-website:refresh`
+
+## 1.11.1
+
+- Na deployment moeten de bestaande caches verwijderd worden: `php artisan optimize:clear`
+- Na de deployment moeten voor deze release alle worker processen opnieuw opgestart worden
+- Na het herstarten van de worker moet eenmalig de publieke website opnieuw opgebouwd worden: `php artisan public-website:refresh`
+- Na het herstarten van de worker moet eenmalig de statische website opnieuw opgebouwd worden: `php artisan static-website:refresh`
+
+## 1.11.0
+
+- Na deployment moeten de bestaande caches verwijderd worden: `php artisan optimize:clear`
+- Na de deployment moeten voor deze release alle worker processen opnieuw opgestart worden
+- Na het herstarten van de worker moet eenmalig de publieke website opnieuw opgebouwd worden: `php artisan public-website:refresh`
+- Na het herstarten van de worker moet eenmalig de statische website opnieuw opgebouwd worden: `php artisan static-website:refresh`
+
+## 1.10.0
+
+- Na deployment moeten de bestaande caches verwijderd worden: `php artisan optimize:clear`
+- Na de deployment moeten voor deze release alle worker processen opnieuw opgestart worden
+- Na het herstarten van de worker moet eenmalig de publieke website opnieuw opgebouwd worden: `php artisan public-website:refresh`
+- Na het herstarten van de worker moet eenmalig de statische website opnieuw opgebouwd worden: `php artisan static-website:refresh`
+- `IP_WHITELIST_DEFAULTS` om globale applicatie-toegang voor organisaties toe te kennen (https://github.com/minvws/nl-rdo-dataprocessing-register-private/issues/1404)
+
+## v1.9.0
+
+- Na deployment moeten de bestaande caches verwijderd worden: `php artisan optimize:clear`
+- Na de deployment moeten voor deze release alle worker processen opnieuw opgestart worden
+- Na het herstarten van de worker moet eenmalig de publieke website opnieuw opgebouwd worden: `php artisan public-website:refresh`
+- Na het herstarten van de worker moet eenmalig de statische website opnieuw opgebouwd worden: `php artisan static-website:refresh`
+
+## v1.8.2
+
+- Geen bijzonderheden, alleen wijziging van github-build
+
+## v1.8.1
+
+- Na deployment moeten de bestaande caches verwijderd worden: `php artisan optimize:clear`
+- Na de deployment moeten voor deze release alle worker processen opnieuw opgestart worden
+- Na het herstarten van de worker moet eenmalig de publieke website opnieuw opgebouwd worden: `php artisan public-website:refresh`
+- Na het herstarten van de worker moet eenmalig de statische website opnieuw opgebouwd worden: `php artisan static-website:refresh`
+- `STATIC_WEBSITE_BASE_URL`, url waarop de statische (gegenereerde) website beschikbaar zal zijn. Dit dient de volledige
+  base URL met schema te zijn, dus iets als: `https://example.com` (zonder trailing slash), of een relatief path zoals `/public/subfolder`.
+  Indien je de website op root wil hosten, dan dient deze environment variabele de waarde `"."` te hebben.
+- `STATIC_WEBSITE_BUILD_AFTER_HOOK`, het commando / script wat uitegevoerd moet worden na het bouwen van de statische site.
+  Gemaakt voor mogelijkheid (productie) om de site naar een andere machine te kopieren.
+- de admin-applicatie zal bij bepaalde acties in het systeem de statische website her-genereren. De resulterende HTML etc. bestanden
+  worden neergezet in een directory die in te stellen is via `FILESYSTEM_STATIC_WEBSITE_ROOT`. Standaard staat deze instelling op
+  `./storage/app/static-website`.
+- de worker maakt Markdown bestanden & afbeeldingen, de sub-map (van `FILESYSTEM_PUBLIC_WEBSITE_ROOT`) waarin deze bestanden komen is:
+  `static-website/content`. Deze moet schrijfbaar zijn voor de worker.
+- vervolgens worden m.b.v. Hugo deze markdown-bestanden omgezet naar HTML. De uitvoer hiervan komt in: `public/static-website`  (relatief 
+  ten opzichte van `FILESYSTEM_PUBLIC_WEBSITE_ROOT`). Deze map dient ook schrijfbaar te zijn. Let op: omdat de website volledig statisch is,
+  zullen hierin volledige URL's naar de verschillende subpagina's zitten. De basis URL die gebruikt wordt kan via de 
+ `STATIC_WEBSITE_BASE_URL` environment variabele ingesteld worden.
+
+## v1.8.0
+
+- Na deployment moeten de bestaande caches verwijderd worden: `php artisan optimize:clear`
+- Na de deployment moeten voor deze release alle worker processen opnieuw opgestart worden
+- Na het herstarten van de worker moet eenmalig de publieke website opnieuw opgebouwd worden: `php artisan public-website:refresh`
+- Na de deployment moet eenmalig het commando gestart worden om de dubbele systemen uit de applicatie te halen: `php artisan app:system-undouble`
+- De php-versie moet worden bijgewerkt naar versie 8.4
+
+## v1.7.2
 
 - Na deployment moeten de bestaande caches verwijderd worden: `php artisan optimize:clear`
 - Na de deployment moeten voor deze release alle worker processen opnieuw opgestart worden
@@ -88,7 +164,7 @@ ze de code van de meest recente release uitvoeren.
 - Na deployment moeten de bestaande caches verwijderd worden: `php artisan optimize:clear`
 - Na de deployment moeten voor deze release alle worker processen opnieuw opgestart worden
 - Na het herstarten van de worker moet eenmalig de publieke website opnieuw opgebouwd worden: `php artisan public-website:refresh`
-- Het commando om de queue te verwerken moet een extra parameter krijgen zodat we taken prioriteit kunnen geven, het nieuwe command is: `php artisan queue:work --queue=high,default,low` 
+- Het commando om de queue te verwerken moet een extra parameter krijgen zodat we taken prioriteit kunnen geven, het nieuwe command is: `php artisan queue:work --queue=high,default,low`
 
 ## v1.5.2
 
@@ -253,7 +329,7 @@ ze de code van de meest recente release uitvoeren.
 - Na de deployment moeten voor deze release alle worker processen opnieuw opgestart worden.
 
 - De huidige gebruikers in de database hebben allen geen enkele rol toegekend en hebben dus ook geen rechten. Er zal een
-  nieuwe admin gebruiker aangemaakt moeten worden met het `php artisan make:admin-user` commando. Deze gebruiker heeft
+  nieuwe admin gebruiker aangemaakt moeten worden met het `php artisan user:create-admin` commando. Deze gebruiker heeft
   alle rollen (en dus rechten), en kan vervolgens alle andere gebruikers de juiste rollen toekennen.
 
 ## v1.0.6
@@ -337,7 +413,7 @@ ze de code van de meest recente release uitvoeren.
 
 -   gooi alle database-tabellen weg
 -   execute alle SQL files in de folder `database/sql/v1.0.1` om alle tabellen weer aan te maken
--   maak admin-user aan met het `php artisan make:admin-user`-script
+-   maak admin-user aan met het `php artisan user:create-admin`-script
 
 ## v0.0.7
 

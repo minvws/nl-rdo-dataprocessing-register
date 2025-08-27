@@ -19,7 +19,6 @@ class EntityNumberFactory extends Factory
     public function definition(): array
     {
         return [
-            'id' => $this->faker->uuid(),
             'type' => $this->faker->randomElement(EntityNumberType::cases()),
             'number' => $this->faker->unique()->regexify('[A-Z]{3}[0-9]{5}'),
         ];

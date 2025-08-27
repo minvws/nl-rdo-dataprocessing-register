@@ -5,19 +5,17 @@ declare(strict_types=1);
 namespace App\Jobs\PublicWebsite;
 
 use App\Enums\Queue;
-use App\Facades\AdminLog;
+use App\Repositories\AdminLogRepository;
 use App\Services\PublicWebsite\ContentGenerator;
 use Exception;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Support\Str;
 
 use function sprintf;
 
-class ContentGeneratorJob implements ShouldQueue, ShouldBeUnique
+class ContentGeneratorJob implements ShouldQueue
 {
     use Dispatchable;
     use InteractsWithQueue;
@@ -31,13 +29,15 @@ class ContentGeneratorJob implements ShouldQueue, ShouldBeUnique
     /**
      * @throws Exception
      */
-    public function handle(ContentGenerator $contentGenerator): void
-    {
-        AdminLog::timedLog(
+    public function handle(
+        AdminLogRepository $adminLogRepository,
+        ContentGenerator $contentGenerator,
+    ): void {
+        $adminLogRepository->timedLog(
             static function () use ($contentGenerator): void {
                 $contentGenerator->generate();
             },
-            sprintf('Processed job: "%s"', Str::of(self::class)->afterLast('\\')),
+            sprintf('Processed job: "%s"', self::class),
         );
     }
 }

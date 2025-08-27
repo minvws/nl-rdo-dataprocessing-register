@@ -1,25 +1,148 @@
+@php use App\Models\Responsible; @endphp
 @php
-    /** @formatter:off */
-    /** @var App\Models\Avg\AvgResponsibleProcessingRecord $record */
-    use App\Facades\DateFormat;
+    /**: @var App\Models\Avg\AvgResponsibleProcessingRecord $record */
 @endphp
 
-- **Publieke review gepland**: {{ DateFormat::toDate($record->review_at) }}
-- **Import id**: {{ $record->import_id }}
-- **Nummer**: {{ $record->getNumber() }}
-- **Aanmaakdatum**: {{ DateFormat::toDateTime($record->created_at) }}
-- **Wijzigingsdatum**: {{ DateFormat::toDateTime($record->updated_at) }}
-- **Verdeling verantwoordelijkheid**: {{ $record->responsibility_distribution }}
-- <!--- #App\Models\ContactPerson# --->
-- <!--- #App\Models\Processor# --->
-- <!--- #App\Models\System# --->
-- **Beveiliging**:
-  - **Pseudonimisering**: {{ $record->pseudonymization }}
-  - **Encryptie**: {{ $record->encryption }}
-  - **Electronische weg**
-  - **Toegang**
-  - **Verwerkers**: {{ $record->safety_processors }}
-  - **Verantwoordelijken**: {{ $record->safety_responsibles }}
-  - **Maatregelen**:
-- **GEB (DPIA) uitgevoerd**: {{ __(sprintf('general.%s', $record->geb_dpia_executed ? 'yes' : 'no')) }}
-- **Gepubliceerd vanaf**: {{ DateFormat::toDateTime($record->public_from) }}
+## {{ __('avg_responsible_processing_record.step_processing_name') }}
+
+- **{{ __('processing_record.number') }}**: {{ $record->getNumber() }}
+- **{{ __('processing_record.import_number') }}**: {{ $record->import_id }}
+- **{{ __('processing_record.name') }}**: {{ $record->name }}
+- **{{ __('general.data_collection_source') }}**: {{ __(sprintf('core_entity_level.%s', $record->data_collection_source->value)) }}
+- **{{ __('avg_responsible_processing_record_service.model_singular') }}**: {{ $record->avgResponsibleProcessingRecordService->name }}
+- **{{ __('tag.model_plural') }}**: {{ $record->tags->isEmpty() ? '-' : $record->tags->implode(', ') }}
+- **{{ __('general.review_at') }}**: {{ DateFormat::toDate($record->review_at) }}
+- **{{ __('general.parent') }}**: {{ $record->parent === null ? '-' : $record->parent->getNumber() }}
+
+## {{ __('avg_responsible_processing_record.step_responsible') }}
+
+<!--- #App\Models\Responsible# --->
+
+- **{{ __('avg_responsible_processing_record.responsibility_distribution') }}**: {!! single_line_escaped_markdown($record->responsibility_distribution) !!}
+
+## {{ __('avg_responsible_processing_record.step_processor') }}
+
+<!--- #App\Models\Processor# --->
+
+## {{ __('avg_responsible_processing_record.step_receiver') }}
+
+<!--- #App\Models\Receiver# --->
+
+## {{ __('avg_responsible_processing_record.step_processing_goal') }}
+
+@forelse ($record->avgGoals as $goal)
+- **{{ __('avg_goal.goal') }}**: {!! single_line_escaped_markdown($goal->goal) !!}
+  - **{{ __('avg_goal_legal_base.model_plural') }}**: {{ $goal->avg_goal_legal_base }}
+  - **{{ __('avg_goal.remarks') }}**: {!! single_line_escaped_markdown($goal->remarks) !!}
+@empty
+- Geen
+@endforelse
+
+## {{ __('avg_responsible_processing_record.step_stakeholder_data') }}
+
+@forelse ($record->stakeholders as $stakeholder)
+- **{{ __('general.description') }}**: {!! single_line_escaped_markdown($stakeholder->description) !!}
+  - **{{ __('stakeholder.special_collected_data') }}**
+    - **{{ __('stakeholder.biometric') }}**: {{ $stakeholder->biometric ? 'ja' : 'nee'}}
+    - **{{ __('stakeholder.faith_or_belief') }}**: {{ $stakeholder->faith_or_belief ? 'ja' : 'nee' }}
+    - **{{ __('stakeholder.genetic') }}**: {{ $stakeholder->genetic ? 'ja' : 'nee' }}
+    - **{{ __('stakeholder.health') }}**: {{ $stakeholder->health ? 'ja' : 'nee' }}
+    - **{{ __('stakeholder.political_attitude') }}**: {{ $stakeholder->political_attitude ? 'ja' : 'nee' }}
+    - **{{ __('stakeholder.race_or_ethnicity') }}**: {{ $stakeholder->race_or_ethnicity ? 'ja' : 'nee' }}
+    - **{{ __('stakeholder.sexual_life') }}**: {{ $stakeholder->sexual_life ? 'ja' : 'nee' }}
+    - **{{ __('stakeholder.trade_association_membership') }}**: {{ $stakeholder->trade_association_membership ? 'ja' : 'nee' }}
+    - **{{ __('stakeholder.special_collected_data_explanation') }}**: {!! single_line_escaped_markdown($stakeholder->special_collected_data_explanation) !!}
+  - **{{ __('stakeholder.sensitive_data') }}**
+    - **{{ __('stakeholder.criminal_law') }}**: {{ $stakeholder->criminal_law ? 'ja' : 'nee' }}
+    - **{{ __('stakeholder.citizen_service_numbers') }}**: {{ $stakeholder->citizen_service_numbers ? 'ja' : 'nee' }}
+  - **{{ __('stakeholder_data_item.model_plural') }}**
+@foreach($stakeholder->stakeholderDataItems as $stakeholderDataItem)
+    - **{{ __('general.description') }}**: {!! single_line_escaped_markdown($stakeholderDataItem->description) !!}
+      - **{{ __('stakeholder_data_item.collection_purpose') }}**: {!! single_line_escaped_markdown($stakeholderDataItem->collection_purpose) !!}
+      - **{{ __('stakeholder_data_item.retention_period') }}**: {!! single_line_escaped_markdown($stakeholderDataItem->retention_period) !!}
+      - **{{ __('stakeholder_data_item.source_description') }}**: {!! single_line_escaped_markdown($stakeholderDataItem->source_description) !!}
+      - **{{ __('stakeholder_data_item.is_stakeholder_mandatory') }}**: {{ $stakeholderDataItem->is_stakeholder_mandatory ? 'ja' : 'nee' }}
+      - **{{ __('stakeholder_data_item.stakeholder_consequences') }}**: {!! single_line_escaped_markdown($stakeholderDataItem->stakeholder_consequences) !!}
+@endforeach
+@empty
+- Geen
+@endforelse
+
+## {{ __('avg_responsible_processing_record.step_decision_making') }}
+
+- **{{ __('avg_responsible_processing_record.decision_making') }}**: {{ $record->decision_making ? 'ja' : 'nee' }}
+- **{{ __('avg_responsible_processing_record.logic') }}**: {!! single_line_escaped_markdown($record->logic) !!}
+- **{{ __('avg_responsible_processing_record.importance_consequences') }}**: {!! single_line_escaped_markdown($record->importance_consequences) !!}
+
+## {{ __('avg_responsible_processing_record.step_system') }}
+
+<!--- #App\Models\System# --->
+
+## {{ __('avg_responsible_processing_record.step_security') }}
+
+- **{{ __('avg_responsible_processing_record.has_security') }}**: {{ $record->has_security ? 'ja' : 'nee' }}
+- **{{ __('processor.measures') }}**
+  - **{{ __('processor.measures_implemented') }}**: {{ $record->measures_implemented ? 'ja' : 'nee' }}
+  - **{{ __('processor.other_measures') }}**: {{ $record->other_measures ? 'ja' : 'nee' }}
+  - **{{ __('processor.measures_description') }}**: {!! single_line_escaped_markdown($record->measures_description) !!}
+- **{{ __('avg_responsible_processing_record.has_pseudonymization') }}**: {{ $record->has_pseudonymization ? 'ja' : 'nee' }}
+  - **{{ __('avg_responsible_processing_record.pseudonymization') }}**: {!! single_line_escaped_markdown($record->pseudonymization) !!}
+
+## {{ __('avg_responsible_processing_record.step_passthrough') }}
+
+- **{{ __('avg_responsible_processing_record.outside_eu') }}**: {{ $record->outside_eu ? 'ja' : 'nee' }}
+- **{{ __('general.country') }}**: {{ Str::length($record->country) > 0 ? $record->country : '-' }} {{ $record->country_other }}
+- **{{ __('avg_responsible_processing_record.outside_eu_protection_level') }}**: {{ $record->outside_eu_protection_level ? 'ja' : 'nee' }}
+- **{{ __('avg_responsible_processing_record.outside_eu_protection_level_description') }}**: {!! single_line_escaped_markdown($record->outside_eu_protection_level_description) !!}
+- **{{ __('avg_responsible_processing_record.outside_eu_description') }}**: {!! single_line_escaped_markdown($record->outside_eu_description) !!}
+
+## {{ __('avg_responsible_processing_record.step_geb_dpia') }}
+
+- **{{ __('avg_responsible_processing_record.geb_dpia_executed') }}**: {{ $record->geb_dpia_executed ? 'ja' : 'nee' }}
+@if(!$record->geb_dpia_executed)
+- **{{ __('avg_responsible_processing_record.geb_dpia_automated') }}**: {{ $record->geb_dpia_automated ? 'ja' : 'nee' }}
+@if(!$record->geb_dpia_automated)
+- **{{ __('avg_responsible_processing_record.geb_dpia_large_scale_processing') }}**: {{ $record->geb_dpia_large_scale_processing ? 'ja' : 'nee' }}
+@if(!$record->geb_dpia_large_scale_processing)
+- **{{ __('avg_responsible_processing_record.geb_dpia_large_scale_monitoring') }}**: {{ $record->geb_dpia_large_scale_monitoring ? 'ja' : 'nee' }}
+@if(!$record->geb_dpia_large_scale_monitoring)
+- **{{ __('avg_responsible_processing_record.geb_dpia_list_required') }}**: {{ $record->geb_dpia_list_required ? 'ja' : 'nee' }}
+@if(!$record->geb_dpia_list_required)
+- **{{ __('avg_responsible_processing_record.geb_dpia_criteria_wp248') }}**: {{ $record->geb_dpia_criteria_wp248 ? 'ja' : 'nee' }}
+@if(!$record->geb_dpia_criteria_wp248)
+- **{{ __('avg_responsible_processing_record.geb_dpia_high_risk_freedoms') }}**: {{ $record->geb_dpia_high_risk_freedoms ? 'ja' : 'nee' }}
+@endif
+@endif
+@endif
+@endif
+@endif
+@endif
+
+## {{ __('avg_responsible_processing_record.step_contact_person') }}
+
+@foreach($record->users as $user)
+- {{ $user->name }} @if($user->email)&lt;{{ $user->email }}&gt;@endif
+
+@endforeach
+
+<!--- #App\Models\ContactPerson# --->
+
+## {{ __('avg_responsible_processing_record.step_attachments') }}
+
+@forelse($record->documents as $document)
+- **{{ __('document.model_singular') }}**: {{ $document->name }}
+@empty
+- Geen
+@endforelse
+
+## {{ __('avg_responsible_processing_record.step_remarks') }}
+
+@forelse($record->remarks as $remark)
+- **{{ __('remark.model_singular') }}**: {!! single_line_escaped_markdown($remark->body) !!}
+@empty
+- Geen
+@endforelse
+
+## {{ __('avg_responsible_processing_record.step_publish') }}
+
+- **{{ __('general.public_from') }}**: {{ $record->public_from ? DateFormat::toDateTime($record->public_from) : '-' }}

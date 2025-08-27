@@ -1,9 +1,8 @@
 @php
-    /** @formatter:off */
     /** @var App\Models\Responsible $record */
 @endphp
 
-### Verantwoordelijke
+# Verantwoordelijke
 
 {{ $record->name }}
 @isset($record->address)

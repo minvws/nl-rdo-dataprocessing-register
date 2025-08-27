@@ -6,12 +6,16 @@ use App\Filament\Resources\OrganisationSnapshotApprovalResource\Pages\ListOrgani
 use App\Models\Snapshot;
 use App\Models\SnapshotApproval;
 use App\Models\States\Snapshot\Approved;
-
-use function Pest\Livewire\livewire;
+use App\Models\States\Snapshot\Established;
+use App\Models\States\Snapshot\InReview;
+use App\Models\States\Snapshot\Obsolete;
+use Illuminate\Database\Eloquent\Factories\Sequence;
+use Tests\Helpers\Model\OrganisationTestHelper;
 
 it('loads the list page', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $snapshotApprovals = SnapshotApproval::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->count(5)
         ->create([
             'snapshot_id' => Snapshot::factory(state: [
@@ -24,6 +28,30 @@ it('loads the list page', function (): void {
             return $snapshotApproval->snapshot;
         });
 
-    livewire(ListOrganisationSnapshotApprovalItems::class)
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ListOrganisationSnapshotApprovalItems::class)
         ->assertCanSeeTableRecords($snapshots);
 });
+
+it('loads correct list of items in all tabs', function (string $activeTab, int $assertCount): void {
+    $organisation = OrganisationTestHelper::create();
+    Snapshot::factory()
+        ->recycle($organisation)
+        ->count(5)
+        ->state(new Sequence(
+            ['state' => Established::$name],
+            ['state' => Established::$name], // only reason to make a second established is to have diffent resultcounts
+            ['state' => Obsolete::$name],
+            ['state' => InReview::$name],
+            ['state' => Approved::$name],
+        ))
+        ->create();
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ListOrganisationSnapshotApprovalItems::class, ['activeTab' => $activeTab])
+        ->assertCountTableRecords($assertCount);
+})->with([
+    [ListOrganisationSnapshotApprovalItems::TAB_ID_ALL, 5],
+    [ListOrganisationSnapshotApprovalItems::TAB_ID_ESTABLISHED_OBSOLETE, 3],
+    [ListOrganisationSnapshotApprovalItems::TAB_ID_INREVIEW_APPROVED, 2],
+]);

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Pages;
 
 use App\Filament\Actions\CreateSnapshotAction;
-use App\Filament\Widgets\ProcessingRecordHeaderWidget;
+use App\Filament\Widgets\FgRemarksWidget;
 use App\Models\Contracts\EntityNumerable;
 use App\Models\Contracts\SnapshotSource;
 use Filament\Actions\DeleteAction;
@@ -27,7 +27,7 @@ class ProcessingRecordViewRecord extends ViewRecord
     protected function getHeaderWidgets(): array
     {
         return [
-            ProcessingRecordHeaderWidget::class,
+            FgRemarksWidget::class,
         ];
     }
 

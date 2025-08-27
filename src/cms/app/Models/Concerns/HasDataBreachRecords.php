@@ -4,23 +4,23 @@ declare(strict_types=1);
 
 namespace App\Models\Concerns;
 
+use App\Models\Contracts\Cloneable;
 use App\Models\DataBreachRecord;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Webmozart\Assert\Assert;
 
 trait HasDataBreachRecords
 {
-    public function initializeHasDataBreachRecords(): void
+    final public function initializeHasDataBreachRecords(): void
     {
-        Assert::methodExists($this, 'addCloneableRelations');
-
-        $this->addCloneableRelations(['dataBreachRecords']);
+        if ($this instanceof Cloneable) {
+            $this->addCloneableRelations(['dataBreachRecords']);
+        }
     }
 
     /**
      * @return MorphToMany<DataBreachRecord, $this>
      */
-    public function dataBreachRecords(): MorphToMany
+    final public function dataBreachRecords(): MorphToMany
     {
         return $this->morphToMany(DataBreachRecord::class, 'data_breach_record_relatable');
     }

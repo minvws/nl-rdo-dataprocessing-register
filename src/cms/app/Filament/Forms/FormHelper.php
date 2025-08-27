@@ -18,7 +18,7 @@ class FormHelper
     public static function addAuthFields(): Closure
     {
         return static function (array $data) {
-            $data['organisation_id'] = Authentication::organisation()->id;
+            $data['organisation_id'] = Authentication::organisation()->id->toString();
             $data['user_id'] = Authentication::user()->id;
 
             return $data;

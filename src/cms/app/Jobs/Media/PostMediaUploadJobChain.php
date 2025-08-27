@@ -8,7 +8,6 @@ use App\Config\Config;
 use App\Vendor\MediaLibrary\Media;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Bus;
-use Webmozart\Assert\Assert;
 
 readonly class PostMediaUploadJobChain
 {
@@ -21,8 +20,6 @@ readonly class PostMediaUploadJobChain
         /** @var array<class-string<ShouldQueue>> $jobClasses */
         $jobClasses = Config::array('media-library.post_media_upload_job_chain');
         foreach ($jobClasses as $jobClass) {
-            Assert::subclassOf($jobClass, ShouldQueue::class);
-
             $jobs[] = new $jobClass($media);
         }
 

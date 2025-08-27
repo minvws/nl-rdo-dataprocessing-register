@@ -4,42 +4,47 @@ declare(strict_types=1);
 
 use App\Filament\Resources\AvgProcessorProcessingRecordServiceResource\Pages\ListAvgProcessorProcessingRecordServices;
 use App\Models\Avg\AvgProcessorProcessingRecordService;
-
-use function Pest\Livewire\livewire;
+use Tests\Helpers\Model\OrganisationTestHelper;
 
 it('loads the list page', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $avgProcessorProcessingRecordService = AvgProcessorProcessingRecordService::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->count(5)
         ->create();
 
-    livewire(ListAvgProcessorProcessingRecordServices::class)
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ListAvgProcessorProcessingRecordServices::class)
         ->assertCanSeeTableRecords($avgProcessorProcessingRecordService);
 });
 
 it('loads the enabled page', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $enabledAvgProcessorProcessingRecordService = AvgProcessorProcessingRecordService::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create(['enabled' => true]);
     $disabledAvgProcessorProcessingRecordService = AvgProcessorProcessingRecordService::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create(['enabled' => false]);
 
-    livewire(ListAvgProcessorProcessingRecordServices::class)
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ListAvgProcessorProcessingRecordServices::class)
         ->set('activeTab', 'enabled')
         ->assertCanSeeTableRecords([$enabledAvgProcessorProcessingRecordService])
         ->assertCanNotSeeTableRecords([$disabledAvgProcessorProcessingRecordService]);
 });
 
 it('loads the disabled page', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $enabledAvgProcessorProcessingRecordService = AvgProcessorProcessingRecordService::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create(['enabled' => true]);
     $disabledAvgProcessorProcessingRecordService = AvgProcessorProcessingRecordService::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create(['enabled' => false]);
 
-    livewire(ListAvgProcessorProcessingRecordServices::class)
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ListAvgProcessorProcessingRecordServices::class)
         ->set('activeTab', 'disabled')
         ->assertCanSeeTableRecords([$disabledAvgProcessorProcessingRecordService])
         ->assertCanNotSeeTableRecords([$enabledAvgProcessorProcessingRecordService]);

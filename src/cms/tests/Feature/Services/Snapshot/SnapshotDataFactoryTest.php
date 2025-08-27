@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Models\Algorithm\AlgorithmRecord;
 use App\Models\Avg\AvgProcessorProcessingRecord;
 use App\Models\ContactPerson;
+use App\Models\Contracts\SnapshotSource;
 use App\Models\Organisation;
 use App\Models\Processor;
 use App\Models\Receiver;
@@ -12,17 +13,12 @@ use App\Models\Responsible;
 use App\Models\Snapshot;
 use App\Models\System;
 use App\Models\Wpg\WpgProcessingRecord;
-use App\Services\PublicWebsite\HugoPublicWebsiteGenerator;
 use App\Services\Snapshot\SnapshotDataFactory;
-use Mockery\MockInterface;
+use Webmozart\Assert\Assert;
 
 it('creates the data for the snapshot', function (string $snapshotSourceClass): void {
-    $this->mock(HugoPublicWebsiteGenerator::class, static function (MockInterface $mock): void {
-        $mock->expects('generate')
-            ->zeroOrMoreTimes();
-    });
-
     $snapshotSource = $snapshotSourceClass::factory()->create();
+    Assert::isInstanceOf($snapshotSource, SnapshotSource::class);
 
     $snapshot = Snapshot::factory()
         ->create([
@@ -33,7 +29,6 @@ it('creates the data for the snapshot', function (string $snapshotSourceClass): 
     expect($snapshot->snapshotData)
         ->toBeNull();
 
-    /** @var SnapshotDataFactory $snapshotDataFactory */
     $snapshotDataFactory = $this->app->get(SnapshotDataFactory::class);
     $snapshotDataFactory->createDataForSnapshot($snapshot);
 
@@ -56,11 +51,6 @@ it('creates the data for the snapshot', function (string $snapshotSourceClass): 
     ]);
 
 it('fails with an invalid snapshotSource', function (): void {
-    $this->mock(HugoPublicWebsiteGenerator::class, static function (MockInterface $mock): void {
-        $mock->expects('generate')
-            ->zeroOrMoreTimes();
-    });
-
     $organisation = Organisation::factory()->create();
 
     $snapshot = Snapshot::factory()
@@ -69,7 +59,6 @@ it('fails with an invalid snapshotSource', function (): void {
             'snapshot_source_type' => Organisation::class,
         ]);
 
-    /** @var SnapshotDataFactory $snapshotDataFactory */
     $snapshotDataFactory = $this->app->get(SnapshotDataFactory::class);
 
     $this->expectException(InvalidArgumentException::class);

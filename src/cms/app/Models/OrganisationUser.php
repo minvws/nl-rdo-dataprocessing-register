@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Collections\OrganisationUserCollection;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
@@ -13,6 +14,8 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
  */
 class OrganisationUser extends Pivot
 {
+    protected static string $collectionClass = OrganisationUserCollection::class;
+
     /**
      * @return BelongsTo<Organisation, $this>
      */

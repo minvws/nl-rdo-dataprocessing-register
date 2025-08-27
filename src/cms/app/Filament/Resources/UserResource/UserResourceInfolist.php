@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\UserResource;
 
-use App\Enums\Authorization\Role;
-use App\Filament\Infolists\Components\UserGlobalRoleEntry;
-use App\Filament\Infolists\Components\UserOrganisationRoleRepeaterEntry;
+use App\Enums\Authorization\Permission;
+use App\Facades\Authorization;
+use App\Filament\Infolists\Components\Section\OrganisationUserRolesSection;
+use App\Filament\Infolists\Components\Section\UserGlobalRolesSection;
+use App\Filament\Infolists\Components\Section\UserSection;
 use App\Models\User;
 use Filament\Infolists\Components\Component;
-use Filament\Infolists\Components\Section;
-use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 
 use function __;
@@ -33,24 +33,11 @@ class UserResourceInfolist
     public static function getSchema(User $user): array
     {
         return [
-            Section::make(__('user.model_singular'))
-                ->schema([
-                    TextEntry::make('name')
-                        ->label(__('user.name')),
-                    TextEntry::make('email')
-                        ->label(__('user.email')),
-                ]),
-            Section::make(__('user.global_roles'))
-                ->columns()
-                ->schema([
-                    UserGlobalRoleEntry::makeForUser(Role::CHIEF_PRIVACY_OFFICER),
-                    UserGlobalRoleEntry::makeForUser(Role::FUNCTIONAL_MANAGER),
-                ]),
-            Section::make(__('user.organisation_roles'))
-                ->columns(1)
-                ->schema([
-                    UserOrganisationRoleRepeaterEntry::makeForUser('organisations', $user),
-                ]),
+            UserSection::make(__('user.model_singular')),
+            UserGlobalRolesSection::make()
+                ->visible(Authorization::hasPermission(Permission::USER_UPDATE)),
+            OrganisationUserRolesSection::makeForUser($user)
+                ->visible(Authorization::hasPermission(Permission::USER_UPDATE)),
         ];
     }
 }

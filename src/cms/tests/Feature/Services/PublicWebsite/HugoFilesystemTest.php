@@ -8,42 +8,42 @@ use Illuminate\Filesystem\FilesystemAdapter;
 use Psr\Log\NullLogger;
 
 it('can call deleteAll', function (): void {
-    /** @var FilesystemAdapter $filesystem */
-    $filesystem = $this->createMock(FilesystemAdapter::class);
-    $filesystem->expects($this->once())
-        ->method('path');
-    $filesystem->expects($this->once())
-        ->method('deleteDirectory');
+    $filesystem = $this->mock(FilesystemAdapter::class)
+        ->shouldReceive('path')
+        ->once()
+        ->shouldReceive('deleteDirectory')
+        ->once()
+        ->getMock();
 
     $contentGenerator = new HugoFilesystem($filesystem, 'path', new NullLogger());
     $contentGenerator->deleteAll();
 });
 
 it('can call deleteDirectory', function (): void {
-    /** @var FilesystemAdapter $filesystem */
-    $filesystem = $this->createMock(FilesystemAdapter::class);
-    $filesystem->expects($this->once())
-        ->method('deleteDirectory');
+    $filesystem = $this->mock(FilesystemAdapter::class)
+        ->shouldReceive('deleteDirectory')
+        ->once()
+        ->getMock();
 
     $contentGenerator = new HugoFilesystem($filesystem, 'path', new NullLogger());
     $contentGenerator->deleteDirectory('path');
 });
 
 it('can call deleteFile', function (): void {
-    /** @var FilesystemAdapter $filesystem */
-    $filesystem = $this->createMock(FilesystemAdapter::class);
-    $filesystem->expects($this->once())
-        ->method('delete');
+    $filesystem = $this->mock(FilesystemAdapter::class)
+        ->shouldReceive('delete')
+        ->once()
+        ->getMock();
 
     $contentGenerator = new HugoFilesystem($filesystem, 'path', new NullLogger());
     $contentGenerator->deleteFile('path');
 });
 
 it('can call write', function (): void {
-    /** @var FilesystemAdapter $filesystem */
-    $filesystem = $this->createMock(FilesystemAdapter::class);
-    $filesystem->expects($this->once())
-        ->method('put');
+    $filesystem = $this->mock(FilesystemAdapter::class)
+        ->shouldReceive('put')
+        ->once()
+        ->getMock();
 
     $contentGenerator = new HugoFilesystem($filesystem, 'path', new NullLogger());
     $contentGenerator->write('path', 'contents');
@@ -52,12 +52,12 @@ it('can call write', function (): void {
 it('can call writeStream', function (): void {
     $organisation = Organisation::factory()
         ->withPosterImage()
-        ->create();
+        ->createQuietly();
 
-    /** @var FilesystemAdapter $filesystem */
-    $filesystem = $this->createMock(FilesystemAdapter::class);
-    $filesystem->expects($this->once())
-        ->method('writeStream');
+    $filesystem = $this->mock(FilesystemAdapter::class)
+        ->shouldReceive('writeStream')
+        ->once()
+        ->getMock();
 
     $contentGenerator = new HugoFilesystem($filesystem, 'path', new NullLogger());
     $contentGenerator->writeStream('path', $organisation->getFilamentPoster()->stream());

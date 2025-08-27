@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\UserResource;
 
+use App\Enums\Authorization\Permission;
+use App\Facades\Authorization;
 use App\Filament\Tables\Columns\CreatedAtColumn;
 use App\Filament\Tables\Columns\UpdatedAtColumn;
 use Filament\Tables\Actions\DetachBulkAction;
@@ -29,7 +31,8 @@ class UserResourceTable
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('organisations.name')
-                    ->separator(','),
+                    ->separator(',')
+                    ->visible(Authorization::hasPermission(Permission::USER_ROLE_ORGANISATION_MANAGE)),
                 CreatedAtColumn::make(),
                 UpdatedAtColumn::make(),
             ])

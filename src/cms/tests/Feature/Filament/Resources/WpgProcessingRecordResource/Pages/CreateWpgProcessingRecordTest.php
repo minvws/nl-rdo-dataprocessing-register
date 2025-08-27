@@ -3,27 +3,34 @@
 declare(strict_types=1);
 
 use App\Enums\CoreEntityDataCollectionSource;
+use App\Enums\RegisterLayout;
 use App\Filament\Resources\WpgProcessingRecordResource;
 use App\Filament\Resources\WpgProcessingRecordResource\Pages\CreateWpgProcessingRecord;
 use App\Models\Wpg\WpgProcessingRecord;
 use App\Models\Wpg\WpgProcessingRecordService;
+use Tests\Helpers\Model\OrganisationTestHelper;
+use Tests\Helpers\Model\UserTestHelper;
 
-use function Pest\Livewire\livewire;
+it('loads the create page with all layouts', function (RegisterLayout $registerLayout): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisation($organisation, ['register_layout' => $registerLayout]);
 
-it('loads the create page', function (): void {
-    $this->get(WpgProcessingRecordResource::getUrl('create'))
+    $this->asFilamentUser($user)
+        ->get(WpgProcessingRecordResource::getUrl('create'))
         ->assertSuccessful();
-});
+})->with(RegisterLayout::cases());
 
 it('can create an entry', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $wpgProcessingRecordService = WpgProcessingRecordService::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create([
             'enabled' => true,
         ]);
     $name = fake()->uuid();
 
-    livewire(CreateWpgProcessingRecord::class)
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(CreateWpgProcessingRecord::class)
         ->fillForm([
             'data_collection_source' => CoreEntityDataCollectionSource::PRIMARY->value,
             'name' => $name,

@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Enums\RegisterLayout;
+use App\Facades\Authentication;
 use App\Filament\NavigationGroups\NavigationGroup;
 use App\Filament\RelationManagers\AvgResponsibleProcessingRecordChildrenRelationManager;
 use App\Filament\RelationManagers\AvgResponsibleProcessingRecordParentRelationManager;
-use App\Filament\RelationManagers\ContactPersonRelationManager;
 use App\Filament\RelationManagers\DocumentRelationManager;
+use App\Filament\RelationManagers\ProcessingRecordContactPersonRelationManager;
+use App\Filament\RelationManagers\ProcessingRecordUsersRelationManager;
 use App\Filament\RelationManagers\ProcessorRelationManager;
 use App\Filament\RelationManagers\ReceiverRelationManager;
 use App\Filament\RelationManagers\ResponsibleRelationManager;
@@ -41,12 +44,18 @@ class AvgResponsibleProcessingRecordResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return AvgResponsibleProcessingRecordResourceForm::form($form);
+        return match (Authentication::user()->register_layout) {
+            RegisterLayout::STEPS => AvgResponsibleProcessingRecordResourceForm::stepsForm($form),
+            RegisterLayout::ONE_PAGE => AvgResponsibleProcessingRecordResourceForm::onePageForm($form),
+        };
     }
 
     public static function infolist(Infolist $infolist): Infolist
     {
-        return AvgResponsibleProcessingRecordResourceInfolist::infolist($infolist);
+        return match (Authentication::user()->register_layout) {
+            RegisterLayout::STEPS => AvgResponsibleProcessingRecordResourceInfolist::stepsInfolist($infolist),
+            RegisterLayout::ONE_PAGE => AvgResponsibleProcessingRecordResourceInfolist::onePageInfolist($infolist),
+        };
     }
 
     public static function table(Table $table): Table
@@ -69,15 +78,16 @@ class AvgResponsibleProcessingRecordResource extends Resource
     {
         return [
             SnapshotsRelationManager::class,
+            DocumentRelationManager::class,
             AvgResponsibleProcessingRecordParentRelationManager::class,
             AvgResponsibleProcessingRecordChildrenRelationManager::class,
-            TagRelationManager::class,
             ResponsibleRelationManager::class,
             ProcessorRelationManager::class,
             ReceiverRelationManager::class,
             SystemRelationManager::class,
-            ContactPersonRelationManager::class,
-            DocumentRelationManager::class,
+            ProcessingRecordUsersRelationManager::class,
+            ProcessingRecordContactPersonRelationManager::class,
+            TagRelationManager::class,
         ];
     }
 

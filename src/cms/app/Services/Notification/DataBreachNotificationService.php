@@ -7,9 +7,7 @@ namespace App\Services\Notification;
 use App\Enums\Authorization\Role;
 use App\Mail\DataBreachRecordApReportedNotification;
 use App\Models\DataBreachRecord;
-use App\Models\User;
 use App\Services\User\UserByRoleService;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Mail;
 
 class DataBreachNotificationService
@@ -21,18 +19,19 @@ class DataBreachNotificationService
 
     public function sendNotifications(DataBreachRecord $dataBreachRecord): void
     {
-        /** @var Collection<int, User> $chiefPrivacyOfficers */
-        $chiefPrivacyOfficers = $this->userByRoleService->getUsersByGlobalRole(Role::CHIEF_PRIVACY_OFFICER);
+        $chiefPrivacyOfficers = $this->userByRoleService->getUsersByOrganisationRole(
+            $dataBreachRecord->organisation,
+            [Role::CHIEF_PRIVACY_OFFICER],
+        );
 
         foreach ($chiefPrivacyOfficers as $chiefPrivacyOfficer) {
             Mail::to($chiefPrivacyOfficer)
                 ->queue(new DataBreachRecordApReportedNotification($dataBreachRecord));
         }
 
-        /** @var Collection<int, User> $dataProtectionOfficials */
         $dataProtectionOfficials = $this->userByRoleService->getUsersByOrganisationRole(
             $dataBreachRecord->organisation,
-            Role::DATA_PROTECTION_OFFICIAL,
+            [Role::DATA_PROTECTION_OFFICIAL],
         );
 
         foreach ($dataProtectionOfficials as $dataProtectionOfficial) {

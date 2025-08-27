@@ -19,15 +19,21 @@ class DocumentNotification extends Mailable
     use SerializesModels;
 
     public string $link;
-    public Document $document;
 
-    public function __construct(Document $document)
-    {
-        $this->document = $document;
+    public function __construct(
+        public Document $document,
+    ) {
         $this->link = EditDocument::getUrl([
             'record' => $document,
             'tenant' => $document->organisation,
         ]);
+    }
+
+    public function getLogContext(): array
+    {
+        return [
+            'document_id' => $this->document->id->toString(),
+        ];
     }
 
     public function getSubject(): string

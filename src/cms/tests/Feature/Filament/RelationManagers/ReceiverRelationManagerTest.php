@@ -7,8 +7,6 @@ use App\Filament\Resources\AvgResponsibleProcessingRecordResource\Pages\EditAvgR
 use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\Receiver;
 
-use function Pest\Livewire\livewire;
-
 it('loads the table', function (): void {
     $receiver = Receiver::factory()
         ->create();
@@ -16,8 +14,10 @@ it('loads the table', function (): void {
         ->hasAttached($receiver)
         ->create();
 
-    livewire(ReceiverRelationManager::class, [
-        'ownerRecord' => $avgResponsibleProcessingRecord,
-        'pageClass' => EditAvgResponsibleProcessingRecord::class,
-    ])->assertCanSeeTableRecords([$receiver]);
+    $this->asFilamentUser()
+        ->createLivewireTestable(ReceiverRelationManager::class, [
+            'ownerRecord' => $avgResponsibleProcessingRecord,
+            'pageClass' => EditAvgResponsibleProcessingRecord::class,
+        ])
+        ->assertCanSeeTableRecords([$receiver]);
 });

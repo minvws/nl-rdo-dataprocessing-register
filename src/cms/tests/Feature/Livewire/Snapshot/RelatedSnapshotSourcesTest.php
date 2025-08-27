@@ -11,20 +11,20 @@ use App\Models\States\Snapshot\Approved;
 use App\Models\States\Snapshot\Established;
 use App\Models\States\Snapshot\InReview;
 use App\Models\States\Snapshot\Obsolete;
-
-use function Pest\Livewire\livewire;
+use Tests\Helpers\Model\OrganisationTestHelper;
 
 it('can load the table', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
         ->create();
     $snapshot = Snapshot::factory()
         ->for($avgResponsibleProcessingRecord, 'snapshotSource')
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
 
     // no snapshot
     $processor = Processor::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
     $relatedSnapshotSource = RelatedSnapshotSource::factory()
         ->for($snapshot)
@@ -36,7 +36,7 @@ it('can load the table', function (): void {
 
     // no snapshot and deleted
     $deletedProcessor = Processor::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create(['deleted_at' => fake()->dateTime()]);
     $deletedRelatedSnapshotSource = RelatedSnapshotSource::factory()
         ->for($snapshot)
@@ -48,7 +48,7 @@ it('can load the table', function (): void {
 
     // established
     $establishedProcessor = Processor::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
     $establishedProcessorSnapshotSource = RelatedSnapshotSource::factory()
         ->for($snapshot)
@@ -59,12 +59,12 @@ it('can load the table', function (): void {
         ]);
     Snapshot::factory()
         ->for($establishedProcessor, 'snapshotSource')
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create(['state' => Established::class]);
 
     // Approved
     $approvedProcessor = Processor::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
     $approvedProcessorSnapshotSource = RelatedSnapshotSource::factory()
         ->for($snapshot)
@@ -75,12 +75,12 @@ it('can load the table', function (): void {
         ]);
     Snapshot::factory()
         ->for($approvedProcessor, 'snapshotSource')
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create(['state' => Approved::class]);
 
     // InReview
     $inReviewProcessor = Processor::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
     $inReviewProcessorSnapshotSource = RelatedSnapshotSource::factory()
         ->for($snapshot)
@@ -91,12 +91,12 @@ it('can load the table', function (): void {
         ]);
     Snapshot::factory()
         ->for($inReviewProcessor, 'snapshotSource')
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create(['state' => InReview::class]);
 
     // Obsolete
     $obsoleteProcessor = Processor::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
     $obsoleteProcessorSnapshotSource = RelatedSnapshotSource::factory()
         ->for($snapshot)
@@ -107,12 +107,13 @@ it('can load the table', function (): void {
         ]);
     Snapshot::factory()
         ->for($obsoleteProcessor, 'snapshotSource')
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create(['state' => Obsolete::class]);
 
-    livewire(RelatedSnapshotSources::class, [
-        'snapshot' => $snapshot,
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(RelatedSnapshotSources::class, [
+            'snapshot' => $snapshot,
+        ])
         ->assertCanSeeTableRecords([
             $relatedSnapshotSource,
             $deletedRelatedSnapshotSource,

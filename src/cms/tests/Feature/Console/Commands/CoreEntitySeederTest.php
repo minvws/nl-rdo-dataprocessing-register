@@ -9,7 +9,7 @@ it('can seed data', function (): void {
     $amount = fake()->numberBetween(1, 3);
 
     $this->artisan('app:core-entity-seeder')
-        ->expectsQuestion('Organisation', $organisation->id)
+        ->expectsQuestion('Organisation', $organisation->id->toString())
         ->expectsQuestion('Amount of entities', $amount)
         ->assertSuccessful();
 

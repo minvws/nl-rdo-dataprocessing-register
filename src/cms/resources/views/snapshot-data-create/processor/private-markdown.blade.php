@@ -1,5 +1,4 @@
 @php
-    /** @formatter:off */
     /** @var App\Models\Processor $record */
 @endphp
 

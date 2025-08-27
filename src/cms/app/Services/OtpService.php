@@ -6,6 +6,8 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Services\OneTimePassword\OneTimePassword;
+use App\ValueObjects\OneTimePassword\Code;
+use App\ValueObjects\OneTimePassword\Secret;
 use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Session\Session;
 use Webmozart\Assert\Assert;
@@ -20,12 +22,12 @@ class OtpService
     ) {
     }
 
-    public function generateQRCodeInline(string $secret, string $label): string
+    public function generateQRCodeInline(Secret $secret, string $label): string
     {
         return $this->oneTimePassword->generateQRCodeInline($label, $secret);
     }
 
-    public function verifyCode(string $code, User $user): bool
+    public function verifyCode(Code $code, User $user): bool
     {
         $otpSecret = $user->otp_secret;
         Assert::nullOrString($otpSecret);
@@ -34,7 +36,7 @@ class OtpService
             return false;
         }
 
-        $isValid = $this->oneTimePassword->isCodeValid($code, $otpSecret);
+        $isValid = $this->oneTimePassword->isCodeValid($code, Secret::fromString($otpSecret));
 
         if ($isValid === false) {
             return false;

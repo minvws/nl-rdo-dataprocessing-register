@@ -2,27 +2,43 @@
 
 declare(strict_types=1);
 
+use App\Enums\RegisterLayout;
+use App\Filament\Resources\DataBreachRecord\Pages\CreateDataBreachRecord;
 use App\Filament\Resources\DataBreachRecord\Pages\ListDataBreachRecords;
 use App\Models\DataBreachRecord;
-
-use function Pest\Livewire\livewire;
+use Tests\Helpers\Model\OrganisationTestHelper;
+use Tests\Helpers\Model\UserTestHelper;
 
 it('loads the list page', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $dataBreachRecords = DataBreachRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->count(5)
         ->create();
 
-    livewire(ListDataBreachRecords::class)
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ListDataBreachRecords::class)
         ->assertCanSeeTableRecords($dataBreachRecords);
 });
 
+it('loads the page with all layouts', function (RegisterLayout $registerLayout): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisation($organisation, ['register_layout' => $registerLayout]);
+
+    $this->asFilamentUser($user)
+        ->createLivewireTestable(ListDataBreachRecords::class)
+        ->assertOk()
+        ->assertActionHasUrl('create', CreateDataBreachRecord::getUrl());
+})->with(RegisterLayout::cases());
+
 it('can export', function (): void {
+    $organisation = OrganisationTestHelper::create();
     DataBreachRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
 
-    livewire(ListDataBreachRecords::class)
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ListDataBreachRecords::class)
         ->callAction('export')
         ->assertHasNoActionErrors()
         ->assertNotified();

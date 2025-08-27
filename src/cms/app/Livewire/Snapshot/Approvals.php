@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Snapshot;
 
+use App\Collections\SnapshotApprovalCollection;
 use App\Enums\Authorization\Permission;
 use App\Enums\Authorization\Role;
 use App\Enums\Snapshot\SnapshotApprovalStatus;
@@ -16,9 +17,9 @@ use App\Models\User;
 use App\Services\DateFormatService;
 use App\Services\Snapshot\SnapshotApprovalService;
 use Filament\Forms\Components\CheckboxList;
+use Filament\Forms\Components\Component as FilamentFormComponent;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Notifications\Notification;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\IconColumn;
@@ -28,8 +29,8 @@ use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Collection;
 use Livewire\Component;
+use Webmozart\Assert\Assert;
 
 use function __;
 use function view;
@@ -80,6 +81,8 @@ class Approvals extends Component implements HasForms, HasTable
                     ->visible(Authorization::hasPermission(Permission::SNAPSHOT_APPROVAL_CREATE))
                     ->action(function (array $data, SnapshotApprovalService $snapshotApprovalService): void {
                         $requestedBy = Authentication::user();
+                        Assert::keyExists($data, 'user_ids');
+                        Assert::isArray($data['user_ids']);
 
                         foreach ($data['user_ids'] as $userId) {
                             $assignedTo = User::where('id', $userId)->firstOrFail();
@@ -91,26 +94,6 @@ class Approvals extends Component implements HasForms, HasTable
                     }),
             ])
             ->bulkActions([
-                BulkAction::make('snapshot_approval_notify_bulk_action')
-                    ->label(__('snapshot_approval.notify'))
-                    ->icon('heroicon-o-envelope')
-                    ->visible(Authorization::hasPermission(Permission::SNAPSHOT_APPROVAL_REQUEST_NOTIFICATION))
-                    ->requiresConfirmation()
-                    ->deselectRecordsAfterCompletion()
-                    ->action(static function (Collection $records, SnapshotApprovalService $snapshotApprovalService): void {
-                        /** @var Collection<int, SnapshotApproval> $records */
-                        $records->each(static function (SnapshotApproval $snapshotApproval) use ($snapshotApprovalService): void {
-                            $snapshotApprovalService->notify($snapshotApproval, Authentication::user());
-                        });
-                    })
-                    ->after(static function (Component $livewire): void {
-                        $livewire->dispatch(ViewSnapshot::REFRESH_LIVEWIRE_COMPONENT);
-
-                        Notification::make()
-                            ->title(__('snapshot_approval.notification_sent'))
-                            ->success()
-                            ->send();
-                    }),
                 BulkAction::make('snapshot_approval_notify_bulk_delete')
                     ->label(__('general.delete'))
                     ->icon('heroicon-o-trash')
@@ -118,12 +101,13 @@ class Approvals extends Component implements HasForms, HasTable
                     ->visible(Authorization::hasPermission(Permission::SNAPSHOT_APPROVAL_DELETE))
                     ->requiresConfirmation()
                     ->deselectRecordsAfterCompletion()
-                    ->action(static function (Collection $records, SnapshotApprovalService $snapshotApprovalService): void {
-                        /** @var Collection<int, SnapshotApproval> $records */
-                        $records->each(static function (SnapshotApproval $snapshotApproval) use ($snapshotApprovalService): void {
-                            $snapshotApprovalService->delete($snapshotApproval, Authentication::user());
-                        });
-                    })
+                    ->action(
+                        static function (SnapshotApprovalCollection $records, SnapshotApprovalService $snapshotApprovalService): void {
+                            $records->each(static function (SnapshotApproval $snapshotApproval) use ($snapshotApprovalService): void {
+                                $snapshotApprovalService->delete($snapshotApproval, Authentication::user());
+                            });
+                        },
+                    )
                     ->after(static function (Component $livewire): void {
                         $livewire->dispatch(ViewSnapshot::REFRESH_LIVEWIRE_COMPONENT);
                     }),
@@ -135,6 +119,9 @@ class Approvals extends Component implements HasForms, HasTable
         return view('livewire.filament.table');
     }
 
+    /**
+     * @return array<FilamentFormComponent>
+     */
     private function createRequestApprovalForm(): array
     {
         return [

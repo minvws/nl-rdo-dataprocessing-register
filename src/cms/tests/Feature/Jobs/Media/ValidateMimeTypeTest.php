@@ -8,7 +8,7 @@ use App\Jobs\Media\ValidateMimeType;
 use App\Services\Media\MimeTypeService;
 use App\Vendor\MediaLibrary\Media;
 use Illuminate\Support\Facades\Storage;
-use Tests\Helpers\ConfigHelper;
+use Tests\Helpers\ConfigTestHelper;
 use Throwable;
 
 use function base_path;
@@ -17,7 +17,7 @@ use function it;
 use function sprintf;
 
 it('throws a Exception when the mime type of a media is not in the permitted list', function (): void {
-    $disk = ConfigHelper::get('media-library.filesystem_disk');
+    $disk = ConfigTestHelper::get('media-library.filesystem_disk');
     Storage::fake($disk);
 
     $media = Media::factory()
@@ -32,7 +32,7 @@ it('throws a Exception when the mime type of a media is not in the permitted lis
         $disk,
     );
 
-    ConfigHelper::set('media-library.permitted_file_types.attachment', ['image/jpg']);
+    ConfigTestHelper::set('media-library.permitted_file_types.attachment', ['image/jpg']);
 
     $job = new ValidateMimeType($media);
     $this->expectException(Throwable::class);
@@ -42,7 +42,7 @@ it('throws a Exception when the mime type of a media is not in the permitted lis
 });
 
 it('does not throw an RunTimeException when the mime type of a media is in the permitted list', function (): void {
-    $disk = ConfigHelper::get('media-library.filesystem_disk');
+    $disk = ConfigTestHelper::get('media-library.filesystem_disk');
     Storage::fake($disk);
     $media = Media::factory()->create([
         'file_name' => 'test.png',
@@ -60,11 +60,14 @@ it('does not throw an RunTimeException when the mime type of a media is in the p
 })->throwsNoExceptions();
 
 it('does not validate mime type if the batch is cancelled', function (): void {
-    $this->mock(MimeTypeService::class, function ($mock): void {
-        $mock->allows('getMimeType')->never();
-    });
+    $this->mock(MimeTypeService::class)
+        ->shouldReceive('getMimeType')
+        ->never();
 
-    [$job, $batch] = (new ValidateMimeType(Media::factory()->create()))->withFakeBatch();
+    $validateMimeType = (new ValidateMimeType(Media::factory()->create()))->withFakeBatch();
+    $job = $validateMimeType[0];
+    $batch = $validateMimeType[1];
+
     $batch->cancel();
 
     dispatch_sync($job);

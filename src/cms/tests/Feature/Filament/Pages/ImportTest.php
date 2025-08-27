@@ -2,24 +2,25 @@
 
 declare(strict_types=1);
 
-use App\Enums\Authorization\Role;
 use App\Filament\Pages\Import;
 use App\Import\ImportFailedException;
 use App\Import\ZipImporter;
+use App\Services\BuildContextService;
 use Filament\Notifications\Notification;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
-
-use function Pest\Livewire\livewire;
+use Tests\Helpers\Model\OrganisationTestHelper;
 
 it('loads the import page', function (): void {
-    $this->get(Import::getUrl(tenant: $this->organisation))
+    $organisation = OrganisationTestHelper::create();
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->get(Import::getUrl(tenant: $organisation))
         ->assertSee(__('import.help'));
 });
 
 it('validates files input', function (): void {
-    $this->user->assignOrganisationRole(Role::PRIVACY_OFFICER, $this->organisation);
-
-    livewire(Import::class)
+    $this->asFilamentUser()
+        ->createLivewireTestable(Import::class)
         ->fillForm([
             'files' => [],
         ])
@@ -28,40 +29,50 @@ it('validates files input', function (): void {
 });
 
 it('can submit the files', function (): void {
-    $importFile = new TemporaryUploadedFile('import.zip', '');
+    $this->asFilamentUser();
 
-    $zipImporter = $this->createMock(ZipImporter::class);
-    $zipImporter->expects($this->once())
-        ->method('importFiles')
-        ->with([$importFile]);
+    $filename = sprintf('%s.zip', fake()->slug());
+    $importFile = new TemporaryUploadedFile($filename, '');
 
-    prepareImportZip('import.zip');
+    $buildContextService = $this->app->get(BuildContextService::class);
+
+    $zipImporter = $this->mock(ZipImporter::class)
+        ->shouldReceive('importFiles')
+        ->once()
+        ->withSomeOfArgs([$importFile])
+        ->getMock();
+
+    prepareImportZip($filename);
 
     $importPage = new Import();
-    $importPage->files = [
-        $importFile,
-    ];
-    $importPage->submit($zipImporter);
+    $importPage->files = [$importFile];
+    $importPage->submit($buildContextService, $zipImporter);
 
     Notification::assertNotified(__('import.upload_success'));
 });
 
 it('shows import failed notification on failure', function (): void {
-    $importFile = new TemporaryUploadedFile('import.zip', '');
+    $this->asFilamentUser();
 
-    $zipImporter = $this->createMock(ZipImporter::class);
-    $zipImporter->expects($this->once())
-        ->method('importFiles')
-        ->with([$importFile])
-        ->willThrowException(new ImportFailedException());
+    $filename = sprintf('%s.zip', fake()->slug());
+    $importFile = new TemporaryUploadedFile($filename, '');
 
-    prepareImportZip('import.zip');
+    $buildContextService = $this->app->get(BuildContextService::class);
+
+    $zipImporter = $this->mock(ZipImporter::class)
+        ->shouldReceive('importFiles')
+        ->once()
+        ->withSomeOfArgs([$importFile])
+        ->andThrow(new ImportFailedException())
+        ->getMock();
+
+    prepareImportZip($filename);
 
     $importPage = new Import();
     $importPage->files = [
         $importFile,
     ];
-    $importPage->submit($zipImporter);
+    $importPage->submit($buildContextService, $zipImporter);
 
     Notification::assertNotified(__('import.failed'));
 });

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Enums\MarkdownField;
+use App\Enums\Snapshot\SnapshotDataSection;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\Organisation;
 use App\Models\Receiver;
@@ -13,7 +13,7 @@ use App\Models\States\Snapshot\Established;
 use App\Models\States\Snapshot\InReview;
 use App\Services\Snapshot\SnapshotDataMarkdownRenderer;
 
-it('can render', function (): void {
+it('can render', function (SnapshotDataSection $snapshotDataSection): void {
     $organisation = Organisation::factory()
         ->create();
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
@@ -32,12 +32,12 @@ it('can render', function (): void {
     /** @var SnapshotDataMarkdownRenderer $snapshotDataMarkdownRenderer */
     $snapshotDataMarkdownRenderer = $this->app->get(SnapshotDataMarkdownRenderer::class);
 
-    $markdown = $snapshotDataMarkdownRenderer->fromSnapshotData($snapshotData, MarkdownField::PUBLIC_MARKDOWN);
+    $markdown = $snapshotDataMarkdownRenderer->fromSnapshotMarkdown($snapshot, $snapshotData->public_markdown, $snapshotDataSection);
 
     expect($markdown)->toMatchSnapshot();
-});
+})->with(SnapshotDataSection::cases());
 
-it('can render even if no public_markdown', function (): void {
+it('can render even if no public_markdown', function (SnapshotDataSection $snapshotDataSection): void {
     $organisation = Organisation::factory()
         ->create();
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
@@ -56,12 +56,12 @@ it('can render even if no public_markdown', function (): void {
     /** @var SnapshotDataMarkdownRenderer $snapshotDataMarkdownRenderer */
     $snapshotDataMarkdownRenderer = $this->app->get(SnapshotDataMarkdownRenderer::class);
 
-    $markdown = $snapshotDataMarkdownRenderer->fromSnapshotData($snapshotData, MarkdownField::PUBLIC_MARKDOWN);
+    $markdown = $snapshotDataMarkdownRenderer->fromSnapshotMarkdown($snapshot, $snapshotData->public_markdown, $snapshotDataSection);
 
     expect($markdown)->toMatchSnapshot();
-});
+})->with(SnapshotDataSection::cases());
 
-it('can render with related records', function (): void {
+it('can render with related records', function (SnapshotDataSection $snapshotDataSection): void {
     $organisation = Organisation::factory()
         ->create();
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
@@ -90,6 +90,7 @@ it('can render with related records', function (): void {
         ->for($receiverSnapshot)
         ->create([
             'public_markdown' => 'Doloribus eum qui fugit hic voluptas aliquam id.',
+            'private_markdown' => 'Cupiditate iure voluptatem aspernatur.',
         ]);
 
     RelatedSnapshotSource::factory()
@@ -102,15 +103,16 @@ it('can render with related records', function (): void {
     /** @var SnapshotDataMarkdownRenderer $snapshotDataMarkdownRenderer */
     $snapshotDataMarkdownRenderer = $this->app->get(SnapshotDataMarkdownRenderer::class);
 
-    $markdown = $snapshotDataMarkdownRenderer->fromSnapshotData(
-        $avgResponsibleProcessingRecordSnapshotData,
-        MarkdownField::PUBLIC_MARKDOWN,
+    $markdown = $snapshotDataMarkdownRenderer->fromSnapshotMarkdown(
+        $avgResponsibleProcessingRecordSnapshot,
+        $avgResponsibleProcessingRecordSnapshotData->public_markdown,
+        $snapshotDataSection,
     );
 
     expect($markdown)->toMatchSnapshot();
-});
+})->with(SnapshotDataSection::cases());
 
-it('can render but without related records if snapshot not yet established', function (): void {
+it('can render but without related records if snapshot not yet established', function (SnapshotDataSection $snapshotDataSection): void {
     $organisation = Organisation::factory()
         ->create();
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
@@ -151,10 +153,11 @@ it('can render but without related records if snapshot not yet established', fun
     /** @var SnapshotDataMarkdownRenderer $snapshotDataMarkdownRenderer */
     $snapshotDataMarkdownRenderer = $this->app->get(SnapshotDataMarkdownRenderer::class);
 
-    $markdown = $snapshotDataMarkdownRenderer->fromSnapshotData(
-        $avgResponsibleProcessingRecordSnapshotData,
-        MarkdownField::PUBLIC_MARKDOWN,
+    $markdown = $snapshotDataMarkdownRenderer->fromSnapshotMarkdown(
+        $avgResponsibleProcessingRecordSnapshot,
+        $avgResponsibleProcessingRecordSnapshotData->public_markdown,
+        $snapshotDataSection,
     );
 
     expect($markdown)->toMatchSnapshot();
-});
+})->with(SnapshotDataSection::cases());

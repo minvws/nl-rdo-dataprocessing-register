@@ -1,0 +1,14 @@
+/*---------------------------------------------------------------*/
+/*------------------- notification-error.scss -------------------*/
+/*---------------------------------------------------------------*/
+@use "notification";
+@use "notification-error-variables";
+@use "mixins/notification-type";
+
+p.error,
+span.error,
+section.error,
+div.error {
+  @include notification.notification;
+  @include notification-type.notification-type("error");
+}

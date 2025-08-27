@@ -1,8 +1,8 @@
 services:
     laravel.test:
-        image: sail-8.2-hugo/app
+        image: sail-8.4-hugo/app
         build:
-            context: ./vendor/laravel/sail/runtimes/8.2
+            context: ./vendor/laravel/sail/runtimes/8.4
             dockerfile: ../../../../../Dockerfile
             args:
                 WWWGROUP: '${WWWGROUP}'
@@ -21,6 +21,7 @@ services:
         volumes:
             - '.:/var/www/html'
             - '../public-website:/var/www/html/public-website'
+            - '../static-website:/var/www/html/static-website'
             - '../../.db_requirements:/var/www/html/storage/app/sql-generation-management/.db_requirements'
         networks:
             - sail

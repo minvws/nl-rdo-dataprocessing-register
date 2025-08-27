@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Enums\RouteName;
 use App\Facades\Authentication;
 use App\Models\Organisation;
-use App\Models\UserOrganisationRole;
+use App\Models\OrganisationUserRole;
 use Filament\Facades\Filament;
 use Filament\Panel;
 use Illuminate\Http\RedirectResponse;
@@ -24,17 +25,14 @@ class RedirectToTenantController
         try {
             $user = Authentication::user();
         } catch (Throwable) {
-            return redirect(route('filament.admin.auth.login'));
+            return redirect(route(RouteName::FILAMENT_ADMIN_AUTH_LOGIN));
         }
 
-        /** @var UserOrganisationRole|null $organisationRole */
+        /** @var OrganisationUserRole|null $organisationRole */
         $organisationRole = $user->organisationRoles()->first();
 
         if ($organisationRole !== null) {
-            $tenant = $organisationRole->organisation;
-            Assert::isInstanceOf($tenant, Organisation::class);
-
-            return $this->redirectToOrganisation($tenant);
+            return $this->redirectToOrganisation($organisationRole->organisation);
         }
 
         $organisation = $user->organisations->first();

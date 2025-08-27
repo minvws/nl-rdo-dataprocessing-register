@@ -14,6 +14,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Psr\Log\LoggerInterface;
+use Webmozart\Assert\Assert;
 
 use function in_array;
 
@@ -26,12 +27,16 @@ class ValidateMimeType implements ShouldQueue
     use SerializesModels;
     use SkipBatchIfCancelledMiddleware;
 
+    /** @var array<string> */
     private readonly array $permittedMimeTypes;
 
     public function __construct(
         private readonly Media $media,
     ) {
-        $this->permittedMimeTypes = Config::array('media-library.permitted_file_types.attachment');
+        $permittedMimeTypes = Config::array('media-library.permitted_file_types.attachment');
+        Assert::allString($permittedMimeTypes);
+
+        $this->permittedMimeTypes = $permittedMimeTypes;
     }
 
     /**
@@ -42,6 +47,7 @@ class ValidateMimeType implements ShouldQueue
         MimeTypeService $mimeTypeService,
     ): void {
         $mimeType = $mimeTypeService->getMimeType($this->media->getPath());
+        Assert::string($mimeType);
 
         $logger->info('Mime type is not permitted', [
             'path' => $this->media->getPath(),

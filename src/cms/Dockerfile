@@ -24,4 +24,4 @@ RUN rm -rf dart-sass*
 RUN apt-get update && apt-get install -y exiftool
 
 # PHP ini
-RUN echo "zend.assertions=1" >>  /etc/php/8.2/cli/conf.d/999-development.ini
+RUN echo "zend.assertions=1" >>  /etc/php/8.4/cli/conf.d/999-development.ini

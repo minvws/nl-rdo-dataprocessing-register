@@ -6,36 +6,35 @@ namespace App\Http;
 
 use Spatie\Csp\Directive;
 use Spatie\Csp\Keyword;
-use Spatie\Csp\Policies\Policy;
+use Spatie\Csp\Policy;
+use Spatie\Csp\Preset;
 use Spatie\Csp\Scheme;
 
-class CspPolicy extends Policy
+class CspPolicy implements Preset
 {
-    public function configure(): void
+    public function configure(Policy $policy): void
     {
-        $this
-            ->addDirective(Directive::BASE, Keyword::SELF)
-            ->addDirective(Directive::CONNECT, Keyword::SELF)
-            ->addDirective(Directive::DEFAULT, Keyword::UNSAFE_INLINE)
-            ->addDirective(Directive::FONT, Keyword::SELF)
-            ->addDirective(Directive::FONT, Keyword::UNSAFE_INLINE)
-            ->addDirective(Directive::FONT, 'fonts.bunny.net')
-            ->addDirective(Directive::FONT, Scheme::DATA)
-            ->addDirective(Directive::FORM_ACTION, Keyword::SELF)
-            ->addDirective(Directive::IMG, Keyword::UNSAFE_INLINE)
-            ->addDirective(Directive::IMG, Keyword::SELF)
-            ->addDirective(Directive::IMG, Scheme::BLOB)
-            ->addDirective(Directive::IMG, Scheme::DATA)
-            ->addDirective(Directive::IMG, 'ui-avatars.com')
-            ->addDirective(Directive::MEDIA, Keyword::SELF)
-            ->addDirective(Directive::MEDIA, Keyword::UNSAFE_INLINE)
-            ->addDirective(Directive::SCRIPT, Keyword::SELF)
-            ->addDirective(Directive::SCRIPT, Keyword::UNSAFE_EVAL)
-            ->addDirective(Directive::SCRIPT, Keyword::UNSAFE_INLINE)
-            ->addDirective(Directive::STYLE, 'fonts.bunny.net')
-            ->addDirective(Directive::STYLE, Keyword::SELF)
-            ->addDirective(Directive::STYLE, Keyword::UNSAFE_INLINE)
-            ->addDirective(Directive::WORKER, Keyword::SELF)
-            ->addDirective(Directive::WORKER, Scheme::BLOB);
+        $policy
+            ->add(Directive::BASE, Keyword::SELF)
+            ->add(Directive::CONNECT, Keyword::SELF)
+            ->add(Directive::DEFAULT, Keyword::UNSAFE_INLINE)
+            ->add(Directive::FONT, Keyword::SELF)
+            ->add(Directive::FONT, Keyword::UNSAFE_INLINE)
+            ->add(Directive::FONT, Scheme::DATA)
+            ->add(Directive::FORM_ACTION, Keyword::SELF)
+            ->add(Directive::IMG, Keyword::UNSAFE_INLINE)
+            ->add(Directive::IMG, Keyword::SELF)
+            ->add(Directive::IMG, Scheme::BLOB)
+            ->add(Directive::IMG, Scheme::DATA)
+            ->add(Directive::IMG, 'ui-avatars.com')
+            ->add(Directive::MEDIA, Keyword::SELF)
+            ->add(Directive::MEDIA, Keyword::UNSAFE_INLINE)
+            ->add(Directive::SCRIPT, Keyword::SELF)
+            ->add(Directive::SCRIPT, Keyword::UNSAFE_EVAL)
+            ->add(Directive::SCRIPT, Keyword::UNSAFE_INLINE)
+            ->add(Directive::STYLE, Keyword::SELF)
+            ->add(Directive::STYLE, Keyword::UNSAFE_INLINE)
+            ->add(Directive::WORKER, Keyword::SELF)
+            ->add(Directive::WORKER, Scheme::BLOB);
     }
 }

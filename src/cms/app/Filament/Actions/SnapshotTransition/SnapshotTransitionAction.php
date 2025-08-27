@@ -18,7 +18,7 @@ abstract class SnapshotTransitionAction extends Action
     public static function makeForSnapshotState(Snapshot $snapshot, SnapshotState $snapshotState): static
     {
         return parent::make(sprintf('snapshot_transition_to_%s', $snapshotState::$name))
-            ->color($snapshotState::$color)
+            ->color($snapshotState::$color->value)
             ->label(__(sprintf('snapshot_state.transition.%s', $snapshotState::$name)))
             ->visible(Authorization::hasPermission($snapshotState::$requiredPermission))
             ->action(static function (SnapshotStateTransitionService $snapshotStateTransitionService) use (

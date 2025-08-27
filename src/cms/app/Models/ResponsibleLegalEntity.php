@@ -4,32 +4,28 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Models\Concerns\HasUuidAsKey;
-use Carbon\CarbonImmutable;
+use App\Collections\ResponsibleLegalEntityCollection;
+use App\Models\Concerns\HasSoftDeletes;
+use App\Models\Concerns\HasTimestamps;
+use App\Models\Concerns\HasUuidAsId;
+use Database\Factories\ResponsibleLegalEntityFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * @property string $id
  * @property string $name
- * @property CarbonImmutable|null $created_at
- * @property CarbonImmutable|null $updated_at
- * @property CarbonImmutable|null $deleted_at
  */
 class ResponsibleLegalEntity extends Model
 {
+    /** @use HasFactory<ResponsibleLegalEntityFactory> */
     use HasFactory;
-    use HasUuidAsKey;
-    use SoftDeletes;
+    use HasSoftDeletes;
+    use HasTimestamps;
+    use HasUuidAsId;
 
-    protected $casts = [
-        'id' => 'string',
-    ];
-
+    protected static string $collectionClass = ResponsibleLegalEntityCollection::class;
     protected $fillable = [
         'name',
     ];
-
     protected $table = 'responsible_legal_entity';
 }

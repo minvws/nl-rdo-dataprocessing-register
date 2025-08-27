@@ -4,7 +4,17 @@ declare(strict_types=1);
 
 namespace App\Models\Avg;
 
+use App\Collections\Avg\AvgResponsibleProcessingRecordCollection;
+use App\Collections\DataBreachRecordCollection;
+use App\Collections\DocumentCollection;
+use App\Collections\ProcessorCollection;
+use App\Collections\ReceiverCollection;
+use App\Collections\ResponsibleCollection;
+use App\Collections\SystemCollection;
+use App\Collections\TagCollection;
+use App\Components\Uuid\UuidInterface;
 use App\Enums\CoreEntityDataCollectionSource;
+use App\Models\Casts\UuidCast;
 use App\Models\Concerns\HasAvgGoals;
 use App\Models\Concerns\HasChildren;
 use App\Models\Concerns\HasContactPersons;
@@ -18,43 +28,32 @@ use App\Models\Concerns\HasReceivers;
 use App\Models\Concerns\HasRemarks;
 use App\Models\Concerns\HasResponsibles;
 use App\Models\Concerns\HasSnapshots;
+use App\Models\Concerns\HasSoftDeletes;
 use App\Models\Concerns\HasStakeholders;
 use App\Models\Concerns\HasSystems;
 use App\Models\Concerns\HasTags;
-use App\Models\Concerns\HasUuidAsKey;
+use App\Models\Concerns\HasTimestamps;
+use App\Models\Concerns\HasUsers;
+use App\Models\Concerns\HasUuidAsId;
 use App\Models\Concerns\IsCloneable;
 use App\Models\Concerns\IsPublishable;
-use App\Models\ContactPerson;
+use App\Models\Concerns\IsReviewable;
 use App\Models\Contracts\Cloneable;
 use App\Models\Contracts\EntityNumerable;
 use App\Models\Contracts\Publishable;
-use App\Models\Contracts\SnapshotSource;
-use App\Models\DataBreachRecord;
-use App\Models\Document;
-use App\Models\Processor;
-use App\Models\Receiver;
-use App\Models\Responsible;
-use App\Models\Snapshot;
-use App\Models\Stakeholder;
-use App\Models\System;
-use App\Models\Tag;
-use Carbon\CarbonImmutable;
-use Illuminate\Database\Eloquent\Collection;
+use App\Models\Contracts\Reviewable;
+use App\Models\Contracts\TenantAware;
+use Database\Factories\Avg\AvgResponsibleProcessingRecordFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * @property string $id
  * @property string $name
  * @property bool $outside_eu
  * @property bool $decision_making
- * @property CarbonImmutable|null $created_at
- * @property CarbonImmutable|null $updated_at
  * @property string|null $import_id
  * @property string|null $import_number
- * @property CarbonImmutable|null $review_at
  * @property bool $has_processors
  * @property bool $has_security
  * @property bool $has_systems
@@ -64,11 +63,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property bool $other_measures
  * @property string|null $outside_eu_description
  * @property string|null $outside_eu_protection_level_description
- * @property string|null $avg_responsible_processing_record_service_id
+ * @property ?UuidInterface $avg_responsible_processing_record_service_id
  * @property bool $has_pseudonymization
  * @property string|null $logic
  * @property string|null $importance_consequences
- * @property CarbonImmutable|null $deleted_at
  * @property string|null $country
  * @property string|null $country_other
  * @property bool $outside_eu_protection_level
@@ -79,35 +77,29 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property bool $geb_dpia_list_required
  * @property bool $geb_dpia_criteria_wp248
  * @property bool $geb_dpia_high_risk_freedoms
- * @property string|null $parent_id
- * @property CarbonImmutable|null $public_from
  * @property string|null $measures_description
  * @property CoreEntityDataCollectionSource $data_collection_source
  * @property string|null $published_at
  *
- * @property-read Collection<int, AvgGoal> $avgGoals
  * @property-read AvgResponsibleProcessingRecordService|null $avgResponsibleProcessingRecordService
- * @property-read Collection<int, AvgResponsibleProcessingRecord> $children
- * @property-read Collection<int, ContactPerson> $contactPersons
- * @property-read Collection<int, Document> $documents
- * @property-read AvgResponsibleProcessingRecord|null $parent
- * @property-read Collection<int, Processor> $processors
- * @property-read Collection<int, Receiver> $receivers
- * @property-read Collection<int, Responsible> $responsibles
- * @property-read Collection<int, Snapshot> $snapshots
- * @property-read Collection<int, Stakeholder> $stakeholders
- * @property-read Collection<int, System> $systems
- * @property-read Collection<int, Tag> $tags
- * @property-read Collection<int, DataBreachRecord> $dataBreachRecords
+ * @property-read DataBreachRecordCollection $dataBreachRecords
+ * @property-read DocumentCollection $documents
+ * @property-read ProcessorCollection $processors
+ * @property-read ReceiverCollection $receivers
+ * @property-read ResponsibleCollection $responsibles
+ * @property-read SystemCollection $systems
+ * @property-read TagCollection $tags
  */
-class AvgResponsibleProcessingRecord extends Model implements EntityNumerable, SnapshotSource, Publishable, Cloneable
+class AvgResponsibleProcessingRecord extends Model implements Cloneable, EntityNumerable, Publishable, Reviewable, TenantAware
 {
     use HasAvgGoals;
+    /** @use HasChildren<AvgResponsibleProcessingRecord, AvgResponsibleProcessingRecordCollection> */
     use HasChildren;
     use HasContactPersons;
     use HasDataBreachRecords;
     use HasDocuments;
     use HasEntityNumber;
+    /** @use HasFactory<AvgResponsibleProcessingRecordFactory> */
     use HasFactory;
     use HasFgRemark;
     use HasOrganisation;
@@ -117,38 +109,19 @@ class AvgResponsibleProcessingRecord extends Model implements EntityNumerable, S
     use HasResponsibles;
     use HasSnapshots;
     use HasStakeholders;
+    use HasSoftDeletes;
     use HasSystems;
     use HasTags;
-    use HasUuidAsKey;
-    use IsPublishable;
+    use HasTimestamps;
+    use HasUsers;
+    use HasUuidAsId;
     use IsCloneable;
-    use SoftDeletes;
+    use IsPublishable;
+    use IsReviewable;
 
-    protected $casts = [
-        'decision_making' => 'bool',
-        'has_processors' => 'bool',
-        'has_security' => 'bool',
-        'has_systems' => 'bool',
-        'id' => 'string',
-        'measures' => 'bool',
-        'other_measures' => 'bool',
-        'outside_eu' => 'bool',
-        'review_at' => 'date',
-        'has_pseudonymization' => 'bool',
-        'outside_eu_protection_level' => 'bool',
-        'geb_dpia_executed' => 'bool',
-        'geb_dpia_automated' => 'bool',
-        'geb_dpia_large_scale_processing' => 'bool',
-        'geb_dpia_large_scale_monitoring' => 'bool',
-        'geb_dpia_list_required' => 'bool',
-        'geb_dpia_criteria_wp248' => 'bool',
-        'geb_dpia_high_risk_freedoms' => 'bool',
-        'public_from' => 'datetime',
-        'data_collection_source' => CoreEntityDataCollectionSource::class,
-    ];
+    protected static string $collectionClass = AvgResponsibleProcessingRecordCollection::class;
     protected $fillable = [
         'avg_responsible_processing_record_service_id',
-        'parent_id',
 
         'data_collection_source',
         'name',
@@ -169,7 +142,6 @@ class AvgResponsibleProcessingRecord extends Model implements EntityNumerable, S
         'logic',
         'importance_consequences',
         'import_id',
-        'review_at',
         'has_processors',
         'has_security',
         'has_systems',
@@ -182,6 +154,31 @@ class AvgResponsibleProcessingRecord extends Model implements EntityNumerable, S
         'geb_dpia_high_risk_freedoms',
         'public_from',
     ];
+
+    public function casts(): array
+    {
+        return [
+            'avg_responsible_processing_record_service_id' => UuidCast::class,
+            'decision_making' => 'bool',
+            'has_processors' => 'bool',
+            'has_security' => 'bool',
+            'has_systems' => 'bool',
+            'measures' => 'bool',
+            'other_measures' => 'bool',
+            'outside_eu' => 'bool',
+            'has_pseudonymization' => 'bool',
+            'outside_eu_protection_level' => 'bool',
+            'geb_dpia_executed' => 'bool',
+            'geb_dpia_automated' => 'bool',
+            'geb_dpia_large_scale_processing' => 'bool',
+            'geb_dpia_large_scale_monitoring' => 'bool',
+            'geb_dpia_list_required' => 'bool',
+            'geb_dpia_criteria_wp248' => 'bool',
+            'geb_dpia_high_risk_freedoms' => 'bool',
+            'public_from' => 'datetime',
+            'data_collection_source' => CoreEntityDataCollectionSource::class,
+        ];
+    }
 
     /**
      * @return BelongsTo<AvgResponsibleProcessingRecordService, $this>

@@ -6,20 +6,14 @@ namespace App\Providers;
 
 use App\Config\Config;
 use App\Models\AdminLogEntry;
-use App\Models\Algorithm\AlgorithmMetaSchema;
-use App\Models\Algorithm\AlgorithmPublicationCategory;
 use App\Models\Algorithm\AlgorithmRecord;
-use App\Models\Algorithm\AlgorithmStatus;
-use App\Models\Algorithm\AlgorithmTheme;
 use App\Models\Avg\AvgGoal;
 use App\Models\Avg\AvgProcessorProcessingRecord;
-use App\Models\Avg\AvgProcessorProcessingRecordService;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
-use App\Models\Avg\AvgResponsibleProcessingRecordService;
 use App\Models\ContactPerson;
-use App\Models\ContactPersonPosition;
 use App\Models\DataBreachRecord;
 use App\Models\Document;
+use App\Models\LookupListModel;
 use App\Models\Organisation;
 use App\Models\Processor;
 use App\Models\PublicWebsiteTree;
@@ -33,10 +27,11 @@ use App\Models\Tag;
 use App\Models\User;
 use App\Models\Wpg\WpgGoal;
 use App\Models\Wpg\WpgProcessingRecord;
-use App\Models\Wpg\WpgProcessingRecordService;
 use App\Policies\AdminLogEntryPolicy;
 use App\Policies\CoreEntityPolicy;
 use App\Policies\DataBreachRecordPolicy;
+use App\Policies\DocumentPolicy;
+use App\Policies\ExportPolicy;
 use App\Policies\LookupListPolicy;
 use App\Policies\ManagementPolicy;
 use App\Policies\OrganisationPolicy;
@@ -49,6 +44,7 @@ use App\Services\OneTimePassword\OneTimePassword;
 use App\Services\OneTimePassword\OneTimePasswordManager;
 use App\Services\OneTimePassword\TimedOneTimePassword;
 use App\Services\OtpService;
+use Filament\Actions\Exports\Models\Export;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as IlluminateAuthServiceProvider;
 
 class AuthServiceProvider extends IlluminateAuthServiceProvider
@@ -63,21 +59,15 @@ class AuthServiceProvider extends IlluminateAuthServiceProvider
         WpgProcessingRecord::class => CoreEntityPolicy::class,
 
         // lookup lists
-        AlgorithmMetaSchema::class => LookupListPolicy::class,
-        AlgorithmPublicationCategory::class => LookupListPolicy::class,
-        AlgorithmStatus::class => LookupListPolicy::class,
-        AlgorithmTheme::class => LookupListPolicy::class,
-        AvgProcessorProcessingRecordService::class => LookupListPolicy::class,
-        AvgResponsibleProcessingRecordService::class => LookupListPolicy::class,
-        ContactPersonPosition::class => LookupListPolicy::class,
-        WpgProcessingRecordService::class => LookupListPolicy::class,
+        LookupListModel::class => LookupListPolicy::class,
 
         // management
         AvgGoal::class => ManagementPolicy::class,
         ContactPerson::class => ManagementPolicy::class,
-        Document::class => ManagementPolicy::class,
+        Document::class => DocumentPolicy::class,
         Processor::class => ManagementPolicy::class,
         Receiver::class => ManagementPolicy::class,
+        Responsible::class => ResponsiblePolicy::class,
         Stakeholder::class => ManagementPolicy::class,
         StakeholderDataItem::class => ManagementPolicy::class,
         System::class => ManagementPolicy::class,
@@ -87,10 +77,12 @@ class AuthServiceProvider extends IlluminateAuthServiceProvider
         AdminLogEntry::class => AdminLogEntryPolicy::class,
         Organisation::class => OrganisationPolicy::class,
         PublicWebsiteTree::class => OrganisationPolicy::class,
-        Responsible::class => ResponsiblePolicy::class,
         ResponsibleLegalEntity::class => ResponsibleLegalEntityPolicy::class,
         Tag::class => TagPolicy::class,
         User::class => UserPolicy::class,
+
+        // filament
+        Export::class => ExportPolicy::class,
     ];
 
     public function boot(): void

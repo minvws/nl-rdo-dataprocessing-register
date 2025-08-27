@@ -2,40 +2,121 @@
 
 declare(strict_types=1);
 
-use App\Enums\Authorization\Role;
+use App\Enums\Snapshot\SnapshotApprovalStatus;
 use App\Filament\Resources\PersonalSnapshotApprovalResource;
 use App\Filament\Resources\PersonalSnapshotApprovalResource\Pages\ListPersonalSnapshotApprovalItems;
 use App\Models\Snapshot;
 use App\Models\SnapshotApproval;
 use App\Models\States\Snapshot\Approved;
+use Illuminate\Database\Eloquent\Factories\Sequence;
+use Tests\Helpers\Model\OrganisationTestHelper;
+use Tests\Helpers\Model\UserTestHelper;
 
-use function Pest\Livewire\livewire;
+it('loads the list page', function (): void {
+    $this->asFilamentUser()
+        ->get(PersonalSnapshotApprovalResource::getUrl())
+        ->assertSuccessful();
+});
 
 it('loads the list items', function (): void {
-    $this->user->assignOrganisationRole(Role::MANDATE_HOLDER, $this->organisation);
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisation($organisation);
 
     $snapshotApprovals = SnapshotApproval::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->count(5)
         ->create([
-            'assigned_to' => $this->user,
-            'snapshot_id' => Snapshot::factory(state: [
+            'assigned_to' => $user,
+            'snapshot_id' => Snapshot::factory()->state([
                 'state' => Approved::$name,
             ]),
         ]);
 
-    $snapshots = collect($snapshotApprovals)
-        ->map(static function (SnapshotApproval $snapshotApproval): Snapshot {
-            return $snapshotApproval->snapshot;
-        });
+    $snapshots = $snapshotApprovals->map(static function (SnapshotApproval $snapshotApproval): Snapshot {
+        return $snapshotApproval->snapshot;
+    });
 
-    livewire(ListPersonalSnapshotApprovalItems::class)
+    $this->asFilamentUser($user)
+        ->createLivewireTestable(ListPersonalSnapshotApprovalItems::class)
         ->assertCanSeeTableRecords($snapshots);
 });
 
-it('loads the list page', function (): void {
-    $this->user->assignOrganisationRole(Role::MANDATE_HOLDER, $this->organisation);
+it('loads correct list of items in all tabs', function (string $activeTab, int $assertCount): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisation($organisation);
 
-    $this->get(PersonalSnapshotApprovalResource::getUrl())
+    SnapshotApproval::factory()
+        ->recycle($organisation)
+        ->count(3)
+        ->state(new Sequence(
+            ['status' => SnapshotApprovalStatus::APPROVED],
+            ['status' => SnapshotApprovalStatus::DECLINED],
+            ['status' => SnapshotApprovalStatus::UNKNOWN],
+        ))
+        ->create([
+            'assigned_to' => $user,
+            'snapshot_id' => Snapshot::factory()->state([
+                'state' => Approved::$name,
+            ]),
+        ]);
+
+    $this->asFilamentUser($user)
+        ->createLivewireTestable(ListPersonalSnapshotApprovalItems::class, ['activeTab' => $activeTab])
+        ->assertCountTableRecords($assertCount);
+})->with([
+    [ListPersonalSnapshotApprovalItems::TAB_ID_ALL, 3],
+    [ListPersonalSnapshotApprovalItems::TAB_ID_REVIEWED, 2],
+    [ListPersonalSnapshotApprovalItems::TAB_ID_UNREVIEWED, 1],
+]);
+
+it('can bulk approve', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisation($organisation);
+
+    $snapshotApprovalApproved = SnapshotApproval::factory()
+        ->recycle($organisation)
+        ->create([
+            'assigned_to' => $user,
+            'snapshot_id' => Snapshot::factory()->state([
+                'state' => Approved::$name,
+            ]),
+            'status' => SnapshotApprovalStatus::APPROVED,
+        ]);
+    $snapshotApprovalDeclined = SnapshotApproval::factory()
+        ->recycle($organisation)
+        ->create([
+            'assigned_to' => $user,
+            'snapshot_id' => Snapshot::factory()->state([
+                'state' => Approved::$name,
+            ]),
+            'status' => SnapshotApprovalStatus::DECLINED,
+        ]);
+    $snapshotApprovalUnknown = SnapshotApproval::factory()
+        ->recycle($organisation)
+        ->create([
+            'assigned_to' => $user,
+            'snapshot_id' => Snapshot::factory()->state([
+                'state' => Approved::$name,
+            ]),
+            'status' => SnapshotApprovalStatus::UNKNOWN,
+        ]);
+
+    $this->asFilamentUser($user)
+        ->createLivewireTestable(ListPersonalSnapshotApprovalItems::class)
+        ->assertCountTableRecords(3)
+        ->assertCanSeeTableRecords([
+            $snapshotApprovalApproved->snapshot,
+            $snapshotApprovalDeclined->snapshot,
+            $snapshotApprovalUnknown->snapshot,
+        ])
+        ->callTableBulkAction('snapshot_approval_approve', [
+            $snapshotApprovalUnknown->snapshot,
+        ])
+        ->assertHasNoTableBulkActionErrors()
         ->assertSuccessful();
+
+    $this->assertDatabaseHas(SnapshotApproval::class, [
+        'id' => $snapshotApprovalUnknown->id,
+        'status' => SnapshotApprovalStatus::APPROVED, // updated
+    ]);
 });

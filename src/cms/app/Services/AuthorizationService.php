@@ -7,6 +7,8 @@ namespace App\Services;
 use App\Enums\Authorization\Permission;
 use App\Enums\Authorization\Role;
 
+use function array_any;
+use function array_key_exists;
 use function in_array;
 
 readonly class AuthorizationService
@@ -22,20 +24,20 @@ readonly class AuthorizationService
 
     public function hasPermission(Permission $permission): bool
     {
-        $principal = $this->authenticationService->getPrincipal();
+        $principal = $this->authenticationService->principal();
 
-        foreach ($principal->roles as $role) {
-            if (in_array($permission->value, $this->rolesAndPermissions[$role->value], true)) {
-                return true;
+        return array_any($principal->roles, function ($role) use ($permission): bool {
+            if (!array_key_exists($role->value, $this->rolesAndPermissions)) {
+                return false;
             }
-        }
 
-        return false;
+            return in_array($permission->value, $this->rolesAndPermissions[$role->value], true);
+        });
     }
 
     public function hasRole(Role $role): bool
     {
-        $principal = $this->authenticationService->getPrincipal();
+        $principal = $this->authenticationService->principal();
 
         return in_array($role, $principal->roles, true);
     }

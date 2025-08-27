@@ -10,7 +10,7 @@ it('is an array', function (): void {
 
     config()->set($configKey, $configValue);
 
-    $this->assertEquals($configValue, Config::array($configKey));
+    $this->assertSame($configValue, Config::array($configKey));
 });
 
 it('is not an array', function (): void {
@@ -20,7 +20,7 @@ it('is not an array', function (): void {
     config()->set($configKey, $configValue);
 
     $this->expectException(InvalidArgumentException::class);
-    $this->assertEquals($configValue, Config::array($configKey));
+    $this->assertSame($configValue, Config::array($configKey));
 });
 
 it('is a boolean', function (): void {
@@ -29,7 +29,7 @@ it('is a boolean', function (): void {
 
     config()->set($configKey, $configValue);
 
-    $this->assertEquals($configValue, Config::boolean($configKey));
+    $this->assertSame($configValue, Config::boolean($configKey));
 });
 
 it('is not a boolean', function (): void {
@@ -72,7 +72,7 @@ it('is a string', function (): void {
 
     config()->set($configKey, $configValue);
 
-    $this->assertEquals($configValue, Config::string($configKey));
+    $this->assertSame($configValue, Config::string($configKey));
 });
 
 it('is not a string', function (): void {
@@ -90,7 +90,7 @@ it('is a string or null', function (): void {
 
     config()->set($configKey, $configValue);
 
-    $this->assertEquals($configValue, Config::stringOrNull($configKey));
+    $this->assertSame($configValue, Config::stringOrNull($configKey));
 });
 
 it('is not a string or null', function (): void {

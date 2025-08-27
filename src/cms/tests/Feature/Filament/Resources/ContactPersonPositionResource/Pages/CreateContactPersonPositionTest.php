@@ -6,17 +6,17 @@ use App\Filament\Resources\ContactPersonPositionResource;
 use App\Filament\Resources\ContactPersonPositionResource\Pages\CreateContactPersonPosition;
 use App\Models\ContactPersonPosition;
 
-use function Pest\Livewire\livewire;
-
 it('loads the create page', function (): void {
-    $this->get(ContactPersonPositionResource::getUrl('create'))
+    $this->asFilamentUser()
+        ->get(ContactPersonPositionResource::getUrl('create'))
         ->assertSuccessful();
 });
 
 it('can create an entry', function (): void {
     $name = fake()->uuid();
 
-    livewire(CreateContactPersonPosition::class)
+    $this->asFilamentUser()
+        ->createLivewireTestable(CreateContactPersonPosition::class)
         ->fillForm([
             'name' => $name,
         ])

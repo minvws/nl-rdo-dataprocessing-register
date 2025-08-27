@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Components\Uuid\Uuid;
 use App\Import\Importers\JsonImporter;
 use Illuminate\Support\Facades\Log;
 
@@ -16,10 +17,10 @@ it('can handle empty json', function (): void {
         ->with('json-dataset is empty, skipping import', ['factoryClass' => $factoryClass]);
 
     $jsonImporter = new JsonImporter();
-    $jsonImporter->import(fake()->word(), '{}', $factoryClass, fake()->uuid(), fake()->uuid());
+    $jsonImporter->import(fake()->word(), '{}', $factoryClass, Uuid::fromString(fake()->uuid()), fake()->uuid());
 });
 
 it('fails on invalid json', function (): void {
     $jsonImporter = new JsonImporter();
-    $jsonImporter->import(fake()->word(), fake()->sentence(), fake()->word(), fake()->uuid(), fake()->uuid());
+    $jsonImporter->import(fake()->word(), fake()->sentence(), fake()->word(), Uuid::fromString(fake()->uuid()), fake()->uuid());
 })->expectExceptionMessage('invalid json');

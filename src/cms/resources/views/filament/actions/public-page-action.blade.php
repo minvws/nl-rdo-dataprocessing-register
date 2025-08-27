@@ -1,10 +1,7 @@
-@php
-    use App\Facades\DateFormat;
-@endphp
 <span @class(['hidden' => !$getRecord()->isPublished()])>
     <a href="{{ $getRecord()->getLatestPublicWebsiteSnapshotEntry()?->url }}"
        target="_blank"
-       title="{{ __('general.published_at', ['published_at' => DateFormat::toDateTime($getRecord()->getPublicFrom())]) }}"
+       title="{{ __('general.published_at') }}"
     >
         <x-filament::icon
             icon="heroicon-o-globe-alt"

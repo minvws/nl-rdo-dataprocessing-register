@@ -7,7 +7,6 @@ namespace App\Filament\Infolists\Components;
 use App\Models\Contracts\Publishable;
 use App\Models\Snapshot;
 use Filament\Infolists\Components\TextEntry;
-use Webmozart\Assert\Assert;
 
 use function __;
 
@@ -19,9 +18,11 @@ class SnapshotUrlEntry extends TextEntry
             ->label(__('snapshot.url'))
             ->visible(static function (Snapshot $snapshot): bool {
                 $snapshotSource = $snapshot->snapshotSource;
-                Assert::isInstanceOf($snapshotSource, Publishable::class);
+                if ($snapshotSource instanceof Publishable) {
+                    return $snapshotSource->isPublished();
+                }
 
-                return $snapshotSource->isPublished();
+                return false;
             })
             ->view('filament.infolists.components.entries.snapshot-url-entry');
     }

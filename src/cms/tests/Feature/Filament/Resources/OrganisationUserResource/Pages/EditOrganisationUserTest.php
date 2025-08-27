@@ -2,26 +2,58 @@
 
 declare(strict_types=1);
 
+use App\Enums\Authorization\Permission;
 use App\Enums\Authorization\Role;
-use App\Filament\Resources\UserOrganisationResource;
-use App\Filament\Resources\UserOrganisationResource\Pages\EditUserOrganisation;
+use App\Filament\Resources\OrganisationUserResource;
+use App\Filament\Resources\OrganisationUserResource\Pages\EditOrganisationUser;
+use App\Models\OrganisationUserRole;
 use App\Models\User;
+use Tests\Helpers\Model\OrganisationTestHelper;
+use Tests\Helpers\Model\UserTestHelper;
 
-use function Pest\Livewire\livewire;
+it('loads the edit page with cpo-manage permission', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisation($organisation);
 
-beforeEach(function (): void {
-    $this->user->assignGlobalRole(Role::FUNCTIONAL_MANAGER);
+    $filamentUser = UserTestHelper::createForOrganisation($organisation);
+    $permissions = [
+        Permission::USER_CREATE,
+        Permission::USER_UPDATE,
+        Permission::USER_VIEW,
+        Permission::USER_ROLE_GLOBAL_MANAGE,
+        Permission::USER_ROLE_ORGANISATION_MANAGE,
+        Permission::USER_ROLE_ORGANISATION_CPO_MANAGE,
+    ];
+
+    $this->withPermissions($filamentUser, $permissions)
+        ->withFilamentSession($filamentUser, $organisation)
+        ->get(OrganisationUserResource::getUrl('edit', ['record' => $user]))
+        ->assertSuccessful();
 });
 
-it('loads the edit page', function (): void {
-    $this->get(UserOrganisationResource::getUrl('edit', ['record' => $this->user->id]))
+it('loads the edit page without cpo-manage permission', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisation($organisation);
+
+    $filamentUser = UserTestHelper::createForOrganisation($organisation);
+    $permissions = [
+        Permission::USER_CREATE,
+        Permission::USER_UPDATE,
+        Permission::USER_VIEW,
+        Permission::USER_ROLE_GLOBAL_MANAGE,
+        Permission::USER_ROLE_ORGANISATION_MANAGE,
+    ];
+
+    $this->withPermissions($filamentUser, $permissions)
+        ->withFilamentSession($filamentUser, $organisation)
+        ->get(OrganisationUserResource::getUrl('edit', ['record' => $user]))
         ->assertSuccessful();
 });
 
 it('can edit a role for a user that is already linked to the organisation', function (): void {
-    $user = User::factory()
-        ->hasAttached($this->organisation)
-        ->create();
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisation($organisation);
+
     $role = fake()->randomElement([
         Role::COUNSELOR,
         Role::DATA_PROTECTION_OFFICIAL,
@@ -30,13 +62,14 @@ it('can edit a role for a user that is already linked to the organisation', func
         Role::PRIVACY_OFFICER,
     ]);
 
-    $this->assertDatabaseMissing('user_organisation_roles', [
+    $this->assertDatabaseMissing(OrganisationUserRole::class, [
         'role' => $role->value,
         'user_id' => $user->id,
-        'organisation_id' => $this->organisation->id,
+        'organisation_id' => $organisation->id,
     ]);
 
-    livewire(EditUserOrganisation::class, ['record' => $user->id])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditOrganisationUser::class, ['record' => $user->id])
         ->fillForm([
             $role->value => true,
         ])
@@ -48,27 +81,31 @@ it('can edit a role for a user that is already linked to the organisation', func
     expect($organisationRoles->count())
         ->toBe(1)
         ->and($organisationRoles->first()->organisation_id)
-        ->toBe($this->organisation->id)
+        ->toBe($organisation->id)
         ->and($organisationRoles->first()->role)
         ->toBe($role);
 });
 
 it('can detach a user that is linked to an organisation', function (): void {
-    $user = User::factory()
-        ->hasAttached($this->organisation)
-        ->create();
-    $user->assignOrganisationRole(fake()->randomElement([
+    $organisation = OrganisationTestHelper::create();
+    $role = fake()->randomElement([
         Role::INPUT_PROCESSOR,
         Role::PRIVACY_OFFICER,
         Role::COUNSELOR,
         Role::DATA_PROTECTION_OFFICIAL,
         Role::MANDATE_HOLDER,
-    ]), $this->organisation);
+    ]);
+
+    $user = User::factory()
+        ->hasAttached($organisation)
+        ->hasOrganisationRole($role, $organisation)
+        ->create();
 
     expect($user->organisations->count())
         ->toBe(1);
 
-    livewire(EditUserOrganisation::class, ['record' => $user->id])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditOrganisationUser::class, ['record' => $user->id])
         ->callAction('detach')
         ->assertHasNoFormErrors();
 

@@ -7,12 +7,12 @@
     <ul class="list-reset">
         {{- range (.Paginator 10).Pages }}
         <li>
-          <a href="{{ .RelPermalink }}" >
-            <div class="card" role="group" aria-label="Voorbeeldkaart">
-                <h3>{{.Params.record.title}}</h3>
+          <a href="{{ .RelPermalink }}" aria-labelledby="title-{{ .Params.record.reference }}" aria-describedby="desc-{{ .Params.record.reference }}">
+            <div class="card" role="group">
+                <h2 id="title-{{ .Params.record.reference }}">{{.Params.record.title}}</h2>
                 <p>{{.Params.record.description}}</p>
 
-                <p class="processing-record-list__details">
+                <p id="desc-{{ .Params.record.reference }}" class="processing-record-list__details">
                   {{/*  organisatie: {{.Params.organisation}}<br>  */}}
                   Verwerkingsnummer: {{.Params.record.reference}}<br>
                   {{/*  Type: {{.Params.type}}<br>  */}}

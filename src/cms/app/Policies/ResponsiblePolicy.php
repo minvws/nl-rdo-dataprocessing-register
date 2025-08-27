@@ -11,21 +11,21 @@ class ResponsiblePolicy extends BasePolicy
 {
     public function view(): bool
     {
-        return Authorization::hasPermission(Permission::MANAGEMENT_VIEW);
+        return Authorization::hasPermission(Permission::RESPONSIBLE_VIEW);
     }
 
     public function create(): bool
     {
-        return Authorization::hasPermission(Permission::MANAGEMENT_CREATE);
+        return Authorization::hasPermission(Permission::RESPONSIBLE_CREATE);
     }
 
     public function update(): bool
     {
-        return Authorization::hasPermission(Permission::MANAGEMENT_UPDATE);
+        return Authorization::hasPermission(Permission::RESPONSIBLE_UPDATE);
     }
 
     public function delete(): bool
     {
-        return Authorization::hasPermission(Permission::MANAGEMENT_DELETE);
+        return Authorization::hasPermission(Permission::RESPONSIBLE_DELETE);
     }
 }

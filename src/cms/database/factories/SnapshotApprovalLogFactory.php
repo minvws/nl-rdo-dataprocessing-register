@@ -11,6 +11,8 @@ use App\Models\SnapshotApprovalLog;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+use function sprintf;
+
 /**
  * @extends Factory<SnapshotApprovalLog>
  */
@@ -24,12 +26,11 @@ class SnapshotApprovalLogFactory extends Factory
         $assignedTo = User::factory()->create();
 
         return [
-            'id' => $this->faker->uuid(),
             'snapshot_id' => Snapshot::factory(),
             'user_id' => User::factory(),
             'message' => [
                 'type' => $this->faker->randomElement(SnapshotApprovalLogMessageType::cases()),
-                'assigned_to' => $assignedTo->id,
+                'assigned_to' => sprintf('%s (%s)', $assignedTo->name, $assignedTo->email),
                 'status' => $this->faker->randomElement(SnapshotApprovalStatus::cases()),
                 'notes' => $this->faker->optional()->sentence(),
             ],

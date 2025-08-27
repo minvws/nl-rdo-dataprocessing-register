@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Enums\RegisterLayout;
 use App\Filament\RelationManagers\SnapshotsRelationManager;
 use App\Filament\Resources\AvgResponsibleProcessingRecordResource;
 use App\Filament\Resources\AvgResponsibleProcessingRecordResource\Pages\ViewAvgResponsibleProcessingRecord;
@@ -12,28 +13,36 @@ use App\Models\Snapshot;
 use App\Models\States\Snapshot\Established;
 use App\Services\DateFormatService;
 use Carbon\CarbonImmutable;
-use Tests\Helpers\ConfigHelper;
+use Tests\Helpers\ConfigTestHelper;
+use Tests\Helpers\Model\OrganisationTestHelper;
+use Tests\Helpers\Model\UserTestHelper;
 
-use function Pest\Livewire\livewire;
+it('can load the page with all layouts', function (RegisterLayout $registerLayout): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisation($organisation, ['register_layout' => $registerLayout]);
 
-it('can load the ViewAvgResponsibleProcessingRecord page', function (): void {
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
 
-    $this->get(AvgResponsibleProcessingRecordResource::getUrl('view', ['record' => $avgResponsibleProcessingRecord->id]))
+    $this->asFilamentUser($user)
+        ->get(AvgResponsibleProcessingRecordResource::getUrl('view', [
+            'record' => $avgResponsibleProcessingRecord,
+        ]))
         ->assertSuccessful();
-});
+})->with(RegisterLayout::cases());
 
 it('can create a snapshot', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
 
     expect($avgResponsibleProcessingRecord->snapshots->count())
         ->toBe(0);
 
-    livewire(ViewAvgResponsibleProcessingRecord::class, ['record' => $avgResponsibleProcessingRecord->id])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ViewAvgResponsibleProcessingRecord::class, ['record' => $avgResponsibleProcessingRecord->id])
         ->callAction('snapshot_create')
         ->assertNotified(__('snapshot.created'))
         ->assertDispatched(SnapshotsRelationManager::REFRESH_TABLE_EVENT);
@@ -45,8 +54,9 @@ it('can create a snapshot', function (): void {
 it('shows the link to the public page when the record is published', function (): void {
     $publishedAt = fake()->dateTimeBetween('-2 weeks', '-1 week', 'utc');
 
+    $organisation = OrganisationTestHelper::create();
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create([
             'public_from' => $publishedAt,
         ]);
@@ -58,28 +68,33 @@ it('shows the link to the public page when the record is published', function ()
     $avgResponsibleProcessingRecord->refresh();
 
     $expectedPublishedAt = CarbonImmutable::instance($publishedAt)
-        ->setTimezone(ConfigHelper::get('app.display_timezone'))
+        ->setTimezone(ConfigTestHelper::get('app.display_timezone'))
         ->format(DateFormatService::FORMAT_DATE);
-    livewire(ViewAvgResponsibleProcessingRecord::class, [
-        'record' => $avgResponsibleProcessingRecord->getRouteKey(),
-    ])
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ViewAvgResponsibleProcessingRecord::class, [
+            'record' => $avgResponsibleProcessingRecord->getRouteKey(),
+        ])
         ->assertSee(__('general.published_at', ['published_at' => $expectedPublishedAt]));
 });
 
 it('shows current state as not published', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
 
-    livewire(ViewAvgResponsibleProcessingRecord::class, [
-        'record' => $avgResponsibleProcessingRecord->getRouteKey(),
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ViewAvgResponsibleProcessingRecord::class, [
+            'record' => $avgResponsibleProcessingRecord->getRouteKey(),
+        ])
         ->assertSee(__('public_website.public_from_section.public_state_not_public'));
 });
 
 it('shows the data of the publications when the record is published', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
     $snapshot = Snapshot::factory()
         ->for($avgResponsibleProcessingRecord, 'snapshotSource')
@@ -103,13 +118,14 @@ it('shows the data of the publications when the record is published', function (
             'end_date' => null,
         ]);
 
-    livewire(ViewAvgResponsibleProcessingRecord::class, [
-        'record' => $avgResponsibleProcessingRecord->getRouteKey(),
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ViewAvgResponsibleProcessingRecord::class, [
+            'record' => $avgResponsibleProcessingRecord->getRouteKey(),
+        ])
         ->assertSee(__('public_website.public_from_section.public_state_public'))
-        ->assertSee(__('public_website.public_from_section.public_history_since', ['start' => '01-03-2020 00:00']))
+        ->assertSee(__('public_website.public_from_section.public_history_since', ['start' => '01-03-2020 01:00']))
         ->assertSee(__('public_website.public_from_section.public_history_from_to', [
-            'start' => '01-01-2020 00:00',
-            'end' => '01-02-2020 00:00',
+            'start' => '1 januari 2020 01:00',
+            'end' => '1 februari 2020 01:00',
         ]));
 });

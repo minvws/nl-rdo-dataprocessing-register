@@ -4,8 +4,14 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Enums\Authorization\Role;
+use App\Enums\RegisterLayout;
+use App\Enums\Snapshot\MandateholderNotifyBatch;
+use App\Enums\Snapshot\MandateholderNotifyDirectly;
 use App\Models\Organisation;
+use App\Models\OrganisationUserRole;
 use App\Models\User;
+use App\Models\UserGlobalRole;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
@@ -21,14 +27,31 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'id' => $this->faker->uuid(),
-            'name' => $this->faker->name(),
             'email' => $this->faker->unique()->safeEmail(),
-            'remember_token' => Str::random(10),
+            'mandateholder_notify_batch' => $this->faker->randomElement(MandateholderNotifyBatch::class),
+            'mandateholder_notify_directly' => $this->faker->randomElement(MandateholderNotifyDirectly::class),
+            'name' => $this->faker->name(),
             'otp_secret' => $this->faker->regexify('[A-Z]{16}'),
             'otp_confirmed_at' => $this->faker->optional()->dateTime(),
             'otp_timestamp' => $this->faker->numberBetween(),
+            'register_layout' => $this->faker->randomElement(RegisterLayout::cases()),
+            'remember_token' => Str::random(10),
         ];
+    }
+
+    public function hasGlobalRole(Role $role): self
+    {
+        $userGlobalRoleFactory = UserGlobalRole::factory(['role' => $role]);
+
+        return $this->has($userGlobalRoleFactory, 'globalRoles');
+    }
+
+    public function hasOrganisationRole(Role $role, Organisation $organisation): self
+    {
+        $organisationUserRoleFactory = OrganisationUserRole::factory(['role' => $role])
+            ->recycle($organisation);
+
+        return $this->has($organisationUserRoleFactory, 'organisationRoles');
     }
 
     public function withOrganisation(): self

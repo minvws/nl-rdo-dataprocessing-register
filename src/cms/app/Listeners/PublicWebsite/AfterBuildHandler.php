@@ -17,7 +17,6 @@ class AfterBuildHandler
     public function __construct(
         private readonly LoggerInterface $logger,
         private readonly ?string $afterBuildHook,
-        private readonly int $buildDebounceSeconds,
         private readonly array $planCheckJobDelays,
     ) {
     }
@@ -26,7 +25,6 @@ class AfterBuildHandler
     {
         $this->logger->debug('After build handler triggered', [
             'afterBuildHook' => $this->afterBuildHook,
-            'buildDebounceSeconds' => $this->buildDebounceSeconds,
         ]);
 
         // plan website checks with delays

@@ -224,6 +224,7 @@ return [
         'step_remarks_info' => '
             <p class="text-sm text-gray-500" mb-4>Voeg opmerkingen toe aan de verwerking. Deze zijn intern en worden niet openbaar gemaakt.</p>
             <p class="text-sm text-gray-500">Het kunnen notities zijn over de betrokken medewerker, herinneringen, mededelingen, openstaande zaken, mutatiedata, verwijzingen naar andere verwerkingen of documenten zoals PIA&#39;s, verwerkersovereenkomsten, vastgestelde regelingen bij meerdere verwerkingsverantwoordelijken, beheermaatregelen op basis van een GEB/PIA, of datalekken met het informatiesysteem, enz.</p>',
+        'step_remarks_extra_info' => '',
 
         'step_publish_title' => 'Publiceren',
         'step_publish_info' => '
@@ -457,7 +458,7 @@ return [
         'step_remarks_info' => '
             <p class="text-sm text-gray-500" mb-4>Voeg opmerkingen toe aan de verwerking. Deze zijn intern en worden niet openbaar gemaakt.</p>
             <p class="text-sm text-gray-500">Het kunnen notities zijn over de betrokken medewerker, herinneringen, mededelingen, openstaande zaken, mutatiedata, verwijzingen naar andere verwerkingen of documenten zoals PIA&#39;s, verwerkersovereenkomsten, vastgestelde regelingen bij meerdere verwerkingsverantwoordelijken, beheermaatregelen op basis van een GEB/PIA, of datalekken met het informatiesysteem, enz.</p>',
-
+        'step_remarks_extra_info' => '',
     ],
 
     'wpg_processing_record' => [
@@ -551,7 +552,7 @@ return [
         'step_geb_dpia_title' => 'Informatie over GEB (DPIA)',
         'step_geb_dpia_info' => '
             <p class="text-sm text-gray-500">In de praktijk worden verschillende termen voor dit voorafgaande onderzoek door elkaar gebruikt zoals PIA (privacy impact assessment), GEB of GBEB (gegevensbeschermingseffectbeoordeling) en DPIA (data protection impact assessment). Dit komt echter allemaal op hetzelfde neer, namelijk een schriftelijk onderzoek om te voldoen aan de verplichting uit de Wpg om ten aanzien van verwerkingen die waarschijnlijk een hoog risico opleveren voor de privacybescherming van personen, deze risico’s ik kaart te brengen en risico mitigerende maatregelen te benoemen. In de Wpg is aan de verwerkingsverantwoordelijke de opdracht toegekend om te beoordelen of de risicobeperkende maatregelen ook daadwerkelijk zijn uitgevoerd.</p>',
-        'step_geb_dpia_extra_info_info' => '
+        'step_geb_dpia_extra_info' => '
             <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-gray-300 mb-1">Hoog Risico? Dan een GEB (DPIA)!</h3>
             <p class="text-sm text-gray-950 dark:text-gray-300 mb-4">De verwerkingsverantwoordelijke is verplicht om een GEB (DPIA) uit te voeren voor verwerkingen die een hoog risico met zich meebrengen voor de betrokkenen. Als verwerker dient u de verwerkingsverantwoordelijke te ondersteunen bij het uitvoeren van een GEB (DPIA), als deze hierom verzoekt. Deze ondersteuning kan zich bijvoorbeeld uitten in het aanleveren van gevraagde informatie over verwerkingen die door de verwerker worden verricht. Specifieke afspraken over bijvoorbeeld de kostenverdeling bij het ondersteunen bij een GEB (DPIA) door de verwerker, kunnen in een verwerkersovereenkomst zijn gemaakt.</p>
             <p class="text-sm text-gray-950 dark:text-gray-300 mb-4">U kunt hier aangeven of de verwerkingsverantwoordelijke een GEB (DPIA) heeft uitgevoerd t.a.v. de verwerkingen die door u worden verricht. Zo ja, dan kunt u deze GEB (DPIA) (indien beschikbaar) ook toevoegen aan uw AVG-register onder de tab ‘Documenten & Bijlagen’.</p>
@@ -575,6 +576,7 @@ return [
         'step_remarks_info' => '
             <p class="text-sm text-gray-500 mb-4">Voeg opmerkingen toe aan de verwerking. Deze zijn intern en worden niet openbaar gemaakt.</p>
             <p class="text-sm text-gray-500">Het kunnen notities zijn over de betrokken medewerker, herinneringen, mededelingen, openstaande zaken, mutatiedata, verwijzingen naar andere verwerkingen of documenten zoals PIA\'s, verwerkersovereenkomsten, vastgestelde regelingen bij meerdere verwerkingsverantwoordelijken, beheermaatregelen op basis van een GEB/PIA, of datalekken met het informatiesysteem, enz.</p>',
+        'step_remarks_extra_info' => '',
 
         'step_categories_involved_title' => 'Informatie over Categoriën Betrokkenen',
         'step_categories_involved_info' => '

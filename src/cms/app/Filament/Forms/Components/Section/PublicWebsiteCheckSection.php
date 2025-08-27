@@ -11,6 +11,7 @@ use Filament\Forms\Components\Section;
 use Illuminate\Support\Collection;
 
 use function __;
+use function sprintf;
 
 class PublicWebsiteCheckSection extends Section
 {
@@ -34,13 +35,10 @@ class PublicWebsiteCheckSection extends Section
     {
         $schema = [];
 
-        $publicStateContent = $record->isPublished()
-            ? __('public_website.public_from_section.public_state_public')
-            : __('public_website.public_from_section.public_state_not_public');
-
+        $view = $record->isPublished() ? 'published' : 'unpublished';
         $schema[] = Placeholder::make('public_website_public_state')
             ->label(__('public_website.public_from_section.public_state'))
-            ->content($publicStateContent);
+            ->view(sprintf('filament.forms.components.section.public_website_check_section.%s', $view));
 
         /** @var Collection<int, string> $snapshotIds */
         $snapshotIds = $record->snapshots()->pluck('id');

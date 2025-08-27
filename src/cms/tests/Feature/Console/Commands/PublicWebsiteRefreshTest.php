@@ -4,14 +4,16 @@ declare(strict_types=1);
 
 use App\Jobs\PublicWebsite\ContentGeneratorJob;
 use App\Jobs\PublicWebsite\HugoWebsiteGeneratorJob;
-use App\Jobs\PublicWebsite\OrganisationGeneratorJob;
-use App\Jobs\PublicWebsite\PublicContentDeleteJob;
 use App\Jobs\PublicWebsite\PublicWebsiteCheckJob;
-use App\Jobs\PublicWebsite\PublishableListGeneratorJob;
+use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\Organisation;
+use App\Models\Snapshot;
+use App\Models\SnapshotData;
+use App\Models\States\Snapshot\Established;
 use Illuminate\Support\Facades\Bus;
+use Tests\Helpers\ConfigTestHelper;
 
-it('can run the command', function (): void {
+it('the command will dispatch the correct jobs', function (): void {
     Bus::fake();
 
     $this->artisan('public-website:refresh')
@@ -24,51 +26,24 @@ it('can run the command', function (): void {
     ]);
 });
 
-it('can run the command with a published organisation', function (): void {
-    Bus::fake();
+it('can run the command with a published organisation and a published record', function (): void {
+    ConfigTestHelper::set('public-website.public_website_generator', 'fake');
 
-    Organisation::factory()->create(['public_from' => fake()->date()]);
+    $organisation = Organisation::factory()->create(['public_from' => fake()->date()]);
+    $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->create(['public_from' => fake()->date()]);
+    Snapshot::factory()
+        ->recycle($organisation)
+        ->has(SnapshotData::factory()->state([
+            'public_markdown' => fake()->markdown(),
+        ]))
+        ->create([
+            'snapshot_source_id' => $avgResponsibleProcessingRecord->id,
+            'snapshot_source_type' => $avgResponsibleProcessingRecord::class,
+            'state' => Established::class,
+        ]);
 
     $this->artisan('public-website:refresh')
         ->assertExitCode(0);
-
-    Bus::assertChained([
-        OrganisationGeneratorJob::class,
-        PublishableListGeneratorJob::class,
-        ContentGeneratorJob::class,
-        HugoWebsiteGeneratorJob::class,
-        PublicWebsiteCheckJob::class,
-    ]);
-});
-
-it('can run the command with the delete parameter', function (): void {
-    Bus::fake();
-
-    $this->artisan('public-website:refresh -D')
-        ->assertExitCode(0);
-
-    Bus::assertChained([
-        PublicContentDeleteJob::class,
-        ContentGeneratorJob::class,
-        HugoWebsiteGeneratorJob::class,
-        PublicWebsiteCheckJob::class,
-    ]);
-});
-
-it('can run the command with the delete parameter and a published organisation', function (): void {
-    Bus::fake();
-
-    Organisation::factory()->create(['public_from' => fake()->date()]);
-
-    $this->artisan('public-website:refresh -D')
-        ->assertExitCode(0);
-
-    Bus::assertChained([
-        PublicContentDeleteJob::class,
-        OrganisationGeneratorJob::class,
-        PublishableListGeneratorJob::class,
-        ContentGeneratorJob::class,
-        HugoWebsiteGeneratorJob::class,
-        PublicWebsiteCheckJob::class,
-    ]);
 });

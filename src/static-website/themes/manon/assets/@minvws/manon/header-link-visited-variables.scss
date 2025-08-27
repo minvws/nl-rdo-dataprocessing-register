@@ -1,0 +1,17 @@
+/*---------------------------------------------------------------*/
+/*--------------- footer-link-visited-variables.scss ------------*/
+/*---------------------------------------------------------------*/
+
+@use "mixins/link";
+
+:root {
+  /* Visited */
+  @include link.styling-variables("footer-link-visited-", "link-visited-");
+
+  /* Icon */
+  @include link.icon-styling-variables(
+    "header-link-visited-icon-",
+    "header-link-",
+    "visited"
+  );
+}

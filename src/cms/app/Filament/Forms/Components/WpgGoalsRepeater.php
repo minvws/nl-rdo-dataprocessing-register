@@ -58,7 +58,7 @@ class WpgGoalsRepeater extends Repeater
                 ->columnSpanFull()
                 ->required(),
             Hidden::make('organisation_id')
-                ->default(Authentication::organisation()->id),
+                ->default(Authentication::organisation()->id->toString()),
         ];
     }
 

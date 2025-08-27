@@ -4,6 +4,35 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Collections\Algorithm\AlgorithmMetaSchemaCollection;
+use App\Collections\Algorithm\AlgorithmPublicationCategoryCollection;
+use App\Collections\Algorithm\AlgorithmRecordCollection;
+use App\Collections\Algorithm\AlgorithmStatusCollection;
+use App\Collections\Algorithm\AlgorithmThemeCollection;
+use App\Collections\Avg\AvgGoalCollection;
+use App\Collections\Avg\AvgProcessorProcessingRecordCollection;
+use App\Collections\Avg\AvgProcessorProcessingRecordServiceCollection;
+use App\Collections\Avg\AvgResponsibleProcessingRecordCollection;
+use App\Collections\Avg\AvgResponsibleProcessingRecordServiceCollection;
+use App\Collections\ContactPersonCollection;
+use App\Collections\ContactPersonPositionCollection;
+use App\Collections\DataBreachRecordCollection;
+use App\Collections\DocumentCollection;
+use App\Collections\MediaCollection;
+use App\Collections\OrganisationCollection;
+use App\Collections\ProcessorCollection;
+use App\Collections\ReceiverCollection;
+use App\Collections\ResponsibleCollection;
+use App\Collections\SnapshotCollection;
+use App\Collections\StakeholderCollection;
+use App\Collections\StakeholderDataItemCollection;
+use App\Collections\SystemCollection;
+use App\Collections\TagCollection;
+use App\Collections\UserCollection;
+use App\Collections\Wpg\WpgGoalCollection;
+use App\Collections\Wpg\WpgProcessingRecordCollection;
+use App\Collections\Wpg\WpgProcessingRecordServiceCollection;
+use App\Components\Uuid\UuidInterface;
 use App\Enums\Media\MediaGroup;
 use App\Models\Algorithm\AlgorithmMetaSchema;
 use App\Models\Algorithm\AlgorithmPublicationCategory;
@@ -15,86 +44,84 @@ use App\Models\Avg\AvgProcessorProcessingRecord;
 use App\Models\Avg\AvgProcessorProcessingRecordService;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecordService;
+use App\Models\Casts\UuidCast;
 use App\Models\Concerns\HasDefaultMediaCollections;
-use App\Models\Concerns\HasUuidAsKey;
+use App\Models\Concerns\HasSoftDeletes;
+use App\Models\Concerns\HasTimestamps;
+use App\Models\Concerns\HasUuidAsId;
 use App\Models\Wpg\WpgGoal;
 use App\Models\Wpg\WpgProcessingRecord;
 use App\Models\Wpg\WpgProcessingRecordService;
-use App\Types\IPRanges;
 use Carbon\CarbonImmutable;
-use Illuminate\Database\Eloquent\Collection;
+use Database\Factories\OrganisationFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Spatie\MediaLibrary\HasMedia;
-use Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
- * @property string $id
- * @property string $name
- * @property string $slug
- * @property CarbonImmutable|null $created_at
- * @property CarbonImmutable|null $updated_at
+ * @property array<array-key, string> $allowed_email_domains
  * @property string $allowed_ips
- * @property CarbonImmutable|null $deleted_at
- * @property int $review_at_default_in_months
- * @property string $responsible_legal_entity_id
+ * @property ?UuidInterface $databreach_entity_number_counter_id
+ * @property string $name
  * @property ?string $public_website_content
- * @property ?string $databreach_entity_number_counter_id
- * @property ?string $register_entity_number_counter_id
+ * @property ?UuidInterface $register_entity_number_counter_id
+ * @property UuidInterface $responsible_legal_entity_id
  * @property CarbonImmutable|null $public_from
  * @property CarbonImmutable|null $published_at
+ * @property int $review_at_default_in_months
+ * @property string $slug
  *
- * @property-read Collection<int, AlgorithmMetaSchema> $algorithmMetaSchemas
- * @property-read Collection<int, AlgorithmPublicationCategory> $algorithmPublicationCategories
- * @property-read Collection<int, AlgorithmRecord> $algorithmRecords
- * @property-read Collection<int, AlgorithmStatus> $algorithmStatuses
- * @property-read Collection<int, AlgorithmTheme> $algorithmThemes
- * @property-read Collection<int, AvgGoal> $avgGoals
- * @property-read Collection<int, AvgProcessorProcessingRecordService> $avgProcessorProcessingRecordServices
- * @property-read Collection<int, AvgProcessorProcessingRecord> $avgProcessorProcessingRecords
- * @property-read Collection<int, AvgResponsibleProcessingRecordService> $avgResponsibleProcessingRecordServices
- * @property-read Collection<int, AvgResponsibleProcessingRecord> $avgResponsibleProcessingRecords
- * @property-read Collection<int, ContactPersonPosition> $contactPersonPositions
- * @property-read Collection<int, ContactPerson> $contactPersons
- * @property-read MediaCollection<int, \App\Vendor\MediaLibrary\Media> $media
- * @property-read Collection<int, Processor> $processors
- * @property-read Collection<int, Receiver> $receivers
- * @property-read Collection<int, Responsible> $responsibles
- * @property-read Collection<int, StakeholderDataItem> $stakeholderDataItems
- * @property-read Collection<int, Stakeholder> $stakeholders
- * @property-read Collection<int, System> $systems
- * @property-read Collection<int, Tag> $tags
- * @property-read Collection<int, User> $users
- * @property-read Collection<int, WpgProcessingRecordService> $wpgProcessingRecordServices
- * @property-read Collection<int, WpgProcessingRecord> $wpgProcessingRecords
- * @property-read ResponsibleLegalEntity $responsibleLegalEntity
+ * @property-read AlgorithmMetaSchemaCollection $algorithmMetaSchemas
+ * @property-read AlgorithmPublicationCategoryCollection $algorithmPublicationCategories
+ * @property-read AlgorithmRecordCollection $algorithmRecords
+ * @property-read AlgorithmStatusCollection $algorithmStatuses
+ * @property-read AlgorithmThemeCollection $algorithmThemes
+ * @property-read AvgGoalCollection $avgGoals
+ * @property-read AvgProcessorProcessingRecordServiceCollection $avgProcessorProcessingRecordServices
+ * @property-read AvgProcessorProcessingRecordCollection $avgProcessorProcessingRecords
+ * @property-read AvgResponsibleProcessingRecordServiceCollection $avgResponsibleProcessingRecordServices
+ * @property-read AvgResponsibleProcessingRecordCollection $avgResponsibleProcessingRecords
+ * @property-read ContactPersonPositionCollection $contactPersonPositions
+ * @property-read ContactPersonCollection $contactPersons
  * @property-read EntityNumberCounter $databreachEntityNumberCounter
+ * @property-read DataBreachRecordCollection $dataBreachRecords
+ * @property-read DocumentCollection $documents
+ * @property-read MediaCollection $media
+ * @property-read ProcessorCollection $processors
+ * @property-read ?PublicWebsiteTree $publicWebsiteTree
+ * @property-read ReceiverCollection $receivers
  * @property-read EntityNumberCounter $registerEntityNumberCounter
- * @property-read Collection<int, WpgGoal> $wpgGoals
- * @property-read Collection<int, DataBreachRecord> $dataBreachRecords
- * @property-read Collection<int, Document> $documents
+ * @property-read ResponsibleLegalEntity $responsibleLegalEntity
+ * @property-read ResponsibleCollection $responsibles
+ * @property-read StakeholderDataItemCollection $stakeholderDataItems
+ * @property-read SnapshotCollection $snapshots
+ * @property-read StakeholderCollection $stakeholders
+ * @property-read SystemCollection $systems
+ * @property-read TagCollection $tags
+ * @property-read UserCollection $users
+ * @property-read WpgProcessingRecordServiceCollection $wpgProcessingRecordServices
+ * @property-read WpgProcessingRecordCollection $wpgProcessingRecords
+ * @property-read WpgGoalCollection $wpgGoals
  */
 class Organisation extends Model implements HasMedia
 {
-    use HasFactory;
-    use HasUuidAsKey;
     use HasDefaultMediaCollections;
-    use SoftDeletes;
+    /** @use HasFactory<OrganisationFactory> */
+    use HasFactory;
+    use HasTimestamps;
+    use HasUuidAsId;
+    use HasSoftDeletes;
 
-    protected $casts = [
-        'id' => 'string',
-        'public_from' => 'datetime',
-        'published_at' => 'datetime',
-    ];
-
+    protected static string $collectionClass = OrganisationCollection::class;
     protected $fillable = [
         'name',
         'slug',
+        'allowed_email_domains',
         'allowed_ips',
         'responsible_legal_entity_id',
         'review_at_default_in_months',
@@ -103,6 +130,18 @@ class Organisation extends Model implements HasMedia
         'databreach_entity_number_counter_id',
         'public_from',
     ];
+
+    public function casts(): array
+    {
+        return [
+            'allowed_email_domains' => 'array',
+            'databreach_entity_number_counter_id' => UuidCast::class,
+            'public_from' => 'datetime',
+            'published_at' => 'datetime',
+            'responsible_legal_entity_id' => UuidCast::class,
+            'register_entity_number_counter_id' => UuidCast::class,
+        ];
+    }
 
     /**
      * @return HasMany<AvgGoal, $this>
@@ -241,6 +280,14 @@ class Organisation extends Model implements HasMedia
     }
 
     /**
+     * @return HasOne<PublicWebsiteTree, $this>
+     */
+    public function publicWebsiteTree(): HasOne
+    {
+        return $this->hasOne(PublicWebsiteTree::class);
+    }
+
+    /**
      * @return HasMany<Receiver, $this>
      */
     public function receivers(): HasMany
@@ -270,6 +317,14 @@ class Organisation extends Model implements HasMedia
     public function responsibleLegalEntity(): BelongsTo
     {
         return $this->belongsTo(ResponsibleLegalEntity::class);
+    }
+
+    /**
+     * @return HasMany<Snapshot, $this>
+     */
+    public function snapshots(): HasMany
+    {
+        return $this->hasMany(Snapshot::class);
     }
 
     /**
@@ -339,11 +394,5 @@ class Organisation extends Model implements HasMedia
     public function getFilamentPoster(): ?Media
     {
         return $this->getFirstMedia(MediaGroup::ORGANISATION_POSTERS->value);
-    }
-
-    public function isIPAllowed(string $ipAddress): bool
-    {
-        $ipRanges = IPRanges::make($this->allowed_ips);
-        return $ipRanges->contains($ipAddress);
     }
 }

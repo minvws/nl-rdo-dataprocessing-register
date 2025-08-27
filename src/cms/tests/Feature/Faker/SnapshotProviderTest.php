@@ -11,7 +11,6 @@ use App\Models\States\Snapshot\Established;
 use App\Models\States\Snapshot\InReview;
 use App\Models\States\Snapshot\Obsolete;
 use App\Models\States\SnapshotState;
-use Illuminate\Support\Collection;
 
 use function expect;
 use function fake;
@@ -34,7 +33,6 @@ it('each state can only occur once, except obsolete', function (): void {
     $contactPerson = ContactPerson::factory()
         ->create();
 
-    /** @var Collection<Snapshot> $snapshots */
     $snapshots = Snapshot::factory()
         ->for($contactPerson, 'snapshotSource')
         ->count($amountOfSnapshots)

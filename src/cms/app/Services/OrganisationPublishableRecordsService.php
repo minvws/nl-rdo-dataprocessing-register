@@ -24,7 +24,7 @@ class OrganisationPublishableRecordsService
 
         // filter non-publishable records
         return $publishables->filter(static function (Publishable $publishable): bool {
-            if (!$publishable->canBePublished()) {
+            if (!$publishable->shouldBePublished()) {
                 return false;
             }
 

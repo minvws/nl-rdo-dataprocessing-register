@@ -7,6 +7,7 @@ namespace App\Filament\Pages;
 use App\Config\Config;
 use App\Facades\Otp;
 use App\Services\AuthenticationService;
+use App\ValueObjects\OneTimePassword\Code;
 use DanHarrin\LivewireRateLimiting\Exceptions\TooManyRequestsException;
 use DanHarrin\LivewireRateLimiting\WithRateLimiting;
 use Filament\Actions\Action;
@@ -129,7 +130,7 @@ class OneTimePasswordValidation extends SimplePage
         Assert::string($this->code);
         $user = $this->authenticationService->user();
 
-        return Otp::verifyCode($this->code, $user);
+        return Otp::verifyCode(Code::fromString($this->code), $user);
     }
 
     private function getAuthenticateFormAction(): Action

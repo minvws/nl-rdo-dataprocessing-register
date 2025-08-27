@@ -49,7 +49,10 @@ it('does not run the job if the batch has been cancelled', function (): void {
             'validated_at' => null,
         ]);
 
-    [$job, $batch] = (new MarkMediaUploadAsValidated($media))->withFakeBatch();
+    $markMediaUploadAsValidated = (new MarkMediaUploadAsValidated($media))->withFakeBatch();
+    $job = $markMediaUploadAsValidated[0];
+    $batch = $markMediaUploadAsValidated[1];
+
     $batch->cancel();
 
     dispatch_sync($job);

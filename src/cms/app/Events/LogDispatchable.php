@@ -15,7 +15,7 @@ trait LogDispatchable
         Dispatchable::dispatch as dispatchableDispatch;
     }
 
-    public static function dispatch(): mixed
+    final public static function dispatch(): mixed
     {
         Log::debug('event dispatched', ['eventClass' => static::class]);
 

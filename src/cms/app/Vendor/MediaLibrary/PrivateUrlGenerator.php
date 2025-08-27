@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Vendor\MediaLibrary;
 
+use App\Enums\RouteName;
 use Spatie\MediaLibrary\Support\UrlGenerator\DefaultUrlGenerator;
 use Webmozart\Assert\Assert;
 
@@ -15,6 +16,6 @@ class PrivateUrlGenerator extends DefaultUrlGenerator
     {
         Assert::notNull($this->media, 'Tried to generate path for media without having media');
 
-        return route('media.private', ['media' => $this->media->uuid]);
+        return route(RouteName::MEDIA_PRIVATE, ['media' => $this->media->uuid]);
     }
 }

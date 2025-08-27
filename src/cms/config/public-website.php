@@ -18,11 +18,7 @@ return [
     // the folder on the disk, used for the public website
     'public_website_folder' => 'public-website',
 
-    // this defines the wait time in seconds the new website build process should debounce after a change event
-    // in other words: how long to wait after the last change, before rebuilding the public website
-    'build_debounce_seconds' => env('PUBLIC_WEBSITE_BUILD_DEBOUNCE_SECONDS', 60),
-
-    // This is where the hugo excetable, config and templates are stored that are used to generate the public website
+    // This is where the hugo executable, config and templates are stored that are used to generate the public website
     'hugo_project_path' => base_path('public-website'),
 
     // the base url for the public website

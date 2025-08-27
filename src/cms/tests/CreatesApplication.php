@@ -11,7 +11,7 @@ use function sprintf;
 
 trait CreatesApplication
 {
-    public function createApplication(): Application
+    final public function createApplication(): Application
     {
         $app = require sprintf('%s/%s', __DIR__, '/../bootstrap/app.php');
 

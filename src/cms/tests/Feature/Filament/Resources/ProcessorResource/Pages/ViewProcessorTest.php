@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 use App\Filament\Resources\ProcessorResource;
 use App\Models\Processor;
+use Tests\Helpers\Model\OrganisationTestHelper;
 
 it('can load the ViewProcessor page', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $processor = Processor::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
 
-    $this->get(ProcessorResource::getUrl('view', ['record' => $processor->id]))
+    $this->asFilamentOrganisationUser($organisation)
+        ->get(ProcessorResource::getUrl('view', ['record' => $processor]))
         ->assertSuccessful();
 });

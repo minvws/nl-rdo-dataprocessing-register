@@ -20,7 +20,6 @@ class RelatedSnapshotSourceFactory extends Factory
     public function definition(): array
     {
         return [
-            'id' => $this->faker->uuid(),
             'snapshot_id' => Snapshot::factory(),
             'snapshot_source_id' => Processor::factory(),
             'snapshot_source_type' => Processor::class,

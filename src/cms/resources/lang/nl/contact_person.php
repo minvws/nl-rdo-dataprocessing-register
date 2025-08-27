@@ -9,4 +9,7 @@ return [
 
     'email' => 'E-mailadres',
     'phone' => 'Telefoonnummer',
+
+    'form_title_contact_persons' => 'Overige contactpersonen',
+    'form_title_users' => 'Primair contact',
 ];

@@ -31,7 +31,7 @@ class AttachmentFileField extends SpatieMediaLibraryFileUpload
             ->acceptedFileTypes($types)
             ->maxSize(self::MEGABYTE * 20)
             ->properties([
-                'organisation_id' => Authentication::organisation()->id,
+                'organisation_id' => Authentication::organisation()->id->toString(),
             ])
             ->rules([
                 app()->get(Virusscanner::class),

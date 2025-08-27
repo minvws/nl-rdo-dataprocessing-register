@@ -7,13 +7,13 @@ namespace App\Filament\Resources\SnapshotResource;
 use App\Filament\Resources\SnapshotResource\Pages\ViewSnapshot;
 use App\Filament\Tables\Columns\CreatedAtColumn;
 use App\Filament\Tables\Columns\SnapshotStateColumn;
+use App\Models\Builders\SnapshotBuilder;
 use App\Models\Snapshot;
 use App\Services\DateFormatService;
 use Filament\Facades\Filament;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 
 use function __;
 use function route;
@@ -33,8 +33,7 @@ class SnapshotResourceTable
                     ->label(__('snapshot.replaced_at'))
                     ->dateTime(DateFormatService::FORMAT_DATE_TIME, DateFormatService::getDisplayTimezone()),
             ])
-            ->modifyQueryUsing(static function (Builder $query): void {
-                /** @var Builder<Snapshot> $query */
+            ->modifyQueryUsing(static function (SnapshotBuilder $query): void {
                 $query->orderByVersion();
             })
             ->emptyStateHeading(__('snapshot.table_empty_heading'))

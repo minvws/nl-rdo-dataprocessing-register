@@ -20,6 +20,5 @@ parameters:
     editorUrl: 'phpstorm://open?file=%%file%%&line=%%line%%'
     ignoreErrors:
         - '#Dynamic call to static method Illuminate\\.*#'
-        - '#Return type \(App\\Components\\Uuid\\UuidInterface\) of method App\\Models\\[A-Za-z0-9]+::newUniqueId\(\) should be compatible with return type \(string\) of method Illuminate\\Database\\Eloquent\\Model::newUniqueId\(\)#'
 includes:
 	- phpstan-baseline.neon

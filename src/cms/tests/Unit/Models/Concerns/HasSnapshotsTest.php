@@ -30,7 +30,7 @@ it('throws an error if name is null', function (): void {
         // phpcs:ignore SlevomatCodingStandard.Namespaces.UseSpacing.IncorrectLinesCountBeforeFirstUse
         use HasSnapshots;
 
-        public function getAttribute(string $attribute): string | null
+        public function getAttribute(string $attribute): string|null
         {
             if ($attribute === 'name') {
                 return null;

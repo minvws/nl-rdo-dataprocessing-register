@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Filament\Infolists\Tabs\Snapshot;
 
 use App\Enums\Authorization\Permission;
-use App\Enums\MarkdownField;
 use App\Enums\Snapshot\SnapshotApprovalStatus;
+use App\Enums\Snapshot\SnapshotDataSection;
 use App\Facades\Authentication;
 use App\Facades\Authorization;
 use App\Facades\DateFormat;
@@ -24,6 +24,7 @@ use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\Tabs\Tab;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\ViewEntry;
+use Filament\Support\Enums\MaxWidth;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Livewire\Component;
@@ -31,7 +32,9 @@ use Webmozart\Assert\Assert;
 
 use function __;
 use function class_basename;
+use function redirect;
 use function sprintf;
+use function view;
 
 class ViewInfoTab extends Tab
 {
@@ -59,8 +62,8 @@ class ViewInfoTab extends Tab
                     }),
                 TextEntry::make('snapshotSource')
                     ->label(__('snapshot.snapshot_source_display_name'))
-                    ->formatStateUsing(static function (Snapshot $snapshot): string {
-                        return $snapshot->snapshotSource->getDisplayName();
+                    ->formatStateUsing(static function (Snapshot $snapshot): ?string {
+                        return $snapshot->snapshotSource?->getDisplayName();
                     }),
                 TextEntry::make('version')
                     ->label(__('snapshot.version')),
@@ -75,11 +78,7 @@ class ViewInfoTab extends Tab
     private static function getPublicDataSection(): Section
     {
         return Section::make(__('snapshot.public_data'))
-            ->description(new HtmlString(sprintf(
-                '<span class="text-primary-600 dark:text-primary-400"><strong>%s:</strong> %s</span>',
-                __('general.attention'),
-                __('snapshot.markdown_replacement_help'),
-            )))
+            ->description(new HtmlString(view('filament.infolists.components.entries.snapshot_data_description')->render()))
             ->schema([
                 TextEntry::make('snapshotData.public_markdown')
                     ->label('')
@@ -87,9 +86,10 @@ class ViewInfoTab extends Tab
                         static function (Snapshot $snapshot, SnapshotDataMarkdownRenderer $snapshotDataMarkdownRenderer): string {
                             Assert::notNull($snapshot->snapshotData);
 
-                            return $snapshotDataMarkdownRenderer->fromSnapshotData(
-                                $snapshot->snapshotData,
-                                MarkdownField::PUBLIC_MARKDOWN,
+                            return $snapshotDataMarkdownRenderer->fromSnapshotMarkdown(
+                                $snapshot,
+                                $snapshot->snapshotData->public_markdown,
+                                SnapshotDataSection::PUBLIC,
                             );
                         },
                     )
@@ -101,11 +101,7 @@ class ViewInfoTab extends Tab
     private static function getPrivateDataSection(): Section
     {
         return Section::make(__('snapshot.private_data'))
-            ->description(new HtmlString(sprintf(
-                '<span class="text-primary-600 dark:text-primary-400"><strong>%s:</strong> %s</span>',
-                __('general.attention'),
-                __('snapshot.markdown_replacement_help'),
-            )))
+            ->description(new HtmlString(view('filament.infolists.components.entries.snapshot_data_description')->render()))
             ->schema([
                 TextEntry::make('snapshotData.private_markdown')
                     ->label('')
@@ -113,9 +109,10 @@ class ViewInfoTab extends Tab
                         static function (Snapshot $snapshot, SnapshotDataMarkdownRenderer $snapshotDataMarkdownRenderer): string {
                             Assert::notNull($snapshot->snapshotData);
 
-                            return $snapshotDataMarkdownRenderer->fromSnapshotData(
-                                $snapshot->snapshotData,
-                                MarkdownField::PRIVATE_MARKDOWN,
+                            return $snapshotDataMarkdownRenderer->fromSnapshotMarkdown(
+                                $snapshot,
+                                $snapshot->snapshotData->private_markdown,
+                                SnapshotDataSection::PRIVATE,
                             );
                         },
                     )
@@ -187,72 +184,141 @@ class ViewInfoTab extends Tab
         return ViewEntry::make('snapshot_approval_actions')
             ->view('filament.infolists.components.entries.snapshot_approval_actions')
             ->registerActions([
-                InfolistAction::make('snapshot_approval_approve_action')
-                    ->label(__('snapshot_approval.approve'))
-                    ->color('success')
-                    ->icon('heroicon-o-check-circle')
-                    ->action(static function (Snapshot $snapshot, SnapshotApprovalService $snapshotApprovalService): void {
-                        /** @var SnapshotApproval $snapshotApproval */
-                        $snapshotApproval = $snapshot->snapshotApprovals()
-                            ->firstOrCreate([
-                                'assigned_to' => Authentication::user()->id,
-                            ]);
-                        $snapshotApprovalService->setStatus(
-                            Authentication::user(),
-                            $snapshotApproval,
-                            SnapshotApprovalStatus::APPROVED,
-                        );
-                    })
-                    ->after(static function (Component $livewire): void {
-                        $livewire->dispatch(ViewSnapshot::REFRESH_LIVEWIRE_COMPONENT);
-                    })
-                    ->requiresConfirmation()
-                    ->disabled(static function (Snapshot $snapshot): bool {
-                        /** @var SnapshotApproval|null $approval */
-                        $approval = $snapshot->snapshotApprovals()
-                            ->where('assigned_to', Authentication::user()->id)
-                            ->first();
-
-                        return $approval?->status === SnapshotApprovalStatus::APPROVED;
-                    }),
-                InfolistAction::make('snapshot_approval_decline_action')
-                    ->label(__('snapshot_approval.decline'))
-                    ->color('danger')
-                    ->icon('heroicon-o-x-mark')
-                    ->action(
-                        static function (array $data, Snapshot $snapshot, SnapshotApprovalService $snapshotApprovalService): void {
-                            /** @var SnapshotApproval $snapshotApproval */
-                            $snapshotApproval = $snapshot->snapshotApprovals()
-                                ->firstOrCreate([
-                                    'assigned_to' => Authentication::user()->id,
-                                ]);
-
-                            $notes = $data['notes'];
-                            Assert::nullOrString($notes);
-
-                            $snapshotApprovalService->setStatus(
-                                Authentication::user(),
-                                $snapshotApproval,
-                                SnapshotApprovalStatus::DECLINED,
-                                $notes,
-                            );
-                        },
-                    )
-                    ->after(static function (Component $livewire): void {
-                        $livewire->dispatch(ViewSnapshot::REFRESH_LIVEWIRE_COMPONENT);
-                    })
-                    ->form([
-                        Textarea::make('notes'),
-                    ])
-                    ->requiresConfirmation()
-                    ->disabled(static function (Snapshot $snapshot): bool {
-                        /** @var SnapshotApproval|null $approval */
-                        $approval = $snapshot->snapshotApprovals()
-                            ->where('assigned_to', Authentication::user()->id)
-                            ->first();
-
-                        return $approval?->status === SnapshotApprovalStatus::DECLINED;
-                    }),
+                self::getApproveAction(),
+                self::getDeclineAction(),
             ]);
+    }
+
+    private static function getApproveAction(): InfolistAction
+    {
+        return InfolistAction::make('snapshot_approval_approve_action')
+            ->label(__('snapshot_approval.approve'))
+            ->color('success')
+            ->icon('heroicon-o-check-circle')
+            ->action(
+                static function (
+                    array $arguments,
+                    Component $livewire,
+                    Snapshot $snapshot,
+                    SnapshotApprovalService $snapshotApprovalService,
+                ): void {
+                    /** @var SnapshotApproval $snapshotApproval */
+                    $snapshotApproval = $snapshot->snapshotApprovals()
+                        ->firstOrCreate([
+                            'assigned_to' => Authentication::user()->id,
+                        ]);
+                    $snapshotApprovalService->setStatus(
+                        Authentication::user(),
+                        $snapshotApproval,
+                        SnapshotApprovalStatus::APPROVED,
+                    );
+
+                    Assert::keyExists($arguments, 'next');
+                    $next = $arguments['next'];
+                    Assert::boolean($next);
+
+                    if ($next) {
+                        redirect(ViewSnapshot::getNextUrl($snapshot));
+                    }
+                },
+            )
+            ->after(static function (Component $livewire): void {
+                $livewire->dispatch(ViewSnapshot::REFRESH_LIVEWIRE_COMPONENT);
+            })
+            ->requiresConfirmation()
+            ->modalWidth(MaxWidth::TwoExtraLarge)
+            ->modalSubmitAction(false)
+            ->extraModalFooterActions(static function (InfolistAction $action, Snapshot $record): array {
+                return [
+                    $action->makeModalSubmitAction(__('snapshot_approval.confirm_next'), ['next' => true])
+                        ->icon(null)
+                        ->visible(static function () use ($record): bool {
+                            return ViewSnapshot::
+                                getNext($record) !== null;
+                        })
+                        ->color('success'),
+                    $action->makeModalSubmitAction(__('snapshot_approval.confirm'), ['next' => false])
+                        ->icon(null)
+                        ->color('success'),
+                ];
+            })
+            ->disabled(static function (Snapshot $snapshot): bool {
+                /** @var SnapshotApproval|null $approval */
+                $approval = $snapshot->snapshotApprovals()
+                    ->where('assigned_to', Authentication::user()->id)
+                    ->first();
+
+                return $approval?->status === SnapshotApprovalStatus::APPROVED;
+            });
+    }
+
+    private static function getDeclineAction(): InfolistAction
+    {
+        return InfolistAction::make('snapshot_approval_decline_action')
+            ->label(__('snapshot_approval.decline'))
+            ->color('danger')
+            ->icon('heroicon-o-x-mark')
+            ->action(
+                static function (
+                    array $arguments,
+                    array $data,
+                    Snapshot $snapshot,
+                    SnapshotApprovalService $snapshotApprovalService,
+                ): void {
+                    /** @var SnapshotApproval $snapshotApproval */
+                    $snapshotApproval = $snapshot->snapshotApprovals()
+                        ->firstOrCreate([
+                            'assigned_to' => Authentication::user()->id,
+                        ]);
+
+                    $notes = $data['notes'];
+                    Assert::nullOrString($notes);
+
+                    $snapshotApprovalService->setStatus(
+                        Authentication::user(),
+                        $snapshotApproval,
+                        SnapshotApprovalStatus::DECLINED,
+                        $notes,
+                    );
+
+                    Assert::keyExists($arguments, 'next');
+                    $next = $arguments['next'];
+                    Assert::boolean($next);
+
+                    if ($next) {
+                        redirect(ViewSnapshot::getNextUrl($snapshot));
+                    }
+                },
+            )
+            ->after(static function (Component $livewire): void {
+                $livewire->dispatch(ViewSnapshot::REFRESH_LIVEWIRE_COMPONENT);
+            })
+            ->form([
+                Textarea::make('notes'),
+            ])
+            ->requiresConfirmation()
+            ->modalWidth(MaxWidth::TwoExtraLarge)
+            ->modalSubmitAction(false)
+            ->extraModalFooterActions(static function (InfolistAction $action, Snapshot $record): array {
+                return [
+                    $action->makeModalSubmitAction(__('snapshot_approval.confirm_next'), ['next' => true])
+                        ->icon(null)
+                        ->visible(static function () use ($record): bool {
+                            return ViewSnapshot::getNext($record) !== null;
+                        })
+                        ->color('danger'),
+                    $action->makeModalSubmitAction(__('snapshot_approval.confirm'), ['next' => false])
+                        ->icon(null)
+                        ->color('danger'),
+                ];
+            })
+            ->disabled(static function (Snapshot $snapshot): bool {
+                /** @var SnapshotApproval|null $approval */
+                $approval = $snapshot->snapshotApprovals()
+                    ->where('assigned_to', Authentication::user()->id)
+                    ->first();
+
+                return $approval?->status === SnapshotApprovalStatus::DECLINED;
+            });
     }
 }

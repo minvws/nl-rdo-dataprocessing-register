@@ -80,7 +80,7 @@ class StakeholderDataItemsRepeater extends Repeater
                 ->columnSpanFull()
                 ->maxLength(512),
             Hidden::make('organisation_id')
-                ->default(Authentication::organisation()->id),
+                ->default(Authentication::organisation()->id->toString()),
         ];
     }
 }

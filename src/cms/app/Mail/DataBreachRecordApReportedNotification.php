@@ -18,15 +18,21 @@ class DataBreachRecordApReportedNotification extends Mailable
     use SerializesModels;
 
     public string $link;
-    public DataBreachRecord $dataBreachRecord;
 
-    public function __construct(DataBreachRecord $dataBreachRecord)
-    {
-        $this->dataBreachRecord = $dataBreachRecord;
+    public function __construct(
+        public DataBreachRecord $dataBreachRecord,
+    ) {
         $this->link = ViewDataBreachRecord::getUrl([
             'record' => $dataBreachRecord,
             'tenant' => $dataBreachRecord->organisation,
         ]);
+    }
+
+    public function getLogContext(): array
+    {
+        return [
+            'data_breach_record_id' => $this->dataBreachRecord->id->toString(),
+        ];
     }
 
     public function getSubject(): string

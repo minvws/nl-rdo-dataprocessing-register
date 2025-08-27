@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+use App\Enums\RegisterLayout;
+use App\Enums\Snapshot\MandateholderNotifyBatch;
+use App\Enums\Snapshot\MandateholderNotifyDirectly;
+
 return [
     'model_singular' => 'Gebruiker',
     'model_plural' => 'Gebruikers',
@@ -17,11 +21,13 @@ return [
     'organisation_role_attach_exists' => 'Deze gebruiker is al toegevoegd aan deze organisatie',
     'organisation_role_attach_description' => 'U gaat deze gebruiker verwijderen uit deze organisatie: weet u het zeker?',
     'organisation_role_detach' => 'Gebruiker verwijderen',
+    'organisation_role_detach_alternate_primary_contact' => 'Alternatief Primair Contact',
     'organisation_role_detach_description' => 'U gaat deze gebruiker verwijderen uit deze organisatie: weet u het zeker?',
 
     'name' => 'Naam',
     'password' => 'Wachtwoord',
     'email' => 'E-mail',
+    'email_domain_not_allowed' => 'E-mail domein niet toegestaan, toegestane domeinen zijn: :allowedEmailDomains',
 
     'one_time_password' => [
         'code' => 'Code',
@@ -37,7 +43,7 @@ return [
 
         'personal_info' => [
             'heading' => 'Persoonlijke informatie',
-            'subheading' => 'Beheer je persoonlijke informatie.',
+            'subheading' => 'Beheer je persoonlijke informatie',
             'submit' => 'Opslaan',
             'notify' => 'Persoonlijke informatie bijgewerkt!',
         ],
@@ -78,6 +84,34 @@ return [
                 'success_notification' => 'Code geverifieerd. Tweefactorauthenticatie ingeschakeld.',
                 'invalid_code' => 'De code die je hebt ingevoerd is ongeldig.',
                 'too_many_requests' => 'Te veel inlogpogingen, probeer het opnieuw over :seconds seconden.',
+            ],
+        ],
+
+        'settings' => [
+            'heading' => 'Instellingen',
+            'subheading' => 'Beheer je persoonlijke instellingen',
+            'submit' => 'Opslaan',
+            'notify' => 'Instellingen bijgewerkt!',
+
+            'mandateholder' => 'Mandaathouder',
+            'mandateholder_notify_batch' => 'Samenvatting',
+            'mandateholder_notify_batch_options' => [
+                MandateholderNotifyBatch::NONE->value => 'Geen',
+                MandateholderNotifyBatch::WEEKLY->value => 'Wekelijks',
+            ],
+
+            'mandateholder_notify_directly' => 'Bij elke uitnodiging',
+            'mandateholder_notify_directly_options' => [
+                MandateholderNotifyDirectly::NONE->value => 'Geen',
+                MandateholderNotifyDirectly::BATCH->value => 'Samenvatting',
+                MandateholderNotifyDirectly::SINGLE->value => 'Apart bericht',
+            ],
+
+            'layout' => 'Layout',
+            'register_layout' => 'Layout van registers',
+            'register_layout_options' => [
+                RegisterLayout::STEPS->value => 'Stapsgewijs met navigatie rechts',
+                RegisterLayout::ONE_PAGE->value => 'Alle gegevens onder elkaar',
             ],
         ],
     ],

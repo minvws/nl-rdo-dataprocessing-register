@@ -4,45 +4,44 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Collections\Avg\AvgProcessorProcessingRecordCollection;
+use App\Collections\Avg\AvgResponsibleProcessingRecordCollection;
+use App\Collections\SystemCollection;
+use App\Collections\Wpg\WpgProcessingRecordCollection;
 use App\Models\Avg\AvgProcessorProcessingRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\Concerns\HasOrganisation;
 use App\Models\Concerns\HasSnapshots;
-use App\Models\Concerns\HasUuidAsKey;
+use App\Models\Concerns\HasSoftDeletes;
+use App\Models\Concerns\HasTimestamps;
+use App\Models\Concerns\HasUuidAsId;
 use App\Models\Contracts\SnapshotSource;
+use App\Models\Contracts\TenantAware;
 use App\Models\Wpg\WpgProcessingRecord;
-use Carbon\CarbonImmutable;
-use Illuminate\Database\Eloquent\Collection;
+use Database\Factories\SystemFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * @property string $id
  * @property string|null $import_id
- * @property CarbonImmutable|null $created_at
- * @property CarbonImmutable|null $updated_at
  * @property string|null $description
- * @property CarbonImmutable|null $deleted_at
  *
- * @property-read Collection<int, AvgProcessorProcessingRecord> $avgProcessorProcessingRecords
- * @property-read Collection<int, AvgResponsibleProcessingRecord> $avgResponsibleProcessingRecords
- * @property-read Collection<int, Snapshot> $snapshots
- * @property-read Collection<int, WpgProcessingRecord> $wpgProcessingRecords
+ * @property-read AvgProcessorProcessingRecordCollection $avgProcessorProcessingRecords
+ * @property-read AvgResponsibleProcessingRecordCollection $avgResponsibleProcessingRecords
+ * @property-read WpgProcessingRecordCollection $wpgProcessingRecords
  */
-class System extends Model implements SnapshotSource
+class System extends Model implements SnapshotSource, TenantAware
 {
+    /** @use HasFactory<SystemFactory> */
     use HasFactory;
     use HasOrganisation;
     use HasSnapshots;
-    use HasUuidAsKey;
-    use SoftDeletes;
+    use HasSoftDeletes;
+    use HasTimestamps;
+    use HasUuidAsId;
 
-    protected $casts = [
-        'id' => 'string',
-    ];
-
+    protected static string $collectionClass = SystemCollection::class;
     protected $fillable = [
         'description',
         'import_id',

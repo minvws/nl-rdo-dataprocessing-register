@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace App\Jobs\PublicWebsite;
 
+use App\Components\Uuid\Uuid;
 use App\Enums\Queue;
+use App\Enums\SitemapType;
 use App\Models\PublicWebsiteCheck;
 use App\Models\PublicWebsiteSnapshotEntry;
 use Carbon\CarbonImmutable;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -17,7 +18,7 @@ use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Webmozart\Assert\Assert;
 
-class PublicWebsiteCheckContentProcessorJob implements ShouldQueue, ShouldBeUnique
+class PublicWebsiteCheckContentProcessorJob implements ShouldQueue
 {
     use Dispatchable;
     use InteractsWithQueue;
@@ -43,17 +44,26 @@ class PublicWebsiteCheckContentProcessorJob implements ShouldQueue, ShouldBeUniq
         foreach ($this->publicWebsiteCheck->content['pages'] as $page) {
             try {
                 Assert::isArray($page);
-                Assert::keyExists($page, 'id');
-                Assert::keyExists($page, 'permalink');
                 Assert::keyExists($page, 'type');
 
-                if ($page['type'] !== 'processing-record') {
+                if ($page['type'] !== SitemapType::PROCESSING_RECORD->value) {
                     continue;
                 }
 
+                Assert::keyExists($page, 'id');
+                Assert::string($page['id']);
+                Assert::keyExists($page, 'permalink');
+
+                $snapshotId = Uuid::fromString($page['id']);
+
+                $logger->debug('saving public-website snapshot entry', [
+                    'snapshot_id' => $snapshotId,
+                    'url' => $page['permalink'],
+                ]);
+
                 $publicWebisteSnapshotEntry = PublicWebsiteSnapshotEntry::query()->firstOrNew(
                     [
-                        'snapshot_id' => $page['id'],
+                        'snapshot_id' => $snapshotId,
                         'end_date' => null,
                     ],
                     [
@@ -64,7 +74,11 @@ class PublicWebsiteCheckContentProcessorJob implements ShouldQueue, ShouldBeUniq
 
                 $publicWebisteSnapshotEntry->last_public_website_check_id = $this->publicWebsiteCheck->id;
                 $publicWebisteSnapshotEntry->save();
-            } catch (InvalidArgumentException) {
+            } catch (InvalidArgumentException $invalidArgumentException) {
+                $logger->debug('saving public-website snapshot entry failed', [
+                    'expection' => $invalidArgumentException,
+                ]);
+
                 continue;
             }
         }

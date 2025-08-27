@@ -115,19 +115,19 @@ class RelatedSnapshotSourceResourceTable
                 ->unique();
 
             if ($snapshotStates->contains(Established::$name)) {
-                return Established::$color;
+                return Established::$color->value;
             }
 
             if ($snapshotStates->contains(Approved::$name)) {
-                return Approved::$color;
+                return Approved::$color->value;
             }
 
             if ($snapshotStates->contains(InReview::$name)) {
-                return InReview::$color;
+                return InReview::$color->value;
             }
 
             if ($snapshotStates->contains(Obsolete::$name)) {
-                return Obsolete::$color;
+                return Obsolete::$color->value;
             }
 
             return 'gray';

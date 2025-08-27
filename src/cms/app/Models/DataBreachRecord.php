@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Collections\Avg\AvgProcessorProcessingRecordCollection;
+use App\Collections\Avg\AvgResponsibleProcessingRecordCollection;
+use App\Collections\DataBreachRecordCollection;
+use App\Collections\DocumentCollection;
+use App\Collections\ResponsibleCollection;
+use App\Collections\Wpg\WpgProcessingRecordCollection;
 use App\Models\Avg\AvgProcessorProcessingRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\Concerns\HasDocuments;
@@ -11,20 +17,19 @@ use App\Models\Concerns\HasEntityNumber;
 use App\Models\Concerns\HasFgRemark;
 use App\Models\Concerns\HasOrganisation;
 use App\Models\Concerns\HasResponsibles;
-use App\Models\Concerns\HasUuidAsKey;
-use App\Models\Concerns\IsCloneable;
-use App\Models\Contracts\Cloneable;
+use App\Models\Concerns\HasSoftDeletes;
+use App\Models\Concerns\HasTimestamps;
+use App\Models\Concerns\HasUuidAsId;
 use App\Models\Contracts\EntityNumerable;
+use App\Models\Contracts\TenantAware;
 use App\Models\Wpg\WpgProcessingRecord;
 use Carbon\CarbonImmutable;
-use Illuminate\Database\Eloquent\Collection;
+use Database\Factories\DataBreachRecordFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * @property string $id
  * @property string $name
  * @property string $type
  * @property CarbonImmutable|null $reported_at
@@ -38,54 +43,36 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string|null $nature_of_incident_other
  * @property string|null $summary
  * @property string|null $involved_people
- * @property array|null $personal_data_categories
+ * @property array<string>|null $personal_data_categories
  * @property string|null $personal_data_categories_other
- * @property array|null $personal_data_special_categories
+ * @property array<string>|null $personal_data_special_categories
  * @property string|null $estimated_risk
  * @property string|null $measures
  * @property bool $reported_to_involved
- * @property array|null $reported_to_involved_communication
+ * @property array<string>|null $reported_to_involved_communication
  * @property string|null $reported_to_involved_communication_other
  * @property bool $fg_reported
- * @property CarbonImmutable|null $created_at
- * @property CarbonImmutable|null $updated_at
- * @property CarbonImmutable|null $deleted_at
  *
- * @property-read Collection<int, AvgProcessorProcessingRecord> $avgProcessorProcessingRecords
- * @property-read Collection<int, AvgResponsibleProcessingRecord> $avgResponsibleProcessingRecords
- * @property-read Collection<int, Document> $documents
- * @property-read Collection<int, Responsible> $responsibles
- * @property-read Collection<int, WpgProcessingRecord> $wpgProcessingRecords
+ * @property-read AvgProcessorProcessingRecordCollection $avgProcessorProcessingRecords
+ * @property-read AvgResponsibleProcessingRecordCollection $avgResponsibleProcessingRecords
+ * @property-read DocumentCollection $documents
+ * @property-read ResponsibleCollection $responsibles
+ * @property-read WpgProcessingRecordCollection $wpgProcessingRecords
  */
-class DataBreachRecord extends Model implements EntityNumerable, Cloneable
+class DataBreachRecord extends Model implements EntityNumerable, TenantAware
 {
     use HasDocuments;
     use HasEntityNumber;
+    /** @use HasFactory<DataBreachRecordFactory> */
     use HasFactory;
     use HasFgRemark;
     use HasOrganisation;
     use HasResponsibles;
-    use HasUuidAsKey;
-    use IsCloneable;
-    use SoftDeletes;
+    use HasSoftDeletes;
+    use HasTimestamps;
+    use HasUuidAsId;
 
-    /** @var array<string, string> $casts */
-    protected $casts = [
-        'ap_reported' => 'boolean',
-
-        'reported_at' => 'date',
-        'discovered_at' => 'date',
-        'started_at' => 'date',
-        'ended_at' => 'date',
-        'ap_reported_at' => 'date',
-        'completed_at' => 'date',
-
-        'personal_data_categories' => 'array',
-        'personal_data_special_categories' => 'array',
-        'reported_to_involved_communication' => 'array',
-    ];
-
-    /** @var array<int, string> $fillable */
+    protected static string $collectionClass = DataBreachRecordCollection::class;
     protected $fillable = [
         'name',
         'type',
@@ -112,6 +99,24 @@ class DataBreachRecord extends Model implements EntityNumerable, Cloneable
         'reported_to_involved_communication_other',
         'fg_reported',
     ];
+
+    public function casts(): array
+    {
+        return [
+            'ap_reported' => 'boolean',
+
+            'reported_at' => 'date',
+            'discovered_at' => 'date',
+            'started_at' => 'date',
+            'ended_at' => 'date',
+            'ap_reported_at' => 'date',
+            'completed_at' => 'date',
+
+            'personal_data_categories' => 'array',
+            'personal_data_special_categories' => 'array',
+            'reported_to_involved_communication' => 'array',
+        ];
+    }
 
     /**
      * @return MorphToMany<AvgProcessorProcessingRecord, $this>

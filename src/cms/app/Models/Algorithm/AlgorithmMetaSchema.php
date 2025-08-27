@@ -4,38 +4,22 @@ declare(strict_types=1);
 
 namespace App\Models\Algorithm;
 
-use App\Models\Concerns\HasUuidAsKey;
+use App\Collections\Algorithm\AlgorithmMetaSchemaCollection;
+use App\Collections\Algorithm\AlgorithmRecordCollection;
 use App\Models\LookupListModel;
-use Carbon\CarbonImmutable;
-use Illuminate\Database\Eloquent\Collection;
+use Database\Factories\Algorithm\AlgorithmMetaSchemaFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * @property string $id
- * @property string $name
- * @property bool $enabled
- * @property CarbonImmutable|null $created_at
- * @property CarbonImmutable|null $updated_at
- * @property CarbonImmutable|null $deleted_at
- *
- * @property-read Collection<int, AlgorithmRecord> $algorithmRecords
+ * @property-read AlgorithmRecordCollection $algorithmRecords
  */
 class AlgorithmMetaSchema extends LookupListModel
 {
+    /** @use HasFactory<AlgorithmMetaSchemaFactory> */
     use HasFactory;
-    use HasUuidAsKey;
-    use SoftDeletes;
 
-    protected $casts = [
-        'id' => 'string',
-    ];
-
-    protected $fillable = [
-        'name',
-        'enabled',
-    ];
+    protected static string $collectionClass = AlgorithmMetaSchemaCollection::class;
 
     /**
      * @return HasMany<AlgorithmRecord, $this>

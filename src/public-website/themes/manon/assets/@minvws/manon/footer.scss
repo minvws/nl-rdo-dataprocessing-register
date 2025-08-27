@@ -39,7 +39,6 @@ body > footer,
   h3 {
     font-size: 1.875rem;
     line-height: 1;
-    white-space: nowrap;
   }
 
   nav {
@@ -51,6 +50,7 @@ body > footer,
       li {
         list-style: var(--footer-navigation-list-item-list-style);
         padding: 0;
+        word-break: break-all;
 
         &:before {
           /* Preventing default nav before to show up */
@@ -62,7 +62,6 @@ body > footer,
             line-height: 1;
             padding-bottom: .5rem;
             padding-top: .5rem;
-            white-space: nowrap;
 
             &:focus {
               outline-color: #fff;

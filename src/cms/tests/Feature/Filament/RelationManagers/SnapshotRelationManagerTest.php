@@ -7,8 +7,6 @@ use App\Filament\Resources\AvgResponsibleProcessingRecordResource\Pages\EditAvgR
 use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\Snapshot;
 
-use function Pest\Livewire\livewire;
-
 it('loads the table', function (): void {
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
         ->create();
@@ -16,20 +14,24 @@ it('loads the table', function (): void {
         ->for($avgResponsibleProcessingRecord, 'snapshotSource')
         ->create();
 
-    livewire(SnapshotsRelationManager::class, [
-        'ownerRecord' => $avgResponsibleProcessingRecord,
-        'pageClass' => EditAvgResponsibleProcessingRecord::class,
-    ])->assertCanSeeTableRecords([$snapshot]);
+    $this->asFilamentUser()
+        ->createLivewireTestable(SnapshotsRelationManager::class, [
+            'ownerRecord' => $avgResponsibleProcessingRecord,
+            'pageClass' => EditAvgResponsibleProcessingRecord::class,
+        ])
+        ->assertCanSeeTableRecords([$snapshot]);
 });
 
 it('reloads the snapshots-table', function (): void {
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
         ->create();
 
-    $snapshotRelationManager = livewire(SnapshotsRelationManager::class, [
-        'ownerRecord' => $avgResponsibleProcessingRecord,
-        'pageClass' => EditAvgResponsibleProcessingRecord::class,
-    ])->assertCanSeeTableRecords([]);
+    $snapshotRelationManager = $this->asFilamentUser()
+        ->createLivewireTestable(SnapshotsRelationManager::class, [
+            'ownerRecord' => $avgResponsibleProcessingRecord,
+            'pageClass' => EditAvgResponsibleProcessingRecord::class,
+        ])
+        ->assertCanSeeTableRecords([]);
 
     $snapshot = Snapshot::factory()->make();
     $avgResponsibleProcessingRecord->snapshots()->save($snapshot);

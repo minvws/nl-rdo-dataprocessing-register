@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Events\PublicWebsite;
+use App\Events\StaticWebsite;
 use App\Models\Algorithm\AlgorithmRecord;
 use App\Models\Avg\AvgProcessorProcessingRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
@@ -36,6 +38,7 @@ class CoreEntitySeeder extends Command
         ]);
 
         $bar = $this->output->createProgressBar($inputData['amount']);
+        $this->output->info('starting entity generation');
         $bar->start();
         $skipped = 0;
 
@@ -44,7 +47,7 @@ class CoreEntitySeeder extends Command
 
             // @codeCoverageIgnoreStart
             try {
-                $factory->create();
+                $factory->createQuietly();
             } catch (UniqueConstraintViolationException) {
                 $skipped++;
                 continue;
@@ -54,8 +57,12 @@ class CoreEntitySeeder extends Command
             $bar->advance();
         }
         $bar->finish();
+        $this->output->info(sprintf('entity generation done, skipped %s (non unique) entries', $skipped));
 
-        $this->output->info(sprintf('skipped %s (non unique) entries', $skipped));
+        $this->output->info('building public website');
+        PublicWebsite\BuildEvent::dispatch();
+        StaticWebsite\BuildEvent::dispatch();
+
         $this->output->success('done');
 
         return self::SUCCESS;

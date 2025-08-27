@@ -14,7 +14,7 @@ use Webmozart\Assert\Assert;
  */
 trait HasUuidAsId
 {
-    public function initializeHasUuidAsId(): void
+    final public function initializeHasUuidAsId(): void
     {
         $this->usesUniqueIds = true;
 
@@ -23,12 +23,17 @@ trait HasUuidAsId
         ]);
     }
 
-    public function getId(): UuidInterface
+    final public function getKey(): UuidInterface
     {
-        $id = $this->getKey();
-        Assert::isInstanceOf($id, UuidInterface::class);
+        $key = $this->getAttribute($this->getKeyName());
+        Assert::isInstanceOf($key, UuidInterface::class);
 
-        return $id;
+        return $key;
+    }
+
+    final public function getQueueableId(): string
+    {
+        return $this->getKey()->toString();
     }
 
     /**
@@ -36,8 +41,8 @@ trait HasUuidAsId
      *
      * @return UuidInterface
      */
-    // phpcs:ignore SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingNativeTypeHint
-    public function newUniqueId()
+    // @phpstan-ignore method.childReturnType
+    final public function newUniqueId() // phpcs:ignore SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingNativeTypeHint
     {
         return Uuid::generate();
     }
@@ -45,17 +50,17 @@ trait HasUuidAsId
     /**
      * @return array<string>
      */
-    public function uniqueIds(): array
+    final public function uniqueIds(): array
     {
         return ['id'];
     }
 
-    public function getKeyType(): string
+    final public function getKeyType(): string
     {
         return 'string';
     }
 
-    public function getIncrementing(): false
+    final public function getIncrementing(): false
     {
         return false;
     }

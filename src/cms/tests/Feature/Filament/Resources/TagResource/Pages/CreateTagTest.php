@@ -6,17 +6,17 @@ use App\Filament\Resources\TagResource;
 use App\Filament\Resources\TagResource\Pages\CreateTag;
 use App\Models\Tag;
 
-use function Pest\Livewire\livewire;
-
 it('loads the create page', function (): void {
-    $this->get(TagResource::getUrl('create'))
+    $this->asFilamentUser()
+        ->get(TagResource::getUrl('create'))
         ->assertSuccessful();
 });
 
 it('can create an entry', function (): void {
     $name = fake()->word();
 
-    livewire(CreateTag::class)
+    $this->asFilamentUser()
+        ->createLivewireTestable(CreateTag::class)
         ->fillForm([
             'name' => $name,
         ])

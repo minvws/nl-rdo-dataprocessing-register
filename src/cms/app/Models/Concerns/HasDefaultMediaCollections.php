@@ -14,7 +14,7 @@ trait HasDefaultMediaCollections
     /** @use InteractsWithMedia<Media> */
     use InteractsWithMedia;
 
-    public function registerMediaCollections(): void
+    final public function registerMediaCollections(): void
     {
         foreach (MediaGroup::cases() as $mediaType) {
             $this->addMediaCollection($mediaType->value)

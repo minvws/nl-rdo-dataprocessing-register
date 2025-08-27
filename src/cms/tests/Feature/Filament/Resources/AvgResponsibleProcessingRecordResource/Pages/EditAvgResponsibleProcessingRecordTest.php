@@ -2,48 +2,54 @@
 
 declare(strict_types=1);
 
-use App\Enums\Authorization\Role;
+use App\Enums\Authorization\Permission;
+use App\Enums\RegisterLayout;
 use App\Filament\Forms\Components\Select\ParentSelect;
 use App\Filament\RelationManagers\SnapshotsRelationManager;
 use App\Filament\Resources\AvgResponsibleProcessingRecordResource;
 use App\Filament\Resources\AvgResponsibleProcessingRecordResource\Pages\EditAvgResponsibleProcessingRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
+use App\Models\Avg\AvgResponsibleProcessingRecordService;
 use App\Models\EntityNumber;
 use App\Models\PublicWebsiteCheck;
 use App\Models\PublicWebsiteSnapshotEntry;
 use App\Models\Snapshot;
 use App\Models\States\Snapshot\Established;
 use App\Models\Tag;
-use App\Models\User;
 use App\Services\DateFormatService;
 use App\Services\EntityNumberService;
 use Carbon\CarbonImmutable;
-use Filament\Facades\Filament;
 use Filament\Forms\Components\Select;
-use Mockery\MockInterface;
-use Tests\Helpers\ConfigHelper;
+use Tests\Helpers\ConfigTestHelper;
+use Tests\Helpers\Model\OrganisationTestHelper;
+use Tests\Helpers\Model\UserTestHelper;
 
-use function Pest\Livewire\livewire;
+it('loads the edit page with all layouts', function (RegisterLayout $registerLayout): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisation($organisation, ['register_layout' => $registerLayout]);
 
-it('loads the edit page', function (): void {
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
 
-    $this->get(
-        AvgResponsibleProcessingRecordResource::getUrl('edit', ['record' => $avgResponsibleProcessingRecord->id]),
-    )->assertSuccessful();
-});
+    $this->asFilamentUser($user)
+        ->get(AvgResponsibleProcessingRecordResource::getUrl('edit', [
+            'record' => $avgResponsibleProcessingRecord,
+        ]))
+        ->assertSuccessful();
+})->with(RegisterLayout::cases());
 
 it('can create a snapshot', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
 
     expect($avgResponsibleProcessingRecord->snapshots->count())
         ->toBe(0);
 
-    livewire(EditAvgResponsibleProcessingRecord::class, ['record' => $avgResponsibleProcessingRecord->id])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, ['record' => $avgResponsibleProcessingRecord->id])
         ->callAction('snapshot_create')
         ->assertNotified(__('snapshot.created'))
         ->assertDispatched(SnapshotsRelationManager::REFRESH_TABLE_EVENT);
@@ -53,8 +59,9 @@ it('can create a snapshot', function (): void {
 });
 
 it('can be saved', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->withValidState()
         ->create([
             'has_security' => false,
@@ -63,9 +70,10 @@ it('can be saved', function (): void {
         ]);
     $name = fake()->uuid();
 
-    livewire(EditAvgResponsibleProcessingRecord::class, [
-        'record' => $avgResponsibleProcessingRecord->getRouteKey(),
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+            'record' => $avgResponsibleProcessingRecord->getRouteKey(),
+        ])
         ->fillForm([
             'name' => $name,
         ])
@@ -78,17 +86,14 @@ it('can be saved', function (): void {
 });
 
 it('can be edit & saved with update-permissions for the record, but not for sub-entities', function (): void {
-    $user = User::factory()
-        ->hasAttached($this->organisation)
-        ->withValidOtpRegistration()
-        ->create();
-
-    $user->assignOrganisationRole(Role::INPUT_PROCESSOR, $this->organisation);
-    $this->be($user);
-    Filament::setTenant($this->organisation);
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisationWithPermissions($organisation, [
+        Permission::CORE_ENTITY_VIEW,
+        Permission::CORE_ENTITY_UPDATE,
+    ]);
 
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->withProcessors()
         ->withResponsibles()
         ->withSystems()
@@ -99,9 +104,10 @@ it('can be edit & saved with update-permissions for the record, but not for sub-
         ]);
     $name = fake()->uuid();
 
-    livewire(EditAvgResponsibleProcessingRecord::class, [
-        'record' => $avgResponsibleProcessingRecord->getRouteKey(),
-    ])
+    $this->withFilamentSession($user, $organisation)
+        ->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+            'record' => $avgResponsibleProcessingRecord->getRouteKey(),
+        ])
         ->fillForm([
             'name' => $name,
         ])
@@ -114,35 +120,39 @@ it('can be edit & saved with update-permissions for the record, but not for sub-
 });
 
 it('can see the dpia field', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create([
             'geb_dpia_executed' => false,
         ]);
 
-    livewire(EditAvgResponsibleProcessingRecord::class, [
-        'record' => $avgResponsibleProcessingRecord->getRouteKey(),
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+            'record' => $avgResponsibleProcessingRecord->getRouteKey(),
+        ])
         ->assertSee(__('avg_responsible_processing_record.geb_dpia_automated'));
 });
 
 it('can not see the dpia field', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create([
             'geb_dpia_executed' => true,
         ]);
 
-    livewire(EditAvgResponsibleProcessingRecord::class, [
-        'record' => $avgResponsibleProcessingRecord->getRouteKey(),
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+            'record' => $avgResponsibleProcessingRecord->getRouteKey(),
+        ])
         ->assertDontSee(__('avg_responsible_processing_record.geb_dpia_automated'));
 });
 
 it('can save a dpia subfield', function (): void {
-    /** @var AvgResponsibleProcessingRecord $avgResponsibleProcessingRecord */
+    $organisation = OrganisationTestHelper::create();
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->withValidState()
         ->create([
             'geb_dpia_executed' => false,
@@ -154,9 +164,10 @@ it('can save a dpia subfield', function (): void {
             'geb_dpia_high_risk_freedoms' => true,
         ]);
 
-    livewire(EditAvgResponsibleProcessingRecord::class, [
-        'record' => $avgResponsibleProcessingRecord->getRouteKey(),
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+            'record' => $avgResponsibleProcessingRecord->getRouteKey(),
+        ])
         ->fillForm([
             'geb_dpia_criteria_wp248' => true,
         ])
@@ -169,25 +180,57 @@ it('can save a dpia subfield', function (): void {
         ->and($avgResponsibleProcessingRecord->geb_dpia_high_risk_freedoms)->toBeFalse();
 });
 
-it('can see the protection level description field', function (): void {
+it('can edit the avgResponsibleProcessingRecordService', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
+        ->withValidState()
+        ->create();
+
+    $avgResponsibleProcessingRecordService = AvgResponsibleProcessingRecordService::factory()
+        ->recycle($organisation)
+        ->create([
+            'enabled' => true,
+        ]);
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+            'record' => $avgResponsibleProcessingRecord->getRouteKey(),
+        ])
+        ->fillForm([
+            'avg_responsible_processing_record_service_id' => $avgResponsibleProcessingRecordService->id->toString(),
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    $avgResponsibleProcessingRecord->refresh();
+
+    expect($avgResponsibleProcessingRecord->avg_responsible_processing_record_service_id->toString())
+        ->toBe($avgResponsibleProcessingRecordService->id->toString());
+});
+
+it('can see the protection level description field', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
         ->create([
             'outside_eu' => true,
             'outside_eu_protection_level' => false,
         ]);
 
-    livewire(EditAvgResponsibleProcessingRecord::class, [
-        'record' => $avgResponsibleProcessingRecord->getRouteKey(),
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+            'record' => $avgResponsibleProcessingRecord->getRouteKey(),
+        ])
         ->assertSee(__('avg_responsible_processing_record.outside_eu_protection_level_description'));
 });
 
 it('shows the link to the public page when the record is published', function (): void {
     $publishedAt = fake()->dateTimeBetween('-2 weeks', '-1 week', 'utc');
 
+    $organisation = OrganisationTestHelper::create();
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create([
             'public_from' => $publishedAt,
         ]);
@@ -199,28 +242,33 @@ it('shows the link to the public page when the record is published', function ()
     $avgResponsibleProcessingRecord->refresh();
 
     $expectedPublishedAt = CarbonImmutable::instance($publishedAt)
-        ->setTimezone(ConfigHelper::get('app.display_timezone'))
+        ->setTimezone(ConfigTestHelper::get('app.display_timezone'))
         ->format(DateFormatService::FORMAT_DATE);
-    livewire(EditAvgResponsibleProcessingRecord::class, [
-        'record' => $avgResponsibleProcessingRecord->getRouteKey(),
-    ])
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+            'record' => $avgResponsibleProcessingRecord->getRouteKey(),
+        ])
         ->assertSee(__('general.published_at', ['published_at' => $expectedPublishedAt]));
 });
 
 it('shows current state as not published', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
 
-    livewire(EditAvgResponsibleProcessingRecord::class, [
-        'record' => $avgResponsibleProcessingRecord->getRouteKey(),
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+            'record' => $avgResponsibleProcessingRecord->getRouteKey(),
+        ])
         ->assertSee(__('public_website.public_from_section.public_state_not_public'));
 });
 
 it('shows the data of the publications when the record is published', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
     $snapshot = Snapshot::factory()
         ->for($avgResponsibleProcessingRecord, 'snapshotSource')
@@ -244,9 +292,10 @@ it('shows the data of the publications when the record is published', function (
             'end_date' => null,
         ]);
 
-    livewire(EditAvgResponsibleProcessingRecord::class, [
-        'record' => $avgResponsibleProcessingRecord->getRouteKey(),
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+            'record' => $avgResponsibleProcessingRecord->getRouteKey(),
+        ])
         ->assertSee(__('public_website.public_from_section.public_state_public'))
         ->assertSee(__('public_website.public_from_section.public_history_since', ['start' => '01-03-2020 00:00']))
         ->assertSee(__('public_website.public_from_section.public_history_from_to', [
@@ -256,22 +305,23 @@ it('shows the data of the publications when the record is published', function (
 });
 
 it('shows a parent record from the same organisation', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $parentAvgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
-
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
 
-    livewire(EditAvgResponsibleProcessingRecord::class, [
-        'record' => $avgResponsibleProcessingRecord->getRouteKey(),
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+            'record' => $avgResponsibleProcessingRecord->getRouteKey(),
+        ])
         ->assertFormFieldExists(
             'parent_id',
             static function (ParentSelect $field) use ($parentAvgResponsibleProcessingRecord): bool {
                 return $field->getOptions() === [
-                    $parentAvgResponsibleProcessingRecord->id => $parentAvgResponsibleProcessingRecord->name,
+                    $parentAvgResponsibleProcessingRecord->id->toString() => $parentAvgResponsibleProcessingRecord->name,
                 ];
             },
         );
@@ -282,29 +332,30 @@ it('does not show a parent record from another organisation', function (): void 
     AvgResponsibleProcessingRecord::factory()
         ->create();
 
+    $organisation = OrganisationTestHelper::create();
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
 
-    livewire(EditAvgResponsibleProcessingRecord::class, [
-        'record' => $avgResponsibleProcessingRecord->getRouteKey(),
-    ])
-        ->assertFormFieldExists(
-            'parent_id',
-            static function (ParentSelect $field): bool {
-                return $field->getOptions() === [];
-            },
-        );
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+            'record' => $avgResponsibleProcessingRecord->getRouteKey(),
+        ])
+        ->assertFormFieldExists('parent_id', static function (ParentSelect $field): bool {
+            return $field->getOptions() === [];
+        });
 });
 
 it('does not create a snapshot on unsaved changes', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
 
-    livewire(EditAvgResponsibleProcessingRecord::class, [
-        'record' => $avgResponsibleProcessingRecord->getRouteKey(),
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+            'record' => $avgResponsibleProcessingRecord->getRouteKey(),
+        ])
         ->fillForm([
             'name' => 'unsaved change',
         ])
@@ -314,8 +365,9 @@ it('does not create a snapshot on unsaved changes', function (): void {
 });
 
 it('can be attached to a tag', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->withValidState()
         ->create([
             'has_security' => false,
@@ -323,14 +375,16 @@ it('can be attached to a tag', function (): void {
             'outside_eu_protection_level' => true,
         ]);
     $tag = Tag::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
+
     expect($avgResponsibleProcessingRecord->tags->count())
         ->toBe(0);
 
-    livewire(EditAvgResponsibleProcessingRecord::class, [
-        'record' => $avgResponsibleProcessingRecord->getRouteKey(),
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+            'record' => $avgResponsibleProcessingRecord->getRouteKey(),
+        ])
         ->fillForm([
             'tags' => [$tag->id->toString()],
         ])
@@ -343,16 +397,18 @@ it('can be attached to a tag', function (): void {
 });
 
 it('can do a lookup for a tag', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
     $tag = Tag::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
 
-    livewire(EditAvgResponsibleProcessingRecord::class, [
-        'record' => $avgResponsibleProcessingRecord->getRouteKey(),
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+            'record' => $avgResponsibleProcessingRecord->getRouteKey(),
+        ])
         ->assertFormFieldExists(
             'tags',
             static function (Select $field) use ($tag): bool {
@@ -367,14 +423,16 @@ it('shows a (required) validation error for remarks when avg_goal_legal_base sel
     AvgResponsibleProcessingRecord::factory()
         ->create();
 
+    $organisation = OrganisationTestHelper::create();
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->withValidState()
         ->create();
 
-    livewire(EditAvgResponsibleProcessingRecord::class, [
-        'record' => $avgResponsibleProcessingRecord->getRouteKey(),
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+            'record' => $avgResponsibleProcessingRecord->getRouteKey(),
+        ])
         ->fillForm([
             'avgGoals' => [
                 0 => [
@@ -393,14 +451,16 @@ it('does not allow using a parent from another organisation', function (): void 
     $otherOrganisationAvgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
         ->create();
 
+    $organisation = OrganisationTestHelper::create();
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->withValidState()
         ->create();
 
-    livewire(EditAvgResponsibleProcessingRecord::class, [
-        'record' => $avgResponsibleProcessingRecord->id,
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+            'record' => $avgResponsibleProcessingRecord->id,
+        ])
         ->fillForm([
             'parent_id' => $otherOrganisationAvgResponsibleProcessingRecord->id,
         ])
@@ -408,23 +468,75 @@ it('does not allow using a parent from another organisation', function (): void 
         ->assertHasFormErrors(['parent_id' => 'in']);
 });
 
-it('can be cloned', function (): void {
+it('does allow using a parent from another organisation (passing a uuid)', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $sameOrganisationAvgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->create();
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
+        ->withValidState()
+        ->create();
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+            'record' => $avgResponsibleProcessingRecord->id,
+        ])
+        ->fillForm([
+            'parent_id' => $sameOrganisationAvgResponsibleProcessingRecord->id,
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    $avgResponsibleProcessingRecord->refresh();
+    expect($avgResponsibleProcessingRecord->parent_id->toString())
+        ->toBe($sameOrganisationAvgResponsibleProcessingRecord->id->toString());
+});
+
+it('does allow using a parent from another organisation (passing a string)', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $sameOrganisationAvgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->create();
+    $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->withValidState()
+        ->create();
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+            'record' => $avgResponsibleProcessingRecord->id,
+        ])
+        ->fillForm([
+            'parent_id' => $sameOrganisationAvgResponsibleProcessingRecord->id->toString(),
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    $avgResponsibleProcessingRecord->refresh();
+    expect($avgResponsibleProcessingRecord->parent_id->toString())
+        ->toBe($sameOrganisationAvgResponsibleProcessingRecord->id->toString());
+});
+
+it('can be cloned', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
         ->withAllRelatedEntities()
         ->create();
 
     $entityNumber = EntityNumber::factory()
         ->create();
 
-    $this->mock(EntityNumberService::class, static function (MockInterface $mock) use ($entityNumber): void {
-        $mock->expects('generate')
-            ->andReturn($entityNumber);
-    });
+    $this->mock(EntityNumberService::class)
+        ->shouldReceive('generate')
+        ->once()
+        ->andReturn($entityNumber);
 
-    livewire(EditAvgResponsibleProcessingRecord::class, [
-        'record' => $avgResponsibleProcessingRecord->getRouteKey(),
-    ])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+            'record' => $avgResponsibleProcessingRecord->getRouteKey(),
+        ])
         ->callAction('clone')
         ->assertRedirect();
 
@@ -440,34 +552,34 @@ it('can be cloned', function (): void {
     expect($avgResponsibleProcessingRecordClone->snapshots)->toBeEmpty();
 
     expect($avgResponsibleProcessingRecordClone->avgGoals->pluck('id')->toArray())
-        ->toBe($avgResponsibleProcessingRecord->avgGoals->pluck('id')->toArray());
+        ->toEqual($avgResponsibleProcessingRecord->avgGoals->pluck('id')->toArray());
 
     expect($avgResponsibleProcessingRecordClone->contactPersons->pluck('id')->toArray())
-        ->toBe($avgResponsibleProcessingRecord->contactPersons->pluck('id')->toArray());
+        ->toEqual($avgResponsibleProcessingRecord->contactPersons->pluck('id')->toArray());
 
     expect($avgResponsibleProcessingRecordClone->dataBreachRecords->pluck('id')->toArray())
-        ->toBe($avgResponsibleProcessingRecord->dataBreachRecords->pluck('id')->toArray());
+        ->toEqual($avgResponsibleProcessingRecord->dataBreachRecords->pluck('id')->toArray());
 
-    expect($avgResponsibleProcessingRecordClone->documents->pluck('id')->toArray())
-        ->toBe($avgResponsibleProcessingRecord->documents->pluck('id')->toArray());
+    expect($avgResponsibleProcessingRecordClone->documents->pluck('id'))
+        ->toEqual($avgResponsibleProcessingRecord->documents->pluck('id'));
 
     expect($avgResponsibleProcessingRecordClone->processors->pluck('id')->toArray())
-        ->toBe($avgResponsibleProcessingRecord->processors->pluck('id')->toArray());
+        ->toEqual($avgResponsibleProcessingRecord->processors->pluck('id')->toArray());
 
     expect($avgResponsibleProcessingRecordClone->receivers->pluck('id')->toArray())
-        ->toBe($avgResponsibleProcessingRecord->receivers->pluck('id')->toArray());
+        ->toEqual($avgResponsibleProcessingRecord->receivers->pluck('id')->toArray());
 
     expect($avgResponsibleProcessingRecordClone->remarks->pluck('body')->toArray())
         ->toBe($avgResponsibleProcessingRecord->remarks->pluck('body')->toArray());
 
     expect($avgResponsibleProcessingRecordClone->responsibles->pluck('id')->toArray())
-        ->toBe($avgResponsibleProcessingRecord->responsibles->pluck('id')->toArray());
+        ->toEqual($avgResponsibleProcessingRecord->responsibles->pluck('id')->toArray());
 
     expect($avgResponsibleProcessingRecordClone->stakeholders->pluck('id')->toArray())
-        ->toBe($avgResponsibleProcessingRecord->stakeholders->pluck('id')->toArray());
+        ->toEqual($avgResponsibleProcessingRecord->stakeholders->pluck('id')->toArray());
 
     expect($avgResponsibleProcessingRecordClone->systems->pluck('id')->toArray())
-        ->toBe($avgResponsibleProcessingRecord->systems->pluck('id')->toArray());
+        ->toEqual($avgResponsibleProcessingRecord->systems->pluck('id')->toArray());
 
     expect($avgResponsibleProcessingRecordClone->tags->pluck('id'))
         ->toEqual($avgResponsibleProcessingRecord->tags->pluck('id'));

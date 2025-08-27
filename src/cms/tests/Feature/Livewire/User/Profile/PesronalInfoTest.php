@@ -3,26 +3,32 @@
 declare(strict_types=1);
 
 use App\Livewire\User\Profile\PersonalInfo;
-
-use function Pest\Livewire\livewire;
+use Tests\Helpers\Model\UserTestHelper;
 
 it('can mount the component', function (): void {
-    livewire(PersonalInfo::class, [
-        'user' => $this->user,
-    ])->assertSee(__('user.profile.personal_info.heading'));
+    $user = UserTestHelper::create();
+
+    $this->asFilamentUser($user)
+        ->createLivewireTestable(PersonalInfo::class, [
+            'user' => $user,
+        ])
+        ->assertSee(__('user.profile.personal_info.heading'));
 });
 
 it('can submit the form', function (): void {
     $name = fake()->name();
 
-    livewire(PersonalInfo::class, [
-        'user' => $this->user,
-    ])
+    $user = UserTestHelper::create();
+
+    $this->asFilamentUser($user)
+        ->createLivewireTestable(PersonalInfo::class, [
+            'user' => $user,
+        ])
         ->set('data.name', $name)
         ->call('submit')
         ->assertNotified(__('user.profile.personal_info.notify'));
 
-    $this->user->refresh();
-    expect($this->user->name)
+    $user->refresh();
+    expect($user->name)
         ->toBe($name);
 });

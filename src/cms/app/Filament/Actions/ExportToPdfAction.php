@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Actions;
 
-use App\Enums\MarkdownField;
+use App\Enums\Snapshot\SnapshotDataSection;
 use App\Models\Snapshot;
 use App\Models\SnapshotData;
 use App\Services\Snapshot\SnapshotDataMarkdownRenderer;
@@ -31,13 +31,15 @@ class ExportToPdfAction extends Action
                 return response()->streamDownload(static function () use ($record, $snapshotDataMarkdownRenderer): void {
                     Assert::isInstanceOf($record->snapshotData, SnapshotData::class);
 
-                    $publicMarkdown = $snapshotDataMarkdownRenderer->fromSnapshotData(
-                        $record->snapshotData,
-                        MarkdownField::PUBLIC_MARKDOWN,
+                    $publicMarkdown = $snapshotDataMarkdownRenderer->fromSnapshotMarkdown(
+                        $record,
+                        $record->snapshotData->public_markdown,
+                        SnapshotDataSection::PUBLIC,
                     );
-                    $privateMarkdown = $snapshotDataMarkdownRenderer->fromSnapshotData(
-                        $record->snapshotData,
-                        MarkdownField::PRIVATE_MARKDOWN,
+                    $privateMarkdown = $snapshotDataMarkdownRenderer->fromSnapshotMarkdown(
+                        $record,
+                        $record->snapshotData->private_markdown,
+                        SnapshotDataSection::PRIVATE,
                     );
 
                     $html = Blade::render('export.pdf', [

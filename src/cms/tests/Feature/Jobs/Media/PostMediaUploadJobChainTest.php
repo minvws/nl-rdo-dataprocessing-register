@@ -10,23 +10,22 @@ use App\Listeners\Media\MediaHasBeenAddedHandler;
 use App\Vendor\MediaLibrary\Media;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
-use Mockery\MockInterface;
 use Spatie\MediaLibrary\MediaCollections\Events\MediaHasBeenAddedEvent;
 use Tests\Feature\Jobs\Media\ThrowExceptionJob;
-use Tests\Helpers\ConfigHelper;
+use Tests\Helpers\ConfigTestHelper;
 
 it('can run the chain', function (): void {
     Bus::fake();
     Event::fakeExcept([MediaHasBeenAddedEvent::class]);
 
-    $this->mock(MediaHasBeenAddedHandler::class, function (MockInterface $mock): void {
-        $mock->shouldReceive('handle')->once();
-    });
+    $this->mock(MediaHasBeenAddedHandler::class)
+        ->shouldReceive('handle')
+        ->once();
 
     $media = Media::factory()
         ->create();
 
-    ConfigHelper::set('media-library.post_media_upload_job_chain', [
+    ConfigTestHelper::set('media-library.post_media_upload_job_chain', [
         PruneMetaData::class,
         ValidateMimeType::class,
         MarkMediaUploadAsValidated::class,
@@ -47,7 +46,7 @@ it('deletes the media when an exception is thrown in the chain', function (): vo
         ->create(['uuid' => $uuid]);
 
     Event::fakeExcept([MediaHasBeenAddedEvent::class]);
-    ConfigHelper::set('media-library.post_media_upload_job_chain', [
+    ConfigTestHelper::set('media-library.post_media_upload_job_chain', [
         ThrowExceptionJob::class,
     ]);
 

@@ -2,39 +2,49 @@
 
 declare(strict_types=1);
 
+use App\Enums\RouteName;
 use App\Models\Organisation;
 use Illuminate\Support\Facades\Auth;
-
-use function Pest\Laravel\followingRedirects;
-use function Pest\Laravel\get;
+use Tests\Helpers\Model\OrganisationTestHelper;
+use Tests\Helpers\SessionTestHelper;
 
 it('redirects to login', function (): void {
+    $this->asFilamentUser();
     Auth::logout();
 
     $this->get('/')
-        ->assertRedirectToRoute('filament.admin.auth.login');
+        ->assertRedirectToRoute(RouteName::FILAMENT_ADMIN_AUTH_LOGIN);
 });
 
 it('loads the main page', function (): void {
-    followingRedirects()
+    $organisation = OrganisationTestHelper::create();
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->followingRedirects()
         ->get('/')
-        ->assertSee($this->organisation->name);
+        ->assertSee($organisation->name);
 });
 
 it('gets redirected to the users organisation tenant scoped main page', function (): void {
-    get('/')
-        ->assertRedirect(sprintf('/%s/avg-responsible-processing-records', $this->organisation->slug));
+    $organisation = OrganisationTestHelper::create();
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->get('/')
+        ->assertRedirect(sprintf('/%s/avg-responsible-processing-records', $organisation->slug));
 });
 
 it('is not allowed to access an unauthorized organisation', function (): void {
     $unauthorizedOrganisation = Organisation::factory()->create();
 
-    get(sprintf('/%s', $unauthorizedOrganisation->slug))
+    $this->asFilamentUser()
+        ->get(sprintf('/%s', $unauthorizedOrganisation->slug))
         ->assertNotFound();
 });
 
 it('shows 404 when trying to load a url for a non-existing organisation without valid otp session', function (): void {
-    setOtpValidSessionValue(false);
+    $this->asFilamentUser();
+
+    SessionTestHelper::setOtpInvalid();
 
     $this->get(sprintf('/%s/two-factor-authentication', fake()->slug()))
         ->assertNotFound();

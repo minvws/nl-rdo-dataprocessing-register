@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-use App\Enums\Authorization\Role;
 use App\Filament\Resources\UserResource;
+use Tests\Helpers\Model\UserTestHelper;
 
 it('loads the view page', function (): void {
-    $this->user->assignGlobalRole(Role::FUNCTIONAL_MANAGER);
+    $user = UserTestHelper::create();
 
-    $this->get(UserResource::getUrl('view', ['record' => $this->user->id]))
+    $this->asFilamentUser()
+        ->get(UserResource::getUrl('view', ['record' => $user]))
         ->assertSuccessful();
 });

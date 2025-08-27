@@ -24,46 +24,40 @@ class WpgProcessingRecordExporter extends Exporter
                 ->label(__('organisation.model_singular')),
             ExportColumn::make('organisation.responsibleLegalEntity.name')
                 ->label(__('responsible_legal_entity.model_singular')),
-            ExportColumn::make('number')
+            ExportColumn::make('entityNumber.number')
                 ->label(__('wpg_processing_record.number')),
-            ExportColumn::make('wpg_processing_record_service.name')
+            ExportColumn::make('wpgProcessingRecordService.name')
                 ->label(__('wpg_processing_record_service.model_singular')),
             ExportColumn::make('name')
                 ->label(__('processing_record.name')),
+            ExportColumn::make('data_collection_source')
+                ->label(__('general.data_collection_source')),
             ExportColumn::make('review_at')
                 ->label(__('general.review_at')),
-            ExportColumn::make('parent.number')
+            ExportColumn::make('parent.entityNumber.number')
                 ->label(__('general.parent')),
-
-            // doel & grondslag
-            ExportColumn::make('wpgGoals.description')
-                ->label(__('wpg_goal.model_plural')),
 
             // verantwoordelijke
             ExportColumn::make('responsibles.name')
                 ->label(__('responsible.model_plural')),
 
             // verwerker
+            ExportColumn::make('has_processors')
+                ->label(__('wpg_processing_record.has_processors')),
             ExportColumn::make('processors.name')
                 ->label(__('processor.model_plural')),
 
             // ontvanger
-            ExportColumn::make('explanation_available')
-                ->label(__('wpg_processing_record.explanation_available')),
-            ExportColumn::make('explanation_provisioning')
-                ->label(__('wpg_processing_record.explanation_provisioning')),
-            ExportColumn::make('explanation_transfer')
-                ->label(__('wpg_processing_record.explanation_transfer')),
             ExportColumn::make('article_15')
                 ->label(__('wpg_processing_record.article_15')),
             ExportColumn::make('article_15_a')
                 ->label(__('wpg_processing_record.article_15_a')),
+            ExportColumn::make('explanation_available')
+                ->label(__('wpg_processing_record.explanation_available')),
             ExportColumn::make('article_16')
                 ->label(__('wpg_processing_record.article_16')),
             ExportColumn::make('article_17')
                 ->label(__('wpg_processing_record.article_17')),
-            ExportColumn::make('article_17_a')
-                ->label(__('wpg_processing_record.article_17_a')),
             ExportColumn::make('article_19')
                 ->label(__('wpg_processing_record.article_19')),
             ExportColumn::make('article_19')
@@ -75,7 +69,17 @@ class WpgProcessingRecordExporter extends Exporter
             ExportColumn::make('article_23')
                 ->label(__('wpg_processing_record.article_23')),
             ExportColumn::make('article_23')
-                ->label(__('wpg_processing_record.article_23')),
+                ->label(__('wpg_processing_record.article_24')),
+            ExportColumn::make('explanation_provisioning')
+                ->label(__('wpg_processing_record.explanation_provisioning')),
+            ExportColumn::make('article_17_a')
+                ->label(__('wpg_processing_record.article_17_a')),
+            ExportColumn::make('explanation_transfer')
+                ->label(__('wpg_processing_record.explanation_transfer')),
+
+            // doel & grondslag
+            ExportColumn::make('wpgGoals.description')
+                ->label(__('wpg_goal.model_plural')),
 
             // bijzondere politiegegevens
             ExportColumn::make('police_race_or_ethnicity')
@@ -95,20 +99,6 @@ class WpgProcessingRecordExporter extends Exporter
             ExportColumn::make('police_sexual_life')
                 ->label(__('wpg_processing_record.police_sexual_life')),
 
-            // categorieën betrokkenen
-            ExportColumn::make('suspects')
-                ->label(__('wpg_processing_record.suspects')),
-            ExportColumn::make('victims')
-                ->label(__('wpg_processing_record.victims')),
-            ExportColumn::make('convicts')
-                ->label(__('wpg_processing_record.convicts')),
-            ExportColumn::make('police_sexual_life')
-                ->label(__('wpg_processing_record.police_justice')),
-            ExportColumn::make('third_parties')
-                ->label(__('wpg_processing_record.third_parties')),
-            ExportColumn::make('third_party_explanation')
-                ->label(__('wpg_processing_record.third_party_explanation')),
-
             // besluitvorming
             ExportColumn::make('decision_making')
                 ->label(__('wpg_processing_record.decision_making')),
@@ -118,10 +108,14 @@ class WpgProcessingRecordExporter extends Exporter
                 ->label(__('wpg_processing_record.consequences')),
 
             // systemen / applicaties
+            ExportColumn::make('has_systems')
+                ->label(__('wpg_processing_record.has_systems')),
             ExportColumn::make('systems.name')
                 ->label(__('system.model_plural')),
 
             // beveiliging
+            ExportColumn::make('has_security')
+                ->label(__('wpg_processing_record.has_security')),
             ExportColumn::make('security')
                 ->label(__('wpg_processing_record.security')),
             ExportColumn::make('measures_implemented')
@@ -140,16 +134,32 @@ class WpgProcessingRecordExporter extends Exporter
                 ->label(__('wpg_processing_record.geb_pia')),
 
             // contactpersoon
+            ExportColumn::make('users.name')
+                ->label(__('contact_person.form_title_users')),
             ExportColumn::make('contactPersons.name')
-                ->label(__('contact_person.model_plural')),
+                ->label(__('contact_person.form_title_contact_persons')),
 
             // opmerkingen
             ExportColumn::make('remarks')
                 ->label(__('remark.model_plural')),
 
+            // categorieën betrokkenen
+            ExportColumn::make('suspects')
+                ->label(__('wpg_processing_record.suspects')),
+            ExportColumn::make('victims')
+                ->label(__('wpg_processing_record.victims')),
+            ExportColumn::make('convicts')
+                ->label(__('wpg_processing_record.convicts')),
+            ExportColumn::make('police_sexual_life')
+                ->label(__('wpg_processing_record.police_justice')),
+            ExportColumn::make('third_parties')
+                ->label(__('wpg_processing_record.third_parties')),
+            ExportColumn::make('third_party_explanation')
+                ->label(__('wpg_processing_record.third_party_explanation')),
+
             // documenten
             ExportColumn::make('document_count')
-                ->label(__('documents.model_plural'))
+                ->label(__('document.model_plural'))
                 ->counts('documents'),
 
             // overig

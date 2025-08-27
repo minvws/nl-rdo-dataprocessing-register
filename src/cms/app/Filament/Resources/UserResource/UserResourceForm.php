@@ -7,12 +7,13 @@ namespace App\Filament\Resources\UserResource;
 use App\Enums\Authorization\Permission;
 use App\Enums\Authorization\Role;
 use App\Facades\Authorization;
+use App\Filament\Forms\Components\OrganisationUserRolesRepeater;
 use App\Filament\Forms\Components\UserGlobalRoleToggle;
-use App\Filament\Forms\Components\UserOrganisationRolesRepeater;
 use App\Models\User;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Unique;
@@ -21,8 +22,8 @@ use function __;
 
 class UserResourceForm
 {
-    public const FIELD_USER_GLOBAL_ROLES = 'user_global_roles';
-    public const FIELD_USER_ORGANISATION_ROLES = 'user_organisation_roles';
+    public const string FIELD_USER_GLOBAL_ROLES = 'user_global_roles';
+    public const string FIELD_ORGANISATION_USER_ROLES = 'organisation_user_roles';
 
     public static function form(Form $form): Form
     {
@@ -60,6 +61,7 @@ class UserResourceForm
                     ->schema(static function () use ($form): array {
                         $user = $form->model;
                         if (!$user instanceof User) {
+                            // hide options on user-create
                             return [];
                         }
 
@@ -67,16 +69,30 @@ class UserResourceForm
                             Section::make(__('user.global_roles'))
                                 ->visible(Authorization::hasPermission(Permission::USER_ROLE_GLOBAL_MANAGE))
                                 ->schema([
-                                    UserGlobalRoleToggle::makeForUser(self::FIELD_USER_GLOBAL_ROLES, $user, Role::FUNCTIONAL_MANAGER),
+                                    ...self::getGlobalRoleToggles($user),
                                 ])
                                 ->columns(),
                             Section::make(__('user.organisation_roles'))
                                 ->visible(Authorization::hasPermission(Permission::USER_ROLE_ORGANISATION_MANAGE))
                                 ->schema([
-                                    UserOrganisationRolesRepeater::makeForUser(self::FIELD_USER_ORGANISATION_ROLES, $user),
+                                    OrganisationUserRolesRepeater::makeForUser(self::FIELD_ORGANISATION_USER_ROLES, $user),
                                 ]),
                         ];
                     }),
             ]);
+    }
+
+    /**
+     * @return array<Toggle>
+     */
+    private static function getGlobalRoleToggles(User $user): array
+    {
+        $globalRoleToggles = [];
+
+        foreach (Role::globalRoles() as $globalRole) {
+            $globalRoleToggles[] = UserGlobalRoleToggle::makeForUser(self::FIELD_USER_GLOBAL_ROLES, $user, $globalRole);
+        }
+
+        return $globalRoleToggles;
     }
 }

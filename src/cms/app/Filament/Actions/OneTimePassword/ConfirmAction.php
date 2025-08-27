@@ -7,6 +7,7 @@ namespace App\Filament\Actions\OneTimePassword;
 use App\Facades\Otp;
 use App\Livewire\User\Profile\OneTimePassword;
 use App\Models\User;
+use App\ValueObjects\OneTimePassword\Code;
 use Filament\Actions\Action;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
@@ -32,7 +33,7 @@ class ConfirmAction extends Action
                 $code = $data['code'];
                 Assert::string($code);
 
-                $isValid = Otp::verifyCode($code, $user);
+                $isValid = Otp::verifyCode(Code::fromString($code), $user);
                 if (!$isValid) {
                     $livewire->addError(
                         'mountedActionsData.0.code',

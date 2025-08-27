@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Enums\RegisterLayout;
+use App\Facades\Authentication;
 use App\Filament\NavigationGroups\NavigationGroup;
 use App\Filament\RelationManagers\AlgorithmMetaSchemaRelationManager;
 use App\Filament\RelationManagers\AlgorithmPublicationCategoryRelationManager;
-use App\Filament\RelationManagers\AlgorithmRecordChildrenRelationManager;
-use App\Filament\RelationManagers\AlgorithmRecordParentRelationManager;
 use App\Filament\RelationManagers\AlgorithmStatusRelationManager;
 use App\Filament\RelationManagers\AlgorithmThemeRelationManager;
 use App\Filament\RelationManagers\DocumentRelationManager;
@@ -38,12 +38,18 @@ class AlgorithmRecordResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return AlgorithmRecordResourceForm::form($form);
+        return match (Authentication::user()->register_layout) {
+            RegisterLayout::STEPS => AlgorithmRecordResourceForm::stepsForm($form),
+            RegisterLayout::ONE_PAGE => AlgorithmRecordResourceForm::onePageForm($form),
+        };
     }
 
     public static function infolist(Infolist $infolist): Infolist
     {
-        return AlgorithmRecordResourceInfolist::infolist($infolist);
+        return match (Authentication::user()->register_layout) {
+            RegisterLayout::STEPS => AlgorithmRecordResourceInfolist::stepsInfolist($infolist),
+            RegisterLayout::ONE_PAGE => AlgorithmRecordResourceInfolist::onePageInfolist($infolist),
+        };
     }
 
     public static function table(Table $table): Table
@@ -55,8 +61,6 @@ class AlgorithmRecordResource extends Resource
     {
         return [
             SnapshotsRelationManager::class,
-            AlgorithmRecordParentRelationManager::class,
-            AlgorithmRecordChildrenRelationManager::class,
             DocumentRelationManager::make(),
             AlgorithmThemeRelationManager::class,
             AlgorithmStatusRelationManager::class,

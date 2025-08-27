@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services\OneTimePassword;
 
+use App\ValueObjects\OneTimePassword\Code;
+use App\ValueObjects\OneTimePassword\Secret;
 use BaconQrCode\Renderer\Color\Rgb;
 use BaconQrCode\Renderer\Image\SvgImageBackEnd;
 use BaconQrCode\Renderer\ImageRenderer;
@@ -19,15 +21,11 @@ use function trim;
 
 class TimedOneTimePassword implements OneTimePassword
 {
-    /**
-     * @param non-empty-string $code
-     */
-    public function isCodeValid(string $code, string $secret): bool
+    public function isCodeValid(Code $code, Secret $secret): bool
     {
-        Assert::stringNotEmpty($secret);
-        $totp = TOTP::createFromSecret($secret);
+        $totp = TOTP::createFromSecret($secret->toString());
 
-        return $totp->verify($code);
+        return $totp->verify($code->toString());
     }
 
     public function generateSecretKey(): string
@@ -35,13 +33,11 @@ class TimedOneTimePassword implements OneTimePassword
         return TOTP::generate()->getSecret();
     }
 
-    /**
-     * @param non-empty-string $label
-     * @param non-empty-string $secret
-     */
-    public function generateQRCodeInline(string $label, string $secret): string
+    public function generateQRCodeInline(string $label, Secret $secret): string
     {
-        $otp = TOTP::createFromSecret($secret);
+        Assert::stringNotEmpty($label);
+
+        $otp = TOTP::createFromSecret($secret->toString());
         $otp->setLabel($label);
         $url = $otp->getProvisioningUri();
 
@@ -52,6 +48,9 @@ class TimedOneTimePassword implements OneTimePassword
         $svg = (new Writer($renderer))
             ->writeString($url);
 
-        return trim(substr($svg, strpos($svg, "\n") + 1));
+        $strpos = strpos($svg, "\n");
+        Assert::integer($strpos);
+
+        return trim(substr($svg, $strpos + 1));
     }
 }

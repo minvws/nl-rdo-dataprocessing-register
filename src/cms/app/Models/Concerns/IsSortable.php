@@ -13,7 +13,7 @@ trait IsSortable
 {
     protected static string $defaultOrderByColumn = 'sort';
 
-    protected static function bootIsSortable(): void
+    final protected static function bootIsSortable(): void
     {
         $defaultOrderByColumn = self::$defaultOrderByColumn;
 

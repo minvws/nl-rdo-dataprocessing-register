@@ -18,7 +18,7 @@ class SnapshotStateEntry extends TextEntry
             ->label(__('snapshot.state'))
             ->badge()
             ->color(static function (SnapshotState $state): string {
-                return $state::$color;
+                return $state::$color->value;
             })
             ->formatStateUsing(static function (string $state): string {
                 return __(sprintf('snapshot_state.label.%s', $state));

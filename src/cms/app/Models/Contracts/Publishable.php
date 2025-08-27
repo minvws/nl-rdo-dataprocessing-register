@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models\Contracts;
 
+use App\Collections\PublicWebsiteSnapshotEntryCollection;
 use App\Models\Organisation;
 use App\Models\PublicWebsiteSnapshotEntry;
 use App\Models\Snapshot;
@@ -19,23 +20,23 @@ interface Publishable extends SnapshotSource
 
     public function getPublicFrom(): ?CarbonImmutable;
 
-    public function isDeleted(): bool;
-
     public function isPublished(): bool;
 
     /**
      * @param Collection<int, string> $snapshotIds
-     *
-     * @return Collection<int, PublicWebsiteSnapshotEntry>
      */
-    public function getPublicWebsiteSnapshotEntries(Collection $snapshotIds): Collection;
+    public function getPublicWebsiteSnapshotEntries(Collection $snapshotIds): PublicWebsiteSnapshotEntryCollection;
 
     public function getLatestPublicWebsiteSnapshotEntry(): ?PublicWebsiteSnapshotEntry;
-
-    public function canBePublished(): bool;
 
     /**
      * @param array<class-string<SnapshotState>> $snapshotStates
      */
     public function getLatestSnapshotWithState(array $snapshotStates): ?Snapshot;
+
+    public function shouldBePublished(): bool;
+
+    public function observeUpdated(): void;
+
+    public function observeDeleted(): void;
 }

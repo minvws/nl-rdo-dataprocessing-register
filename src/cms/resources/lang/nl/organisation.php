@@ -14,6 +14,9 @@ return [
     'user_attach' => 'Koppel gebruikers',
     'user_attach_description' => 'Zoek de gebruiker door (een deel van) het mailadres op te geven. Reeds gekoppelde gebruikers worden niet opgenomen in de resultaten.',
 
+    'allowed_email_domains' => 'Toegestane user e-mail domeinen',
+    'allowed_email_domains_help' => 'Indien hier geen domeinen zijn toegevoegd, dan worden er geen restricties toegepast.',
+    'allowed_email_domains_add' => 'Domein toevoegen',
     'avatar' => 'Avatar',
     'poster' => 'Poster',
     'slug' => 'URL-segment',

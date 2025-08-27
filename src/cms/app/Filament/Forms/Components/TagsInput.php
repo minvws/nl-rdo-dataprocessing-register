@@ -26,13 +26,13 @@ class TagsInput extends Select
             ->multiple()
             ->relationship('tags', 'name', TenantScoped::getAsClosure())
             ->searchable(['name'])
-            ->createOptionForm(self::createOtionForm());
+            ->createOptionForm(self::createTagOptionsForm());
     }
 
     /**
      * @return array<Component>
      */
-    private static function createOtionForm(): array
+    private static function createTagOptionsForm(): array
     {
         $hasPermission = Authorization::hasPermission(Permission::TAG_CREATE);
         if (!$hasPermission) {
@@ -41,7 +41,7 @@ class TagsInput extends Select
 
         $hiddenFields = [
             Hidden::make('organisation_id')
-                ->default(Authentication::organisation()->id),
+                ->default(Authentication::organisation()->id->toString()),
         ];
 
         return array_merge(TagResourceForm::getSchema(), $hiddenFields);

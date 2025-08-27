@@ -5,29 +5,32 @@ declare(strict_types=1);
 use App\Filament\Resources\SystemResource;
 use App\Filament\Resources\SystemResource\Pages\EditSystem;
 use App\Models\System;
-
-use function Pest\Livewire\livewire;
+use Tests\Helpers\Model\OrganisationTestHelper;
 
 it('loads the edit page', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $system = System::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
 
-    $this->get(SystemResource::getUrl('edit', ['record' => $system->id]))
+    $this->asFilamentOrganisationUser($organisation)
+        ->get(SystemResource::getUrl('edit', ['record' => $system]))
         ->assertSuccessful();
 });
 
 it('can not save a system with a non-unique description', function (): void {
     $description = fake()->uuid();
 
+    $organisation = OrganisationTestHelper::create();
     System::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create(['description' => $description]);
     $system = System::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->create();
 
-    livewire(EditSystem::class, ['record' => $system->id])
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditSystem::class, ['record' => $system->id])
         ->fillForm([
             'description' => $description,
         ])

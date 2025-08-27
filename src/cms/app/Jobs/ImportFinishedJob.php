@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Jobs;
 
+use App\Components\Uuid\UuidInterface;
 use App\Enums\Queue;
 use App\Models\User;
 use Filament\Notifications\Notification;
@@ -24,7 +25,7 @@ class ImportFinishedJob implements ShouldQueue
 
     public function __construct(
         public readonly string $zipFilename,
-        public readonly string $userId,
+        public readonly UuidInterface $userId,
     ) {
         $this->onQueue(Queue::DEFAULT);
     }

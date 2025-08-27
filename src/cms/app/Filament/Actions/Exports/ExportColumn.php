@@ -6,8 +6,10 @@ namespace App\Filament\Actions\Exports;
 
 use App\Enums\YesNoUnknown;
 use App\Services\DateFormatService;
+use BackedEnum;
 use Carbon\CarbonInterface;
 use Filament\Actions\Exports\ExportColumn as FilamentExportColumn;
+use Filament\Support\Contracts\HasLabel;
 
 use function is_bool;
 
@@ -23,6 +25,10 @@ class ExportColumn extends FilamentExportColumn
             return $this->formatDate($state);
         }
 
+        if ($state instanceof BackedEnum) {
+            return $this->formatEnum($state);
+        }
+
         return parent::formatState($state);
     }
 
@@ -34,5 +40,17 @@ class ExportColumn extends FilamentExportColumn
     private function formatDate(CarbonInterface $state): string
     {
         return $state->format(DateFormatService::FORMAT_DATE_TIME);
+    }
+
+    private function formatEnum(BackedEnum $state): string
+    {
+        if ($state instanceof HasLabel) {
+            $label = $state->getLabel();
+            if ($label !== null) {
+                return $label;
+            }
+        }
+
+        return (string) $state->value;
     }
 }

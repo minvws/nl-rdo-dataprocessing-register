@@ -6,13 +6,12 @@ namespace Tests\Feature\Repositories;
 
 use App\Models\User;
 use App\Policies\BasePolicy;
-use App\Services\AuthorizationService;
 
 use function expect;
 use function it;
 
 it('denies all actions by default', function (string $method): void {
-    $customPolicy = new class ($this->app->get(AuthorizationService::class)) extends BasePolicy
+    $customPolicy = new class extends BasePolicy
     {
     };
 

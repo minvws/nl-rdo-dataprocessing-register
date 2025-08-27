@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 use App\Filament\Resources\DocumentTypeResource\Pages\ListDocumentTypes;
 use App\Models\DocumentType;
-
-use function Pest\Livewire\livewire;
+use Tests\Helpers\Model\OrganisationTestHelper;
 
 it('can load the list resource page', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $records = DocumentType::factory()
-        ->recycle($this->organisation)
+        ->recycle($organisation)
         ->count(5)
         ->create();
 
-    livewire(ListDocumentTypes::class)
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ListDocumentTypes::class)
         ->assertCanSeeTableRecords($records);
 });

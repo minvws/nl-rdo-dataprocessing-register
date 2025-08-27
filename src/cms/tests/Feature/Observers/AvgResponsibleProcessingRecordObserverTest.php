@@ -134,7 +134,7 @@ it('resets passthrough data if outside_eu_protection_level is false on save', fu
     $avgResponsibleProcessingRecord->refresh();
 
     expect($avgResponsibleProcessingRecord->outside_eu_protection_level_description)
-        ->toEqual($word);
+        ->toBe($word);
 });
 
 it('resets passthrough country_other if not other on save', function (): void {

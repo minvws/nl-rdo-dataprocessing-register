@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\PublicWebsiteTreeResource;
 
+use App\Components\Uuid\UuidInterface;
 use App\Enums\Media\MediaGroup;
 use App\Filament\Forms\Components\MarkdownEditor\MarkdownEditor;
 use App\Filament\Forms\Components\PublicFromField;
@@ -33,7 +34,8 @@ class PublicWebsiteTreeResourceForm
                         $set('slug', Str::slug($state));
                     })
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->unique(ignoreRecord: true),
                 PublicFromField::makeForModel(PublicWebsiteTree::class)
                     ->hintIcon('heroicon-o-information-circle', __('organisation.public_from_hint_icon_text')),
                 MarkdownEditor::make('public_website_content')
@@ -54,7 +56,22 @@ class PublicWebsiteTreeResourceForm
                     ->image(),
                 Select::make('organisation_id')
                     ->relationship('organisation', 'name')
-                    ->label(__('public_website_tree.organisation')),
+                    ->label(__('public_website_tree.organisation'))
+                    ->unique(ignoreRecord: true)
+                    ->formatStateUsing(static function (string|UuidInterface|null $state): ?string {
+                        if ($state === null) {
+                            return null;
+                        }
+
+                        if ($state instanceof UuidInterface) {
+                            return $state->toString();
+                        }
+
+                        // @codeCoverageIgnoreStart
+                        // https://github.com/minvws/nl-rdo-dataprocessing-register-private/issues/1231
+                        return $state;
+                        // @codeCoverageIgnoreEnd
+                    }),
             ]);
     }
 }
