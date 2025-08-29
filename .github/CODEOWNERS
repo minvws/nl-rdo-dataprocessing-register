@@ -1,1 +1,3 @@
 * @minvws/rdo-dataprocessing-codeowners
+# Last match takes precedence
+.github/CODEOWNERS @minvws/irealisatie-operations

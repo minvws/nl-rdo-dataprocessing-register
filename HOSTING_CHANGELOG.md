@@ -52,6 +52,13 @@ ze de code van de meest recente release uitvoeren.
 - Na het herstarten van de worker moet eenmalig de publieke website opnieuw opgebouwd worden: `php artisan public-website:refresh`
 - Na het herstarten van de worker moet eenmalig de statische website opnieuw opgebouwd worden: `php artisan static-website:refresh`
 
+## 1.11.3
+
+- Na deployment moeten de bestaande caches verwijderd worden: `php artisan optimize:clear`
+- Na de deployment moeten voor deze release alle worker processen opnieuw opgestart worden
+- Na het herstarten van de worker moet eenmalig de publieke website opnieuw opgebouwd worden: `php artisan public-website:refresh`
+- Na het herstarten van de worker moet eenmalig de statische website opnieuw opgebouwd worden: `php artisan static-website:refresh`
+
 ## 1.11.2
 
 - Na deployment moeten de bestaande caches verwijderd worden: `php artisan optimize:clear`
@@ -108,9 +115,9 @@ ze de code van de meest recente release uitvoeren.
   `./storage/app/static-website`.
 - de worker maakt Markdown bestanden & afbeeldingen, de sub-map (van `FILESYSTEM_PUBLIC_WEBSITE_ROOT`) waarin deze bestanden komen is:
   `static-website/content`. Deze moet schrijfbaar zijn voor de worker.
-- vervolgens worden m.b.v. Hugo deze markdown-bestanden omgezet naar HTML. De uitvoer hiervan komt in: `public/static-website`  (relatief 
+- vervolgens worden m.b.v. Hugo deze markdown-bestanden omgezet naar HTML. De uitvoer hiervan komt in: `public/static-website`  (relatief
   ten opzichte van `FILESYSTEM_PUBLIC_WEBSITE_ROOT`). Deze map dient ook schrijfbaar te zijn. Let op: omdat de website volledig statisch is,
-  zullen hierin volledige URL's naar de verschillende subpagina's zitten. De basis URL die gebruikt wordt kan via de 
+  zullen hierin volledige URL's naar de verschillende subpagina's zitten. De basis URL die gebruikt wordt kan via de
  `STATIC_WEBSITE_BASE_URL` environment variabele ingesteld worden.
 
 ## v1.8.0

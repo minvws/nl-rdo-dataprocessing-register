@@ -127,7 +127,10 @@
             "@reset-static",
             "@phpstan-clear-cache"
         ],
-        "reset-db": "php artisan migrate:fresh --step --seed",
+        "reset-db": [
+            "php artisan db:wipe",
+            "php artisan migrate --step --seed"
+        ],
         "reset-public": [
             "rm -rf storage/app/public-website",
             "@public-refresh",

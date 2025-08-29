@@ -102,7 +102,7 @@ return [
         'Anders',
     ],
 
-    'mail_notification_subject' => 'Datalak gemeld aan Autoriteit Persoonsgegevens (AP)',
+    'mail_notification_subject' => 'Datalek gemeld aan Autoriteit Persoonsgegevens (AP)',
     'mail_notification_text' => 'Er is een datalek gemeld aan de Autoriteit persoonsgegevens (AP):',
     'mail_notification_button_text' => 'Datalek bekijken',
 ];

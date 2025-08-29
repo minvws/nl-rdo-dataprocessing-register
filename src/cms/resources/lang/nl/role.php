@@ -10,7 +10,7 @@ return [
     Role::DATA_PROTECTION_OFFICIAL->value => 'Functionaris Gegevensbescherming',
     Role::FUNCTIONAL_MANAGER->value => 'Functioneel beheerder',
     Role::INPUT_PROCESSOR->value => 'Invoerder',
-    Role::INPUT_PROCESSOR_DATABREACH->value => 'Invoerder Datalakken',
+    Role::INPUT_PROCESSOR_DATABREACH->value => 'Invoerder Datalekken',
     Role::MANDATE_HOLDER->value => 'Mandaathouder',
     Role::PRIVACY_OFFICER->value => 'Privacy Officer',
 ];
