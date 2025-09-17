@@ -9,7 +9,7 @@ use App\Services\StaticWebsite\StaticWebsiteGeneratorManager;
 use Tests\Helpers\ConfigTestHelper;
 
 it('can bind the implementation on the interface', function (): void {
-    ConfigTestHelper::set('public-website.public_website_generator', 'fake');
+    ConfigTestHelper::set('static-website.static_website_generator', 'fake');
 
     $publicWebsiteGenerator = $this->app->get(StaticWebsiteGenerator::class);
 

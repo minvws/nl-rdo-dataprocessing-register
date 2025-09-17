@@ -15,10 +15,10 @@
                             <div class="flex gap-1.5 flex-wrap ">
                                 <div class="flex">
                                     <a class="text-gray-500 dark:text-gray-400 text-sm"
-                                       href="{{ $getRecord()->snapshotSource->getLatestPublicWebsiteSnapshotEntry()?->url }}"
+                                       href="{{ $getRecord()->snapshotSource->getLatestStaticWebsiteSnapshotEntry()?->url }}"
                                        target="_blank"
                                     >
-                                        {{ $getRecord()->snapshotSource->getLatestPublicWebsiteSnapshotEntry()?->url }}
+                                        {{ $getRecord()->snapshotSource->getLatestStaticWebsiteSnapshotEntry()?->url }}
                                     </a>
                                 </div>
                             </div>

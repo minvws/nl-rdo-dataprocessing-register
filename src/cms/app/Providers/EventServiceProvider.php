@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Events;
+use App\Events\StaticWebsite\AfterBuildEvent;
+use App\Events\StaticWebsite\BuildEvent;
 use App\Events\User\UserCreatedEvent;
-use App\Listeners;
 use App\Listeners\Media\MediaHasBeenAddedHandler;
 use App\Listeners\PostMediaUploadHandler;
+use App\Listeners\StaticWebsite\AfterBuildHandler;
+use App\Listeners\StaticWebsite\BuildHandler;
 use App\Listeners\User\Import\UserCreatedHandler;
 use App\Models\Avg\AvgProcessorProcessingRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
@@ -50,13 +52,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         UserCreatedEvent::class => [UserCreatedHandler::class],
 
-        // public website
-        Events\PublicWebsite\BuildEvent::class => [Listeners\PublicWebsite\BuildHandler::class],
-        Events\PublicWebsite\AfterBuildEvent::class => [Listeners\PublicWebsite\AfterBuildHandler::class],
-
         // static website
-        Events\StaticWebsite\BuildEvent::class => [Listeners\StaticWebsite\BuildHandler::class],
-        Events\StaticWebsite\AfterBuildEvent::class => [Listeners\StaticWebsite\AfterBuildHandler::class],
+        BuildEvent::class => [BuildHandler::class],
+        AfterBuildEvent::class => [AfterBuildHandler::class],
     ];
 
     public function boot(): void

@@ -23,7 +23,6 @@ abstract class FeatureTestCase extends TestCase
         Http::fake();
 
         Storage::fake('tmp-for-tests');
-        Storage::fake(ConfigTestHelper::get('public-website.hugo_filesystem_disk'));
         Storage::fake(ConfigTestHelper::get('static-website.hugo_filesystem_disk'));
     }
 }

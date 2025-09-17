@@ -84,10 +84,10 @@ jobs:
       - name: Assert unique migration names
         run: ./bin/assert-unique-migration-names
 
-      - name: Move public website hugo template to the app
+      - name: Move static website hugo template to the app
         working-directory: ./src
         run: |
-          mv public-website/ cms/
+          mv static-website/ cms/
 
       - name: Run Migration
         run: php artisan migrate:fresh
@@ -110,8 +110,8 @@ jobs:
         env:
           DB_PORT: ${{ job.services.postgres.ports[5432] }}
 
-      - name: Run SonarCloud scanner
-        uses: minvws/nl-irealisatie-generic-pipelines/.github/actions/sonarcloud@main
+      - name: Run SonarQube scan
+        uses: minvws/action-sonarqube@v1
         with:
           sonar-token: ${{ secrets.SONAR_TOKEN }}
           project-base-dir: ./src/cms

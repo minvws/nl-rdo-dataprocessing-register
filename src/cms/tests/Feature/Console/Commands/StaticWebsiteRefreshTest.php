@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Jobs\StaticWebsite\ContentGeneratorJob;
 use App\Jobs\StaticWebsite\HugoWebsiteGeneratorJob;
+use App\Jobs\StaticWebsite\StaticWebsiteCheckJob;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\Organisation;
 use App\Models\PublicWebsiteTree;
@@ -22,6 +23,7 @@ it('the command will dispatch the correct jobs', function (): void {
     Bus::assertChained([
         ContentGeneratorJob::class,
         HugoWebsiteGeneratorJob::class,
+        StaticWebsiteCheckJob::class,
     ]);
 });
 

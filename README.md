@@ -10,12 +10,6 @@ The CMS is built using [Laravel](https://laravel.com/). This is where all the da
 
 Directory: `/src/cms/`
 
-**Public website**
-
-This contains the configuration for generating a static website using [Hugo](https://gohugo.io/). It uses JSON and markdown data as its input to generate static html files.
-
-Directory: `/src/public-website/`
-
 **Static website**
 
 This contains the configuration for generating a static website using [Hugo](https://gohugo.io/). It uses JSON and markdown data as its input to generate static html files.
@@ -116,3 +110,14 @@ Execute the following bin script to run all CI checks: `./bin/ci-local`
 
 -   rdo-package.yml
     -   Build the zip file (used by iRealisatie) for the dataprocessing register
+
+## License
+
+The source code is released under the [EUPL license](./LICENSES/EUPL-1.2.txt).
+The documentation is released under the [CC0 license](./LICENSES/CC0-1.0.txt).
+The EUPL 1.2 and the CC0 do not apply to photos, videos, infographics, fonts or other forms of media.
+Specifically the rijkslogo and rijkshuisstijl have specific [terms of use](./LICENSES/LicenseRef-Rijkshuisstijl.txt).
+Some images have a specific [terms of use from Unsplash](./LICENSES/LicenseRef-Unsplash.txt).
+
+This repository follows the [REUSE Specfication v3.3](https://reuse.software/spec/).
+Please see [REUSE.toml](./REUSE.toml) and the individual `*.license` files for copyright and license information.

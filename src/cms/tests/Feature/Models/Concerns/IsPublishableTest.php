@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\EntityNumber;
-use App\Models\PublicWebsiteCheck;
-use App\Models\PublicWebsiteSnapshotEntry;
 use App\Models\Snapshot;
 use App\Models\States\Snapshot\Established;
+use App\Models\StaticWebsiteCheck;
+use App\Models\StaticWebsiteSnapshotEntry;
 
-it('can get the public identifier', function (): void {
+it('can get the static identifier', function (): void {
     $number = fake()->word();
 
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
@@ -23,19 +23,19 @@ it('can get the public identifier', function (): void {
         ->toBe($number);
 });
 
-it('can get the public from', function (): void {
-    $publicFrom = fake()->anyDate();
+it('can get the static from', function (): void {
+    $staticFrom = fake()->anyDate();
 
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
         ->create([
-            'public_from' => $publicFrom,
+            'public_from' => $staticFrom,
         ]);
 
-    expect($avgResponsibleProcessingRecord->getPublicFrom()->equalTo($publicFrom))
+    expect($avgResponsibleProcessingRecord->getPublicFrom()->equalTo($staticFrom))
         ->toBeTrue();
 });
 
-it('can get the public from when null', function (): void {
+it('can get the static from when null', function (): void {
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
         ->create([
             'public_from' => null,
@@ -55,7 +55,7 @@ it('is not published when public_from is null', function (): void {
         ->toBeFalse();
 });
 
-it('is not published when no public-website-check exists', function (): void {
+it('is not published when no static-website-check exists', function (): void {
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
         ->create();
 
@@ -63,28 +63,28 @@ it('is not published when no public-website-check exists', function (): void {
         ->toBeFalse();
 });
 
-it('is not published when public build exists but not for this snapshot', function (): void {
+it('is not published when static build exists but not for this snapshot', function (): void {
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
         ->create([
             'public_from' => fake()->dateTimeBetween(),
         ]);
-    PublicWebsiteCheck::factory()->create();
+    StaticWebsiteCheck::factory()->create();
 
     expect($avgResponsibleProcessingRecord->isPublished())
         ->toBeFalse();
 });
 
-it('is published when public-website-check exists and a established snapshot exists', function (): void {
+it('is published when static-website-check exists and a established snapshot exists', function (): void {
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
         ->create();
     $snapshot = Snapshot::factory()
         ->for($avgResponsibleProcessingRecord, 'snapshotSource')
         ->create(['state' => Established::$name]);
-    $publicWebsiteCheck = PublicWebsiteCheck::factory()
+    $staticWebsiteCheck = StaticWebsiteCheck::factory()
         ->createForSnapshot($snapshot->id);
-    PublicWebsiteSnapshotEntry::factory()
+    StaticWebsiteSnapshotEntry::factory()
         ->create([
-            'last_public_website_check_id' => $publicWebsiteCheck,
+            'last_static_website_check_id' => $staticWebsiteCheck,
             'snapshot_id' => $snapshot->id,
             'end_date' => null,
         ]);

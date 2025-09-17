@@ -1,5 +1,5 @@
 <span @class(['hidden' => !$getRecord()->isPublished()])>
-    <a href="{{ $getRecord()->getLatestPublicWebsiteSnapshotEntry()?->url }}"
+    <a href="{{ $getRecord()->getLatestStaticWebsiteSnapshotEntry()?->url }}"
        target="_blank"
        title="{{ __('general.published_at') }}"
     >

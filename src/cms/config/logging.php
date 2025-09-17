@@ -132,7 +132,7 @@ return [
     ],
 
     /**
-     * RDO Audit logs (minvws/laravel-logging, see ../packages/nl-rdo-laravel-logging)
+     * RDO Audit logs (minvws/laravel-logging, see minvws/laravel-logging package)
      */
     'dblog_enabled' => env('AUDIT_LOG_DBLOG_ENABLED', false),
     'dblog_encrypt' => env('AUDIT_LOG_DBLOG_THEIR_PUB_KEY') !== null,

@@ -11,11 +11,11 @@ use App\Services\AuditLog\User\UserPermissionUpdatedEvent;
 use App\Services\AuditLog\User\UserTwoFactorResetEvent;
 use App\Services\AuditLog\User\UserUpdatedEvent;
 use InvalidArgumentException;
-use MinVWS\Logging\Laravel\Events\Logging\AccountChangeLogEvent;
-use MinVWS\Logging\Laravel\Events\Logging\GeneralLogEvent;
-use MinVWS\Logging\Laravel\Events\Logging\UserCreatedLogEvent;
-use MinVWS\Logging\Laravel\Events\Logging\UserLoginLogEvent;
-use MinVWS\Logging\Laravel\Loggers\LogEventInterface;
+use MinVWS\AuditLogger\Events\Logging\AccountChangeLogEvent;
+use MinVWS\AuditLogger\Events\Logging\GeneralLogEvent;
+use MinVWS\AuditLogger\Events\Logging\UserCreatedLogEvent;
+use MinVWS\AuditLogger\Events\Logging\UserLoginLogEvent;
+use MinVWS\AuditLogger\Loggers\LogEventInterface;
 
 class AuditLogEventFactory
 {

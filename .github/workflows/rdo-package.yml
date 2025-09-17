@@ -57,12 +57,6 @@ jobs:
         run: |
           echo "{ \"version\": \"${{ env.RELEASE_VERSION }}\", \"git_ref\": \"$GITHUB_SHA\"}" > public/version.json
 
-      - name: Move public website hugo template to the app
-        working-directory: ./src
-        run: |
-          cp cms/public/version.json public-website/static/version.json
-          mv public-website/ cms/
-
       - name: Move static website hugo template to the app
         working-directory: ./src
         run: |
@@ -74,7 +68,7 @@ jobs:
         run: cp .db_requirements ./src/cms
 
       - name: Create tar
-        run: tar -czf ${{ github.workspace }}/dataprocessing-register-cms_${{ env.RELEASE_VERSION }}.tar.gz ./app ./bootstrap/app.php ./config ./database ./public ./packages ./resources ./routes ./vendor ./artisan ./composer.json ./public-website ./static-website ./.db_requirements
+        run: tar -czf ${{ github.workspace }}/dataprocessing-register-cms_${{ env.RELEASE_VERSION }}.tar.gz ./app ./bootstrap/app.php ./config ./database ./public ./resources ./routes ./vendor ./artisan ./composer.json ./static-website ./.db_requirements
 
       - name: Upload release tar
         uses: actions/upload-artifact@v4

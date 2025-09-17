@@ -20,7 +20,6 @@ services:
             COMPOSER_ROOT_VERSION: 'dev-develop'
         volumes:
             - '.:/var/www/html'
-            - '../public-website:/var/www/html/public-website'
             - '../static-website:/var/www/html/static-website'
             - '../../.db_requirements:/var/www/html/storage/app/sql-generation-management/.db_requirements'
         networks:

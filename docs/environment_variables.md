@@ -12,7 +12,6 @@ The following variables are required to be set before the application will run.
 - `DB_DATABASE` database name
 - `DB_USERNAME` username for database access
 - `DB_PASSWORD` database password for the database user
-- `PUBLIC_WEBSITE_BASE_URL` base-url for the public-website
 - `STATIC_WEBSITE_BASE_URL` base-url for the static-website
 
 ### Commonly used, but not required
@@ -25,7 +24,6 @@ not set.
 - `DB_PORT` database port, (default: `5432`)
 - `LOG_LEVEL` log level, (default: `debug`)
 - `OUTBOX_SMTP_FROM` from-address for sending e-mail, (default is not set)
-- `FILESYSTEM_PUBLIC_WEBSITE_ROOT` root-folder for the public-website (default: `<laravel-storage-path>/app`)
 - `FILESYSTEM_STATIC_WEBSITE_ROOT` root-folder for the static-website (default: `<laravel-storage-path>/app`)
 - `FILESYSTEM_SHARED_STORAGE_PATH` root-folder for shared storage (default: `<laravel-storage-path>/app/shared-storage`)
 - `VIRUSSCANNER_DEFAULT` default virus-scanner (default: `clamav`)
@@ -91,7 +89,6 @@ The following environment variables are used to configure the application in `sr
 **FILESYSTEMS:**
 
 - `FILESYSTEM_SHARED_STORAGE_PATH` (default: `app/shared-storage`)
-- `FILESYSTEM_PUBLIC_WEBSITE_ROOT` (default: `app/public-website`)
 - `FILESYSTEM_STATIC_WEBSITE_ROOT` (default: `app/static-website`)
 
 **LOGGING:**

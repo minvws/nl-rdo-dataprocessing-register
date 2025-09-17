@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace App\Models\Concerns;
 
-use App\Collections\PublicWebsiteSnapshotEntryCollection;
-use App\Events\PublicWebsite;
-use App\Events\StaticWebsite;
-use App\Models\PublicWebsiteSnapshotEntry;
+use App\Collections\StaticWebsiteSnapshotEntryCollection;
+use App\Events\StaticWebsite\BuildEvent;
 use App\Models\States\Snapshot\Established;
+use App\Models\StaticWebsiteSnapshotEntry;
 use App\Observers\PublishableObserver;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
@@ -38,27 +37,27 @@ trait IsPublishable
 
     final public function isPublished(): bool
     {
-        $publicWebsiteSnapshotEntry = $this->getLatestPublicWebsiteSnapshotEntry();
+        $staticWebsiteSnapshotEntry = $this->getLatestStaticWebsiteSnapshotEntry();
 
-        if ($publicWebsiteSnapshotEntry === null) {
+        if ($staticWebsiteSnapshotEntry === null) {
             return false;
         }
 
-        return $publicWebsiteSnapshotEntry->end_date === null;
+        return $staticWebsiteSnapshotEntry->end_date === null;
     }
 
-    final public function getPublicWebsiteSnapshotEntries(Collection $snapshotIds): PublicWebsiteSnapshotEntryCollection
+    final public function getStaticWebsiteSnapshotEntries(Collection $snapshotIds): StaticWebsiteSnapshotEntryCollection
     {
-        $publicWebsiteSnapshotEntries = PublicWebsiteSnapshotEntry::whereIn('snapshot_id', $snapshotIds)
+        $staticWebsiteSnapshotEntries = StaticWebsiteSnapshotEntry::whereIn('snapshot_id', $snapshotIds)
             ->orderBy('start_date', 'desc')
             ->get();
 
-        Assert::isInstanceOf($publicWebsiteSnapshotEntries, PublicWebsiteSnapshotEntryCollection::class);
+        Assert::isInstanceOf($staticWebsiteSnapshotEntries, StaticWebsiteSnapshotEntryCollection::class);
 
-        return $publicWebsiteSnapshotEntries;
+        return $staticWebsiteSnapshotEntries;
     }
 
-    final public function getLatestPublicWebsiteSnapshotEntry(): ?PublicWebsiteSnapshotEntry
+    final public function getLatestStaticWebsiteSnapshotEntry(): ?StaticWebsiteSnapshotEntry
     {
         $snapshot = $this->getLatestSnapshotWithState([Established::class]);
 
@@ -66,7 +65,7 @@ trait IsPublishable
             return null;
         }
 
-        return PublicWebsiteSnapshotEntry::where('snapshot_id', $snapshot->id)
+        return StaticWebsiteSnapshotEntry::where('snapshot_id', $snapshot->id)
             ->orderBy('start_date', 'desc')
             ->first();
     }
@@ -110,7 +109,6 @@ trait IsPublishable
     {
         Log::debug('build event triggered by isPublishable observer');
 
-        PublicWebsite\BuildEvent::dispatch();
-        StaticWebsite\BuildEvent::dispatch();
+        BuildEvent::dispatch();
     }
 }

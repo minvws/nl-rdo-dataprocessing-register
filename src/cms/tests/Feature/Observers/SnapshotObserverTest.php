@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Listeners\Media;
 
-use App\Events\PublicWebsite;
-use App\Events\StaticWebsite;
+use App\Events\StaticWebsite\BuildEvent;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\Snapshot;
 use App\Models\States\Snapshot\Approved;
@@ -20,15 +19,11 @@ use function fake;
 use function it;
 
 it('does not dispatch the build-event when snapshot is created', function (): void {
-    Event::fake([
-        PublicWebsite\BuildEvent::class,
-        StaticWebsite\BuildEvent::class,
-    ]);
+    Event::fake(BuildEvent::class);
 
     Snapshot::factory()->create();
 
-    Event::assertNotDispatched(PublicWebsite\BuildEvent::class);
-    Event::assertNotDispatched(StaticWebsite\BuildEvent::class);
+    Event::assertNotDispatched(BuildEvent::class);
 });
 
 it(
@@ -39,16 +34,12 @@ it(
                 'state' => $oldState,
             ]);
 
-        Event::fake([
-            PublicWebsite\BuildEvent::class,
-            StaticWebsite\BuildEvent::class,
-        ]);
+        Event::fake(BuildEvent::class);
 
         $snapshot->state = $newState;
         $snapshot->save();
 
-        Event::assertDispatchedTimes(PublicWebsite\BuildEvent::class, (int) $expectedEvent);
-        Event::assertDispatchedTimes(StaticWebsite\BuildEvent::class, (int) $expectedEvent);
+        Event::assertDispatchedTimes(BuildEvent::class, (int) $expectedEvent);
     },
 )->with([
     'old in_review, new approved' => [InReview::class, Approved::class, false],
@@ -61,15 +52,11 @@ it(
 it('does not dispatch the build-event if snapshot is deleted', function (): void {
     $snapshot = Snapshot::factory()->createQuietly();
 
-    Event::fake([
-        PublicWebsite\BuildEvent::class,
-        StaticWebsite\BuildEvent::class,
-    ]);
+    Event::fake(BuildEvent::class);
 
     $snapshot->delete();
 
-    Event::assertNotDispatched(PublicWebsite\BuildEvent::class);
-    Event::assertNotDispatched(StaticWebsite\BuildEvent::class);
+    Event::assertNotDispatched(BuildEvent::class);
 });
 
 it('will set the review_at if snapshotSource is reviewable and not set', function (): void {

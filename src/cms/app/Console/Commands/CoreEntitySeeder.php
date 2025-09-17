@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
-use App\Events\PublicWebsite;
-use App\Events\StaticWebsite;
+use App\Events\StaticWebsite\BuildEvent;
 use App\Models\Algorithm\AlgorithmRecord;
 use App\Models\Avg\AvgProcessorProcessingRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
@@ -60,8 +59,7 @@ class CoreEntitySeeder extends Command
         $this->output->info(sprintf('entity generation done, skipped %s (non unique) entries', $skipped));
 
         $this->output->info('building public website');
-        PublicWebsite\BuildEvent::dispatch();
-        StaticWebsite\BuildEvent::dispatch();
+        BuildEvent::dispatch();
 
         $this->output->success('done');
 

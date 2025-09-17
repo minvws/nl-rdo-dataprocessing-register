@@ -6,10 +6,10 @@ use App\Enums\RegisterLayout;
 use App\Filament\Resources\AvgResponsibleProcessingRecordResource\Pages\CreateAvgResponsibleProcessingRecord;
 use App\Filament\Resources\AvgResponsibleProcessingRecordResource\Pages\ListAvgResponsibleProcessingRecords;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
-use App\Models\PublicWebsiteCheck;
-use App\Models\PublicWebsiteSnapshotEntry;
 use App\Models\Snapshot;
 use App\Models\States\Snapshot\Established;
+use App\Models\StaticWebsiteCheck;
+use App\Models\StaticWebsiteSnapshotEntry;
 use Tests\Helpers\Model\OrganisationTestHelper;
 use Tests\Helpers\Model\UserTestHelper;
 
@@ -43,11 +43,11 @@ it('loads the list page with an action for a published record', function (): voi
     $snapshot = Snapshot::factory()
         ->for($avgResponsibleProcessingRecord, 'snapshotSource')
         ->create(['state' => Established::$name]);
-    $publicWebsiteCheck = PublicWebsiteCheck::factory()
+    $staticWebsiteCheck = StaticWebsiteCheck::factory()
         ->createForSnapshot($snapshot->id);
-    PublicWebsiteSnapshotEntry::factory()
+    StaticWebsiteSnapshotEntry::factory()
         ->create([
-            'last_public_website_check_id' => $publicWebsiteCheck,
+            'last_static_website_check_id' => $staticWebsiteCheck->id,
             'snapshot_id' => $snapshot->id,
             'end_date' => null,
         ]);
@@ -55,7 +55,7 @@ it('loads the list page with an action for a published record', function (): voi
     $this->asFilamentOrganisationUser($organisation)
         ->createLivewireTestable(ListAvgResponsibleProcessingRecords::class)
         ->assertCanSeeTableRecords([$avgResponsibleProcessingRecord])
-        ->callTableAction('public-website', $avgResponsibleProcessingRecord);
+        ->callTableAction('static-website', $avgResponsibleProcessingRecord);
 });
 
 it('can export', function (): void {

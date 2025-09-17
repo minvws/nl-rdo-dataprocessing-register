@@ -8,6 +8,7 @@ use App\Config\Config;
 use App\Listeners\StaticWebsite\AfterBuildHandler;
 use App\Services\StaticWebsite\HugoFilesystem;
 use App\Services\StaticWebsite\HugoStaticWebsiteGenerator;
+use App\Services\StaticWebsite\StaticWebsiteCheckService;
 use App\Services\StaticWebsite\StaticWebsiteFilesystem;
 use App\Services\StaticWebsite\StaticWebsiteFilesystemManager;
 use App\Services\StaticWebsite\StaticWebsiteGenerator;
@@ -70,5 +71,12 @@ class StaticWebsiteServiceProvider extends ServiceProvider
         $this->app->when(AfterBuildHandler::class)
             ->needs('$afterBuildHook')
             ->giveConfig('static-website.build_after_hook');
+
+        $this->app->when([StaticWebsiteCheckService::class])
+            ->needs('$baseUrl')
+            ->giveConfig('static-website.check_base_url');
+        $this->app->when([StaticWebsiteCheckService::class])
+            ->needs('$proxy')
+            ->giveConfig('static-website.check_proxy');
     }
 }

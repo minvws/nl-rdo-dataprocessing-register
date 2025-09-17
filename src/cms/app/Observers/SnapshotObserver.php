@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace App\Observers;
 
 use App\Config\Config;
-use App\Events\PublicWebsite;
-use App\Events\StaticWebsite;
+use App\Events\StaticWebsite\BuildEvent;
 use App\Models\Contracts\Reviewable;
 use App\Models\Snapshot;
 use App\Models\States\Snapshot\Approved;
@@ -45,8 +44,7 @@ class SnapshotObserver
     {
         Log::debug('build event triggered by snapshot observer');
 
-        PublicWebsite\BuildEvent::dispatch();
-        StaticWebsite\BuildEvent::dispatch();
+        BuildEvent::dispatch();
     }
 
     private function setReviewAt(Snapshot $snapshot): void

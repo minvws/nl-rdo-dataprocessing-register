@@ -36,6 +36,6 @@ class PublicWebsiteTreeListGenerator extends Generator
         ])
             ->render();
 
-        $this->staticWebsiteFilesystem->write($this->pathGenerator->getPublicWebsiteTreeIndexPath(), $contents);
+        $this->staticWebsiteFilesystem->write($this->pathGenerator->getStaticWebsiteTreeIndexPath(), $contents);
     }
 }

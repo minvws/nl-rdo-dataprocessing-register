@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Mail;
 
-use App\Components\Uuid\UuidInterface;
 use App\Config\Config;
 use App\Models\User;
 use Illuminate\Contracts\Mail\Factory;
@@ -53,7 +52,6 @@ abstract class Mailable extends IlluminateMailable
         $userIds = User::whereIn('email', $emailAddresses)
             ->pluck('id')
             ->map(static function (mixed $uuid): string {
-                Assert::isInstanceOf($uuid, UuidInterface::class);
                 return $uuid->toString();
             })
             ->toArray();

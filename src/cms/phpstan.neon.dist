@@ -5,7 +5,6 @@ parameters:
         - bootstrap/cache
         - node_modules/
         - public/
-        - packages/
         - storage/
         - tests/
         - vendor/

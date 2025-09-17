@@ -13,7 +13,7 @@ use App\Filament\Infolists\Components\ImportNumberEntry;
 use App\Filament\Infolists\Components\ParentSelectEntry;
 use App\Filament\Infolists\Components\RemarksEntry;
 use App\Filament\Infolists\Components\Section\InformationBlockSection;
-use App\Filament\Infolists\Components\Section\PublicWebsiteCheckSection;
+use App\Filament\Infolists\Components\Section\StaticWebsiteCheckSection;
 use App\Filament\Infolists\Components\SelectMultipleEntry;
 use App\Filament\Infolists\Components\StakeholdersRepeatableEntry;
 use App\Filament\Infolists\Components\TextareaEntry;
@@ -366,7 +366,7 @@ class AvgResponsibleProcessingRecordResourceInfolistSchemas
         return [
             DateTimeEntry::make('public_from')
                 ->label(__('general.public_from')),
-            PublicWebsiteCheckSection::makeTable(),
+            StaticWebsiteCheckSection::makeTable(),
             InformationBlockSection::makeCollapsible(
                 __('information_blocks.avg_responsible_processing_record.step_publish_title'),
                 __('information_blocks.avg_responsible_processing_record.step_publish_info'),

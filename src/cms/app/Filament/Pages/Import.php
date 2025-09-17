@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Pages;
 
 use App\Enums\Authorization\Permission;
-use App\Events;
+use App\Events\StaticWebsite\BuildEvent;
 use App\Facades\Authentication;
 use App\Facades\Authorization;
 use App\Filament\NavigationGroups\NavigationGroup;
@@ -13,7 +13,7 @@ use App\Import\ImportFailedException;
 use App\Import\ZipImporter;
 use App\Rules\Virusscanner;
 use App\Services\BuildContextService;
-use Filament\Forms;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
@@ -51,7 +51,7 @@ class Import extends Page implements HasForms
     public function form(Form $form): Form
     {
         return $form->schema([
-            Forms\Components\FileUpload::make('files')
+            FileUpload::make('files')
                 ->required()
                 ->label(__('import.files'))
                 ->acceptedFileTypes([
@@ -95,8 +95,7 @@ class Import extends Page implements HasForms
         $buildContextService->enableBuild();
 
         Log::debug('build event triggered by organisation observer');
-        Events\PublicWebsite\BuildEvent::dispatch();
-        Events\StaticWebsite\BuildEvent::dispatch();
+        BuildEvent::dispatch();
 
         Notification::make()
             ->title(__('import.upload_success'))

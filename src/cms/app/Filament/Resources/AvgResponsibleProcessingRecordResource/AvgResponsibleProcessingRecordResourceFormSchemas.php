@@ -12,7 +12,7 @@ use App\Filament\Forms\Components\Radio\CoreEntityDataCollectionSource;
 use App\Filament\Forms\Components\RemarksField;
 use App\Filament\Forms\Components\Repeater\AvgGoalsRepeater;
 use App\Filament\Forms\Components\Section\InformationBlockSection;
-use App\Filament\Forms\Components\Section\PublicWebsiteCheckSection;
+use App\Filament\Forms\Components\Section\StaticWebsiteCheckSection;
 use App\Filament\Forms\Components\Select\ParentSelect;
 use App\Filament\Forms\Components\Select\SelectSingleWithLookup;
 use App\Filament\Forms\Components\SelectMultipleWithLookup;
@@ -443,7 +443,7 @@ class AvgResponsibleProcessingRecordResourceFormSchemas
     {
         return [
             PublicFromField::makeForModel(AvgResponsibleProcessingRecord::class),
-            PublicWebsiteCheckSection::makeTable(),
+            StaticWebsiteCheckSection::makeTable(),
             InformationBlockSection::makeCollapsible(
                 __('information_blocks.avg_responsible_processing_record.step_publish_title'),
                 __('information_blocks.avg_responsible_processing_record.step_publish_info'),

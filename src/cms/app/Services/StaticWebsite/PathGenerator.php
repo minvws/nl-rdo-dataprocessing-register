@@ -13,17 +13,17 @@ readonly class PathGenerator
         return '_index.html';
     }
 
-    public function getPublicWebsiteTreePath(string $path): string
+    public function getStaticWebsiteTreePath(string $path): string
     {
         return sprintf('organisatie/%s/_index.html', $path);
     }
 
-    public function getPublicWebsiteTreeIndexPath(): string
+    public function getStaticWebsiteTreeIndexPath(): string
     {
         return 'organisatie/_index.html';
     }
 
-    public function getPublicWebsiteTreePosterPath(string $path): string
+    public function getStaticWebsiteTreePosterPath(string $path): string
     {
         return sprintf('organisatie/%s/poster.jpeg', $path);
     }

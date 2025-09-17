@@ -34,7 +34,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Notifications\DatabaseNotificationCollection;
 use Illuminate\Notifications\Notifiable;
-use MinVWS\Logging\Laravel\Contracts\LoggableUser;
+use MinVWS\AuditLogger\Contracts\LoggableUser;
 use Webmozart\Assert\Assert;
 
 use function sprintf;
@@ -171,5 +171,32 @@ class User extends Authenticatable implements FilamentUser, HasTenants, Loggable
 
             return sprintf('%s (%s)', $name, $email);
         });
+    }
+
+    public function getAuditId(): string
+    {
+        return $this->id->toString();
+    }
+
+    public function getEmail(): string
+    {
+        return $this->email;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function getRoles(): array
+    {
+        $roles = $this->globalRoles
+            ->map(static function (UserGlobalRole $role) {
+                return $role->role->value;
+            })
+            ->toArray();
+        Assert::allString($roles);
+
+        return $roles;
     }
 }

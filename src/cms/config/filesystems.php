@@ -7,9 +7,6 @@ use Webmozart\Assert\Assert;
 $sharedStoragePath = env('FILESYSTEM_SHARED_STORAGE_PATH', storage_path('app/shared-storage'));
 Assert::string($sharedStoragePath);
 
-$publicWebsiteRoot = env('FILESYSTEM_PUBLIC_WEBSITE_ROOT', storage_path('app/public-website'));
-Assert::string($publicWebsiteRoot);
-
 $staticWebsiteRoot = env('FILESYSTEM_STATIC_WEBSITE_ROOT', storage_path('app/static-website'));
 Assert::string($staticWebsiteRoot);
 
@@ -58,14 +55,7 @@ return [
             'throw' => false,
         ],
 
-        // used for public-website output (see config/public-website.php)
-        'public-website' => [
-            'driver' => 'local',
-            'root' => $publicWebsiteRoot,
-            'throw' => false,
-        ],
-
-        // used for public-website output (see config/static-website.php)
+        // used for static-website output (see config/static-website.php)
         'static-website' => [
             'driver' => 'local',
             'root' => $staticWebsiteRoot,
@@ -108,8 +98,7 @@ return [
     */
 
     'links' => [
-        // see env(PUBLIC_WEBSITE_BASE_URL) for the path, and config/public_website.php -> public_website_folder for the folder-suffix
-        public_path('public-website') => sprintf('%s/public-website', $publicWebsiteRoot),
+        // see env(STATIC_WEBSITE_BASE_URL) for the path, and config/static_website.php -> static_website_folder for the folder-suffix
         public_path('static-website') => sprintf('%s/static-website', $staticWebsiteRoot),
     ],
 ];

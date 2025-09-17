@@ -82,3 +82,20 @@ it('will return the correct value for logName', function (): void {
     expect($user->logName)
         ->toBe('foo (bar@baz.com)');
 });
+
+it('will return the correct values for the audit-logger', function (): void {
+    $role = fake()->randomElement(Role::cases());
+
+    $user = User::factory()
+        ->hasGlobalRole($role)
+        ->create();
+
+    expect($user->getAuditId())
+        ->toBe($user->id->toString())
+        ->and($user->getName())
+        ->toBe($user->name)
+        ->and($user->getRoles())
+        ->toBe([$role->value])
+        ->and($user->getEmail())
+        ->toBe($user->email);
+});

@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace App\Observers;
 
 use App\Enums\Media\MediaGroup;
-use App\Events\PublicWebsite;
-use App\Events\StaticWebsite;
+use App\Events\StaticWebsite\BuildEvent;
 use App\Models\Organisation;
 use App\Vendor\MediaLibrary\Media;
 use Illuminate\Support\Facades\Log;
@@ -55,7 +54,6 @@ class MediaObserver
     {
         Log::debug('build event triggered by media observer');
 
-        PublicWebsite\BuildEvent::dispatch();
-        StaticWebsite\BuildEvent::dispatch();
+        BuildEvent::dispatch();
     }
 }

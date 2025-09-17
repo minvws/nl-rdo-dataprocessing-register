@@ -6,6 +6,7 @@ namespace App\Listeners\StaticWebsite;
 
 use App\Jobs\StaticWebsite\ContentGeneratorJob;
 use App\Jobs\StaticWebsite\HugoWebsiteGeneratorJob;
+use App\Jobs\StaticWebsite\StaticWebsiteCheckJob;
 use Illuminate\Support\Facades\Bus;
 use Psr\Log\LoggerInterface;
 
@@ -23,6 +24,7 @@ readonly class BuildHandler
         $jobs = [
             new ContentGeneratorJob(),
             new HugoWebsiteGeneratorJob(),
+            new StaticWebsiteCheckJob(),
         ];
 
         Bus::chain($jobs)->dispatch();

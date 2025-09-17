@@ -49,8 +49,26 @@ ze de code van de meest recente release uitvoeren.
 
 - Na deployment moeten de bestaande caches verwijderd worden: `php artisan optimize:clear`
 - Na de deployment moeten voor deze release alle worker processen opnieuw opgestart worden
-- Na het herstarten van de worker moet eenmalig de publieke website opnieuw opgebouwd worden: `php artisan public-website:refresh`
 - Na het herstarten van de worker moet eenmalig de statische website opnieuw opgebouwd worden: `php artisan static-website:refresh`
+
+## 1.12.1
+
+- Na deployment moeten de bestaande caches verwijderd worden: `php artisan optimize:clear`
+- Na de deployment moeten voor deze release alle worker processen opnieuw opgestart worden
+- Na het herstarten van de worker moet eenmalig de statische website opnieuw opgebouwd worden: `php artisan static-website:refresh`
+
+## 1.12.0
+
+- Na deployment moeten de bestaande caches verwijderd worden: `php artisan optimize:clear`
+- Na de deployment moeten voor deze release alle worker processen opnieuw opgestart worden
+- Na het herstarten van de worker moet eenmalig de statische website opnieuw opgebouwd worden: `php artisan static-website:refresh`
+- De volgende env-vars zijn komen te vervallen (en mogen dus verwijderd worden als ze ingesteld zijn):
+    - `PUBLIC_WEBSITE_FILESYSTEM`
+    - `PUBLIC_WEBSITE_GENERATOR`
+    - `PUBLIC_WEBSITE_BASE_URL`
+    - `PUBLIC_WEBSITE_CHECK_BASE_URL`
+    - `PUBLIC_WEBSITE_CHECK_PROXY`
+    - `PUBLIC_WEBSITE_BUILD_AFTER_HOOK`
 
 ## 1.11.3
 

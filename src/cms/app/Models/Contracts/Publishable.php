@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Models\Contracts;
 
-use App\Collections\PublicWebsiteSnapshotEntryCollection;
+use App\Collections\StaticWebsiteSnapshotEntryCollection;
 use App\Models\Organisation;
-use App\Models\PublicWebsiteSnapshotEntry;
 use App\Models\Snapshot;
 use App\Models\States\SnapshotState;
+use App\Models\StaticWebsiteSnapshotEntry;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
 
@@ -25,9 +25,9 @@ interface Publishable extends SnapshotSource
     /**
      * @param Collection<int, string> $snapshotIds
      */
-    public function getPublicWebsiteSnapshotEntries(Collection $snapshotIds): PublicWebsiteSnapshotEntryCollection;
+    public function getStaticWebsiteSnapshotEntries(Collection $snapshotIds): StaticWebsiteSnapshotEntryCollection;
 
-    public function getLatestPublicWebsiteSnapshotEntry(): ?PublicWebsiteSnapshotEntry;
+    public function getLatestStaticWebsiteSnapshotEntry(): ?StaticWebsiteSnapshotEntry;
 
     /**
      * @param array<class-string<SnapshotState>> $snapshotStates

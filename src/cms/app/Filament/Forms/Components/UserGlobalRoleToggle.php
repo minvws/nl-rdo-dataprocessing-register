@@ -7,7 +7,6 @@ namespace App\Filament\Forms\Components;
 use App\Enums\Authorization\Role;
 use App\Models\User;
 use Filament\Forms\Components\Toggle;
-use Webmozart\Assert\Assert;
 
 use function __;
 use function sprintf;
@@ -22,7 +21,6 @@ class UserGlobalRoleToggle extends Toggle
                 $hasRole = $user->globalRoles
                     ->pluck('role')
                     ->map(static function ($role): string {
-                        Assert::isInstanceOf($role, Role::class);
                         return $role->value;
                     })
                     ->contains($role->value);

@@ -49,7 +49,7 @@ class PublicWebsiteTreeNodeGenerator extends Generator
             'publicWebsiteTree' => $publicWebsiteTree,
         ])->render();
 
-        $this->staticWebsiteFilesystem->write($this->pathGenerator->getPublicWebsiteTreePath($path), $contents);
+        $this->staticWebsiteFilesystem->write($this->pathGenerator->getStaticWebsiteTreePath($path), $contents);
 
         if ($publicWebsiteTree->organisation === null) {
             return;
@@ -73,6 +73,6 @@ class PublicWebsiteTreeNodeGenerator extends Generator
             return;
         }
 
-        $this->staticWebsiteFilesystem->writeStream($this->pathGenerator->getPublicWebsiteTreePosterPath($path), $posterImageStream);
+        $this->staticWebsiteFilesystem->writeStream($this->pathGenerator->getStaticWebsiteTreePosterPath($path), $posterImageStream);
     }
 }

@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Observers;
 
-use App\Events\PublicWebsite;
-use App\Events\StaticWebsite;
+use App\Events\StaticWebsite\BuildEvent;
 use App\Models\Organisation;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\Log;
@@ -42,7 +41,6 @@ class OrganisationObserver
     {
         Log::debug('build event triggered by organisation observer');
 
-        PublicWebsite\BuildEvent::dispatch();
-        StaticWebsite\BuildEvent::dispatch();
+        BuildEvent::dispatch();
     }
 }

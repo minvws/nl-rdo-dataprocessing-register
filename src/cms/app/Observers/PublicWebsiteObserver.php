@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Observers;
 
-use App\Events\PublicWebsite;
-use App\Events\StaticWebsite;
+use App\Events\StaticWebsite\BuildEvent;
 use Illuminate\Support\Facades\Log;
 
 class PublicWebsiteObserver
@@ -24,7 +23,6 @@ class PublicWebsiteObserver
     {
         Log::debug('build event triggered by public website observer');
 
-        PublicWebsite\BuildEvent::dispatch();
-        StaticWebsite\BuildEvent::dispatch();
+        BuildEvent::dispatch();
     }
 }

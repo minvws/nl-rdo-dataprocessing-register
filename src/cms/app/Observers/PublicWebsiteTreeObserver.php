@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Observers;
 
-use App\Events\PublicWebsite;
-use App\Events\StaticWebsite;
+use App\Events\StaticWebsite\BuildEvent;
 use App\Models\PublicWebsiteTree;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\Log;
@@ -45,7 +44,6 @@ class PublicWebsiteTreeObserver
     {
         Log::debug('build event triggered by public website tree observer');
 
-        PublicWebsite\BuildEvent::dispatch();
-        StaticWebsite\BuildEvent::dispatch();
+        BuildEvent::dispatch();
     }
 }

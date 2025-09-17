@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Console;
 
 use App\Console\Commands\DocumentNotificationsSend;
-use App\Console\Commands\PublicWebsiteRefresh;
 use App\Console\Commands\SnapshotApprovalBatchNotifications;
+use App\Console\Commands\StaticWebsiteRefresh;
 use App\Console\Commands\UserDeleteExpiredLoginTokens;
 use App\Console\Commands\UserDeleteWithoutOrganisation;
 use Illuminate\Console\Scheduling\Schedule;
@@ -28,7 +28,7 @@ class Kernel extends ConsoleKernel
             ->everyFifteenMinutes();
 
         // daily
-        $schedule->command(PublicWebsiteRefresh::class, ['-D'])
+        $schedule->command(StaticWebsiteRefresh::class)
             ->dailyAt('01:00');
         $schedule->command(DocumentNotificationsSend::class)
             ->dailyAt('09:00');

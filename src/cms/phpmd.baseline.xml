@@ -6,7 +6,6 @@
   <violation rule="PHPMD\Rule\Design\NumberOfChildren" file="app/Filament/Pages/CreateRecord.php"/>
   <violation rule="PHPMD\Rule\Design\NumberOfChildren" file="app/Filament/RelationManagers/RelationManager.php"/>
   <violation rule="PHPMD\Rule\Design\NumberOfChildren" file="app/Filament/Resources/Resource.php"/>
-  <violation rule="PHPMD\Rule\Design\LongParameterList" file="app/Import/Factories/Avg/AvgProcessorProcessingRecordFactory.php" method="__construct"/>
   <violation rule="PHPMD\Rule\Design\LongMethod" file="app/Import/Factories/Avg/AvgProcessorProcessingRecordFactory.php" method="create"/>
   <violation rule="PHPMD\Rule\Design\LongParameterList" file="app/Import/Factories/Avg/AvgResponsibleProcessingRecordFactory.php" method="__construct"/>
   <violation rule="PHPMD\Rule\Design\LongMethod" file="app/Import/Factories/Avg/AvgResponsibleProcessingRecordFactory.php" method="create"/>

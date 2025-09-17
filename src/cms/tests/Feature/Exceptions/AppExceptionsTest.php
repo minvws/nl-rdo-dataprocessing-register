@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature\Models\Concerns;
 
 use App\Exceptions\AppException;
-use App\Services\PublicWebsite\BuildException;
+use App\Services\StaticWebsite\BuildException;
 use RuntimeException;
 
 use function it;

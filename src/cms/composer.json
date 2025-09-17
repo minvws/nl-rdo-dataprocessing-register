@@ -23,7 +23,7 @@
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.8",
         "livewire/livewire": "^3.4",
-        "minvws/laravel-logging": "*@dev",
+        "minvws/laravel-logging": "^3.2",
         "mlocati/ip-lib": "^1.18",
         "owen-it/laravel-auditing": "^14.0",
         "solution-forest/filament-tree": "^2.1",
@@ -40,7 +40,7 @@
         "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
         "doctrine/sql-formatter": "^1.5",
         "fakerphp/faker": "^1.9.1",
-        "larastan/larastan": "*",
+        "larastan/larastan": "^3.6",
         "laravel/sail": "^1.18",
         "mockery/mockery": "^1.4.4",
         "nunomaduro/collision": "^8.0",
@@ -77,12 +77,6 @@
             "Tests\\": "tests/"
         }
     },
-    "repositories": [
-        {
-            "type": "path",
-            "url": "packages/nl-rdo-laravel-logging"
-        }
-    ],
     "scripts": {
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
@@ -101,7 +95,7 @@
         ],
         "phpcbf": "vendor/bin/phpcbf -n --parallel=12",
         "phpcs": "vendor/bin/phpcs -n --parallel=12",
-        "phpmd": "vendor/bin/phpmd app github ./phpmd.xml",
+        "phpmd": "vendor/bin/phpmd app ansi ./phpmd.xml",
         "phpmd-baseline": "vendor/bin/phpmd app github ./phpmd.xml --generate-baseline",
         "phpstan": "vendor/bin/phpstan --memory-limit=-1",
         "phpstan-clear-cache": "rm -rf /tmp/phpstan",
@@ -111,8 +105,6 @@
             "vendor/bin/phpstan analyze --memory-limit=-1"
         ],
         "phpstan-baseline": "vendor/bin/phpstan --memory-limit=-1 --generate-baseline",
-        "public-check": "php artisan public-website:check",
-        "public-refresh": "php artisan public-website:refresh",
         "queue-listen": "php artisan queue:listen --queue=high,default,low",
         "reset": [
             "composer install",
@@ -123,18 +115,12 @@
             "@reset-test-db",
             "npm i",
             "npm run build",
-            "@reset-public",
             "@reset-static",
             "@phpstan-clear-cache"
         ],
         "reset-db": [
             "php artisan db:wipe",
             "php artisan migrate --step --seed"
-        ],
-        "reset-public": [
-            "rm -rf storage/app/public-website",
-            "@public-refresh",
-            "@public-check"
         ],
         "reset-static": [
             "rm -rf storage/app/static-website",

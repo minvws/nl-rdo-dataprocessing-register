@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Listeners\Media;
 
-use App\Events\PublicWebsite;
-use App\Events\StaticWebsite;
+use App\Events\StaticWebsite\BuildEvent;
 use App\Models\Organisation;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
@@ -14,17 +13,13 @@ use Illuminate\Support\Facades\Event;
 use function it;
 
 it('does not dispatch the build-event if organisation is created', function (?CarbonInterface $publicFrom): void {
-    Event::fake([
-        PublicWebsite\BuildEvent::class,
-        StaticWebsite\BuildEvent::class,
-    ]);
+    Event::fake(BuildEvent::class);
 
     Organisation::factory()->create([
         'public_from' => $publicFrom,
     ]);
 
-    Event::assertNotDispatched(PublicWebsite\BuildEvent::class);
-    Event::assertNotDispatched(StaticWebsite\BuildEvent::class);
+    Event::assertNotDispatched(BuildEvent::class);
 })->with([
     'public_from null' => [null],
     'public_from yesterday' => [CarbonImmutable::yesterday()],
@@ -40,16 +35,12 @@ it('dispatches the build-event if needed if organisation is edited', function (
         'public_from' => $oldPublicFrom,
     ]);
 
-    Event::fake([
-        PublicWebsite\BuildEvent::class,
-        StaticWebsite\BuildEvent::class,
-    ]);
+    Event::fake(BuildEvent::class);
 
     $organisation->public_from = $newPublicFrom;
     $organisation->save();
 
-    Event::assertDispatchedTimes(PublicWebsite\BuildEvent::class, (int) $expectedEvent);
-    Event::assertDispatchedTimes(StaticWebsite\BuildEvent::class, (int) $expectedEvent);
+    Event::assertDispatchedTimes(BuildEvent::class, (int) $expectedEvent);
 })->with([
     'old public_from null, new public_from null' => [null, null, false],
     'old public_from null, new public_from yesterday' => [null, CarbonImmutable::yesterday(), true],
@@ -67,15 +58,11 @@ it('dispatches the build-event if needed if organisation is deleted', function (
         'public_from' => $publicFrom,
     ]);
 
-    Event::fake([
-        PublicWebsite\BuildEvent::class,
-        StaticWebsite\BuildEvent::class,
-    ]);
+    Event::fake(BuildEvent::class);
 
     $organisation->delete();
 
-    Event::assertDispatchedTimes(PublicWebsite\BuildEvent::class, (int) $expectedEvent);
-    Event::assertDispatchedTimes(StaticWebsite\BuildEvent::class, (int) $expectedEvent);
+    Event::assertDispatchedTimes(BuildEvent::class, (int) $expectedEvent);
 })->with([
     'public_from null' => [null, false],
     'public_from yesterday' => [CarbonImmutable::yesterday(), true],

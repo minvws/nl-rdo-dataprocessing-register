@@ -17,7 +17,6 @@ use App\Providers\FakerServiceProvider;
 use App\Providers\FilamentServiceProvider;
 use App\Providers\FilesystemServiceProvider;
 use App\Providers\ImportServiceProvider;
-use App\Providers\PublicWebsiteServiceProvider;
 use App\Providers\RepositoryServiceProvider;
 use App\Providers\RouteServiceProvider;
 use App\Providers\SnapshotDataServiceProvider;
@@ -208,7 +207,6 @@ return [
         FilamentServiceProvider::class,
         FilesystemServiceProvider::class,
         ImportServiceProvider::class,
-        PublicWebsiteServiceProvider::class,
         SnapshotDataServiceProvider::class,
         StaticWebsiteServiceProvider::class,
         SqlGeneratorServiceProvider::class,

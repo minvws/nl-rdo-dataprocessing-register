@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\AvgResponsibleProcessingRecordResource;
 
-use App\Filament\Tables\Actions\GoToPublicWebsiteAction;
+use App\Filament\Tables\Actions\GoToStaticWebsiteAction;
 use App\Filament\Tables\Columns\CreatedAtColumn;
 use App\Filament\Tables\Columns\EntityNumber;
 use App\Filament\Tables\Columns\ExpiringDateColumn;
@@ -46,7 +46,7 @@ class AvgResponsibleProcessingRecordResourceTable
             ->emptyStateHeading(__('avg_responsible_processing_record.table_empty_heading'))
             ->emptyStateDescription(null)
             ->actions([
-                GoToPublicWebsiteAction::make(),
+                GoToStaticWebsiteAction::make(),
                 EditAction::make()
                     ->label(''),
             ])
