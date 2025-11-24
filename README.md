@@ -30,7 +30,7 @@ Directory: `/src/static-website/`
 ### Setup CMS
 
 1. Open a new terminal at `/src/cms`
-2. Create an `.env` file by copying the `./.env.template` to `./.env` and optionally set the `SESSION_DRIVER` to `file`
+2. Create an `.env` file by copying the `./.env.example` to `./.env`
 3. Setup docker using laravel/sail by running:
 
     ```
@@ -38,7 +38,7 @@ Directory: `/src/static-website/`
         -u "$(id -u):$(id -g)" \
         -v "$(pwd):/var/www/html" \
         -w /var/www/html \
-        laravelsail/php82-composer:latest \
+        laravelsail/php84-composer:latest \
         composer install --ignore-platform-reqs
     ```
 
