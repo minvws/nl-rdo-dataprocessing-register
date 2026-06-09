@@ -51,6 +51,54 @@ ze de code van de meest recente release uitvoeren.
 - Na de deployment moeten voor deze release alle worker processen opnieuw opgestart worden
 - Na het herstarten van de worker moet eenmalig de statische website opnieuw opgebouwd worden: `php artisan static-website:refresh`
 
+## 1.17.0
+
+- Na deployment moeten de bestaande caches verwijderd worden: `php artisan optimize:clear`
+- Na de deployment moeten voor deze release alle worker processen opnieuw opgestart worden
+- Na het herstarten van de worker moet eenmalig de statische website opnieuw opgebouwd worden: `php artisan static-website:refresh`
+- Wijzigingen aan MinIO gerelateerde env-vars:
+    - erbij: `UPLOADS_BUCKET`
+    - erbij: `EXPORTS_BUCKET`
+    - erbij: `AWS_ACCESS_KEY_ID`
+    - erbij: `AWS_SECRET_ACCESS_KEY`
+    - erbij: `AWS_DEFAULT_REGION`
+    - erbij: `AWS_BUCKET`
+    - erbij: `AWS_ENDPOINT`
+    - erbij: `AWS_USE_PATH_STYLE_ENDPOINT`
+    - erbij: `AUDIT_SYSLOG_BASE64_ENCODE_ENABLED`
+    - eraf: `MINIO_ACCESS_KEY_ID`
+    - eraf: `MINIO_SECRET_ACCESS_KEY`
+    - eraf: `MINIO_USE_PATH_STYLE_ENDPOINT`
+
+## 1.16.0
+
+- Na deployment moeten de bestaande caches verwijderd worden: `php artisan optimize:clear`
+- Na de deployment moeten voor deze release alle worker processen opnieuw opgestart worden
+- Na het herstarten van de worker moet eenmalig de statische website opnieuw opgebouwd worden: `php artisan static-website:refresh`
+
+## 1.15.0
+
+- Na deployment moeten de bestaande caches verwijderd worden: `php artisan optimize:clear`
+- Na de deployment moeten voor deze release alle worker processen opnieuw opgestart worden
+- Na het herstarten van de worker moet eenmalig de statische website opnieuw opgebouwd worden: `php artisan static-website:refresh`
+
+## 1.14.0
+
+- Na deployment moeten de bestaande caches verwijderd worden: `php artisan optimize:clear`
+- Na de deployment moeten voor deze release alle worker processen opnieuw opgestart worden
+- Na het herstarten van de worker moet eenmalig de statische website opnieuw opgebouwd worden: `php artisan static-website:refresh`
+- De volgende env-vars dienen te worden toegevoegd ivm MinIO integratie:
+    - `MINIO_ROOT_USER`
+    - `MINIO_ROOT_PASSWORD`
+    - `MINIO_PORT`
+    - `MINIO_CONSOLE_PORT`
+    - `MINIO_ENDPOINT`
+    - `MINIO_REGION`
+    - `MINIO_BUCKET`
+    - `MINIO_ACCESS_KEY_ID`
+    - `MINIO_SECRET_ACCESS_KEY`
+    - `MINIO_USE_PATH_STYLE_ENDPOINT`
+
 ## 1.13.1
 
 - Na deployment moeten de bestaande caches verwijderd worden: `php artisan optimize:clear`

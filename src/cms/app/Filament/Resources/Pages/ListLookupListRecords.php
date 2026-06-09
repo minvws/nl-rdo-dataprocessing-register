@@ -23,7 +23,7 @@ abstract class ListLookupListRecords extends ListRecords
     public function getTabs(): array
     {
         return [
-            null => Tab::make('all')
+            'all' => Tab::make('all')
                 ->label(__('general.all')),
             'enabled' => Tab::make()
                 ->label(__('general.enabled'))

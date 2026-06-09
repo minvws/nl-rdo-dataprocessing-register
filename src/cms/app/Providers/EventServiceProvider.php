@@ -7,7 +7,6 @@ namespace App\Providers;
 use App\Events\StaticWebsite\AfterBuildEvent;
 use App\Events\StaticWebsite\BuildEvent;
 use App\Events\User\UserCreatedEvent;
-use App\Listeners\Media\MediaHasBeenAddedHandler;
 use App\Listeners\PostMediaUploadHandler;
 use App\Listeners\StaticWebsite\AfterBuildHandler;
 use App\Listeners\StaticWebsite\BuildHandler;
@@ -48,7 +47,6 @@ class EventServiceProvider extends ServiceProvider
         // model
         MediaHasBeenAddedEvent::class => [
             PostMediaUploadHandler::class,
-            MediaHasBeenAddedHandler::class,
         ],
         UserCreatedEvent::class => [UserCreatedHandler::class],
 
