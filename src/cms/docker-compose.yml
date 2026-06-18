@@ -70,7 +70,7 @@ services:
         platform: 'linux/amd64'
 
     minio:
-        image: 'minio/minio:RELEASE.2025-02-28T09-55-16Z'
+        image: 'minio/minio:RELEASE.2025-09-07T16-13-09Z'
         ports:
             - '${MINIO_PORT:-9000}:9000'
             - '${MINIO_CONSOLE_PORT:-9001}:9001'

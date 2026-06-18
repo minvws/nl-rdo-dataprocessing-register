@@ -19,7 +19,6 @@ class ExpiringDateColumn extends TextColumn
             ->date(DateFormatService::FORMAT_DATE, DateFormatService::getDisplayTimezone())
             ->color(static function (Model $model) use ($name): ?string {
                 $attribute = $model->getAttribute($name);
-                /** @phpstan-ignore argument.type, argument.templateType */
                 Assert::nullOrIsInstanceOfAny($attribute, [
                     CalendarDate::class,
                     CarbonInterface::class,
