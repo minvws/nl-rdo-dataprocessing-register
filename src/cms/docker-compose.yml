@@ -89,7 +89,7 @@ services:
             retries: 3
 
     minio-setup:
-        image: sail-8.4/app
+        image: sail-8.4-hugo/app
         depends_on:
             minio:
                 condition: service_healthy
