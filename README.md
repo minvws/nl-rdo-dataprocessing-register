@@ -107,7 +107,7 @@ The current CI workflow consists of static code analysis and automated tests. Th
 You can use the testing database (which is available by default), which requires to run the migrations there:
 
 1. Bash into the sail-container: `php artisan sail`
-2. Run `DB_DATABASE=testing php artisan migrate:fresh --seed` to (re)run all migrations and default seeders
+2. Run `DB_DATABASE=testing php artisan migrate:fresh` to (re)run all migrations
 3. Run the test: `php artisan test` (optionally with the `--coverage` parameter)
 
 #### Alternative

@@ -28,6 +28,7 @@
         "minvws/laravel-logging": "^4.0",
         "mlocati/ip-lib": "^1.18",
         "owen-it/laravel-auditing": "^14.0",
+        "secondnetwork/blade-tabler-icons": "^3.44",
         "solution-forest/filament-tree": "^2.1",
         "spatie/laravel-csp": "^3.13",
         "spatie/laravel-model-states": "^2.6",

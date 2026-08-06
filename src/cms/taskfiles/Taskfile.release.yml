@@ -66,6 +66,7 @@ tasks:
     desc: Verplaats SQL-bestanden van develop naar versie-map en update .db_requirements
     cmds:
       - |
+        ROOT=$(git rev-parse --show-toplevel)
         DEVELOP_DIR="database/sql/develop"
         TARGET_DIR="database/sql/{{.DB_VERSION}}"
 
@@ -100,7 +101,7 @@ tasks:
           NEXT=$((NEXT + 1))
         done
 
-        echo "{{.DB_VERSION}}" > .db_requirements
+        echo "{{.DB_VERSION}}" > "$ROOT/.db_requirements"
         echo ".db_requirements bijgewerkt naar {{.DB_VERSION}}"
 
         echo "Controleer ook of composer.json archive-sectie nieuwe directories bevat."
@@ -109,7 +110,10 @@ tasks:
     desc: Voeg versie-entry toe aan HOSTING_CHANGELOG.md
     cmds:
       - |
-        if grep -q "^### {{.VERSION}}" HOSTING_CHANGELOG.md; then
+        ROOT=$(git rev-parse --show-toplevel)
+        CHANGELOG="$ROOT/HOSTING_CHANGELOG.md"
+
+        if grep -q "^### {{.VERSION}}" "$CHANGELOG"; then
           echo "HOSTING_CHANGELOG.md heeft al een entry voor {{.VERSION}}, stap overgeslagen."
           exit 0
         fi
@@ -129,8 +133,8 @@ tasks:
             inserted=1
           }
           { print }
-        ' HOSTING_CHANGELOG.md > HOSTING_CHANGELOG.md.tmp
-        mv HOSTING_CHANGELOG.md.tmp HOSTING_CHANGELOG.md
+        ' "$CHANGELOG" > "$CHANGELOG.tmp"
+        mv "$CHANGELOG.tmp" "$CHANGELOG"
 
         echo "Entry voor {{.VERSION}} toegevoegd aan HOSTING_CHANGELOG.md."
         echo "Controleer en vul de entry indien nodig aan."
@@ -154,6 +158,7 @@ tasks:
         set -e
         VERSION_SAFE=$(echo "{{.VERSION}}" | tr '.' '-')
         WORKTREE="/tmp/vwr-clean-${VERSION_SAFE}"
+        APP_DIR="$WORKTREE/src/cms"
         PROJECT_NAME="vwr-clean-${VERSION_SAFE}"
         DB_NAME="vwr_clean_$(echo "{{.VERSION}}" | tr '.' '_' | tr -d 'v')"
 
@@ -164,7 +169,7 @@ tasks:
         cleanup() {
           echo "--- Opruimen schone-installatie test..."
           docker compose \
-            --project-directory "$WORKTREE" \
+            --project-directory "$APP_DIR" \
             --project-name "$PROJECT_NAME" \
             down -v --remove-orphans 2>/dev/null || true
           git worktree remove --force "$WORKTREE" 2>/dev/null || true
@@ -182,26 +187,26 @@ tasks:
         git worktree add "$WORKTREE" "$(git rev-parse release/{{.VERSION}})"
 
         # Stel geïsoleerde .env in
-        cp "$WORKTREE/.env.example" "$WORKTREE/.env"
-        perl -i -pe "s/DB_DATABASE=.*/DB_DATABASE=${DB_NAME}/" "$WORKTREE/.env"
-        perl -i -pe "s/DB_HOST=.*/DB_HOST=pgsql/" "$WORKTREE/.env"
-        perl -i -pe "s/DB_USERNAME=.*/DB_USERNAME=sail/" "$WORKTREE/.env"
-        perl -i -pe "s/DB_PASSWORD=.*/DB_PASSWORD=password/" "$WORKTREE/.env"
-        echo "FORWARD_DB_PORT=15432" >> "$WORKTREE/.env"
-        echo "APP_PORT=18080" >> "$WORKTREE/.env"
-        echo "VITE_PORT=15173" >> "$WORKTREE/.env"
-        echo "FORWARD_MAILPIT_PORT=11025" >> "$WORKTREE/.env"
-        echo "FORWARD_MAILPIT_DASHBOARD_PORT=18025" >> "$WORKTREE/.env"
-        echo "MINIO_PORT=19000" >> "$WORKTREE/.env"
-        echo "MINIO_CONSOLE_PORT=19001" >> "$WORKTREE/.env"
-        echo "WWWUSER=$(id -u)" >> "$WORKTREE/.env"
-        echo "WWWGROUP=$(id -g)" >> "$WORKTREE/.env"
+        cp "$APP_DIR/.env.example" "$APP_DIR/.env"
+        perl -i -pe "s/DB_DATABASE=.*/DB_DATABASE=${DB_NAME}/" "$APP_DIR/.env"
+        perl -i -pe "s/DB_HOST=.*/DB_HOST=pgsql/" "$APP_DIR/.env"
+        perl -i -pe "s/DB_USERNAME=.*/DB_USERNAME=sail/" "$APP_DIR/.env"
+        perl -i -pe "s/DB_PASSWORD=.*/DB_PASSWORD=password/" "$APP_DIR/.env"
+        echo "FORWARD_DB_PORT=15432" >> "$APP_DIR/.env"
+        echo "APP_PORT=18080" >> "$APP_DIR/.env"
+        echo "VITE_PORT=15173" >> "$APP_DIR/.env"
+        echo "FORWARD_MAILPIT_PORT=11025" >> "$APP_DIR/.env"
+        echo "FORWARD_MAILPIT_DASHBOARD_PORT=18025" >> "$APP_DIR/.env"
+        echo "MINIO_PORT=19000" >> "$APP_DIR/.env"
+        echo "MINIO_CONSOLE_PORT=19001" >> "$APP_DIR/.env"
+        echo "WWWUSER=$(id -u)" >> "$APP_DIR/.env"
+        echo "WWWGROUP=$(id -g)" >> "$APP_DIR/.env"
 
         # composer install
         echo "--- composer install ---"
         docker run --rm \
           -u "$(id -u):$(id -g)" \
-          -v "${WORKTREE}:/var/www/html" \
+          -v "${APP_DIR}:/var/www/html" \
           -w /var/www/html \
           -e TELESCOPE_ENABLED=false \
           composer:latest \
@@ -209,7 +214,7 @@ tasks:
 
         # Start geïsoleerde pgsql
         docker compose \
-          --project-directory "$WORKTREE" \
+          --project-directory "$APP_DIR" \
           --project-name "$PROJECT_NAME" \
           up -d pgsql
 
@@ -217,7 +222,7 @@ tasks:
         echo "Wachten op PostgreSQL..."
         for i in $(seq 1 30); do
           docker compose \
-            --project-directory "$WORKTREE" \
+            --project-directory "$APP_DIR" \
             --project-name "$PROJECT_NAME" \
             exec -T pgsql pg_isready -U sail -d "$DB_NAME" -q 2>/dev/null && break || true
           sleep 2
@@ -225,32 +230,32 @@ tasks:
 
         # Start web (zonder depends_on services — alleen pgsql nodig voor migraties)
         docker compose \
-          --project-directory "$WORKTREE" \
+          --project-directory "$APP_DIR" \
           --project-name "$PROJECT_NAME" \
           up -d --no-deps web
         sleep 3
 
         # Genereer app key
         docker compose \
-          --project-directory "$WORKTREE" \
+          --project-directory "$APP_DIR" \
           --project-name "$PROJECT_NAME" \
           exec -T web php artisan key:generate
 
         # migrate:fresh --seed
         echo "--- php artisan migrate:fresh --seed ---"
         docker compose \
-          --project-directory "$WORKTREE" \
+          --project-directory "$APP_DIR" \
           --project-name "$PROJECT_NAME" \
           exec -T web php artisan migrate:fresh --seed
 
         # npm ci && npm run build
         echo "--- npm ci && npm run build ---"
         docker compose \
-          --project-directory "$WORKTREE" \
+          --project-directory "$APP_DIR" \
           --project-name "$PROJECT_NAME" \
           exec -T web npm ci
         docker compose \
-          --project-directory "$WORKTREE" \
+          --project-directory "$APP_DIR" \
           --project-name "$PROJECT_NAME" \
           exec -T web npm run build
 
@@ -265,6 +270,7 @@ tasks:
         set -e
         VERSION_SAFE=$(echo "{{.VERSION}}" | tr '.' '-')
         WORKTREE="/tmp/vwr-migrate-${VERSION_SAFE}"
+        APP_DIR="$WORKTREE/src/cms"
         PROJECT_NAME="vwr-migrate-${VERSION_SAFE}"
         DB_NAME="vwr_migrate_$(echo "{{.VERSION}}" | tr '.' '_' | tr -d 'v')"
 
@@ -282,7 +288,7 @@ tasks:
         cleanup() {
           echo "--- Opruimen migratie-test..."
           docker compose \
-            --project-directory "$WORKTREE" \
+            --project-directory "$APP_DIR" \
             --project-name "$PROJECT_NAME" \
             down -v --remove-orphans 2>/dev/null || true
           git worktree remove --force "$WORKTREE" 2>/dev/null || true
@@ -301,26 +307,26 @@ tasks:
         git worktree add "$WORKTREE" "$PREV_TAG"
 
         # Stel geïsoleerde .env in
-        cp "$WORKTREE/.env.example" "$WORKTREE/.env"
-        perl -i -pe "s/DB_DATABASE=.*/DB_DATABASE=${DB_NAME}/" "$WORKTREE/.env"
-        perl -i -pe "s/DB_HOST=.*/DB_HOST=pgsql/" "$WORKTREE/.env"
-        perl -i -pe "s/DB_USERNAME=.*/DB_USERNAME=sail/" "$WORKTREE/.env"
-        perl -i -pe "s/DB_PASSWORD=.*/DB_PASSWORD=password/" "$WORKTREE/.env"
-        echo "FORWARD_DB_PORT=15433" >> "$WORKTREE/.env"
-        echo "APP_PORT=18081" >> "$WORKTREE/.env"
-        echo "VITE_PORT=15174" >> "$WORKTREE/.env"
-        echo "FORWARD_MAILPIT_PORT=11026" >> "$WORKTREE/.env"
-        echo "FORWARD_MAILPIT_DASHBOARD_PORT=18026" >> "$WORKTREE/.env"
-        echo "MINIO_PORT=19002" >> "$WORKTREE/.env"
-        echo "MINIO_CONSOLE_PORT=19003" >> "$WORKTREE/.env"
-        echo "WWWUSER=$(id -u)" >> "$WORKTREE/.env"
-        echo "WWWGROUP=$(id -g)" >> "$WORKTREE/.env"
+        cp "$APP_DIR/.env.example" "$APP_DIR/.env"
+        perl -i -pe "s/DB_DATABASE=.*/DB_DATABASE=${DB_NAME}/" "$APP_DIR/.env"
+        perl -i -pe "s/DB_HOST=.*/DB_HOST=pgsql/" "$APP_DIR/.env"
+        perl -i -pe "s/DB_USERNAME=.*/DB_USERNAME=sail/" "$APP_DIR/.env"
+        perl -i -pe "s/DB_PASSWORD=.*/DB_PASSWORD=password/" "$APP_DIR/.env"
+        echo "FORWARD_DB_PORT=15433" >> "$APP_DIR/.env"
+        echo "APP_PORT=18081" >> "$APP_DIR/.env"
+        echo "VITE_PORT=15174" >> "$APP_DIR/.env"
+        echo "FORWARD_MAILPIT_PORT=11026" >> "$APP_DIR/.env"
+        echo "FORWARD_MAILPIT_DASHBOARD_PORT=18026" >> "$APP_DIR/.env"
+        echo "MINIO_PORT=19002" >> "$APP_DIR/.env"
+        echo "MINIO_CONSOLE_PORT=19003" >> "$APP_DIR/.env"
+        echo "WWWUSER=$(id -u)" >> "$APP_DIR/.env"
+        echo "WWWGROUP=$(id -g)" >> "$APP_DIR/.env"
 
         # composer install voor vorige versie
         echo "--- composer install ($PREV_TAG) ---"
         docker run --rm \
           -u "$(id -u):$(id -g)" \
-          -v "${WORKTREE}:/var/www/html" \
+          -v "${APP_DIR}:/var/www/html" \
           -w /var/www/html \
           -e TELESCOPE_ENABLED=false \
           composer:latest \
@@ -328,7 +334,7 @@ tasks:
 
         # Start geïsoleerde pgsql
         docker compose \
-          --project-directory "$WORKTREE" \
+          --project-directory "$APP_DIR" \
           --project-name "$PROJECT_NAME" \
           up -d pgsql
 
@@ -336,7 +342,7 @@ tasks:
         echo "Wachten op PostgreSQL..."
         for i in $(seq 1 30); do
           docker compose \
-            --project-directory "$WORKTREE" \
+            --project-directory "$APP_DIR" \
             --project-name "$PROJECT_NAME" \
             exec -T pgsql pg_isready -U sail -d "$DB_NAME" -q 2>/dev/null && break || true
           sleep 2
@@ -344,23 +350,23 @@ tasks:
 
         # Start web
         docker compose \
-          --project-directory "$WORKTREE" \
+          --project-directory "$APP_DIR" \
           --project-name "$PROJECT_NAME" \
           up -d --no-deps web
         sleep 3
 
         docker compose \
-          --project-directory "$WORKTREE" \
+          --project-directory "$APP_DIR" \
           --project-name "$PROJECT_NAME" \
           exec -T web php artisan key:generate
 
         # Verwijder develop/ scripts: productie heeft nooit WIP-migraties,
         # zodat de versioned migraties van de release puur worden getest.
-        rm -rf "$WORKTREE/database/sql/develop"
+        rm -rf "$APP_DIR/database/sql/develop"
 
         echo "--- migrate:fresh --seed op $PREV_TAG ---"
         docker compose \
-          --project-directory "$WORKTREE" \
+          --project-directory "$APP_DIR" \
           --project-name "$PROJECT_NAME" \
           exec -T web php artisan migrate:fresh --seed
 
@@ -372,7 +378,7 @@ tasks:
         echo "--- composer install (release/{{.VERSION}}) ---"
         docker run --rm \
           -u "$(id -u):$(id -g)" \
-          -v "${WORKTREE}:/var/www/html" \
+          -v "${APP_DIR}:/var/www/html" \
           -w /var/www/html \
           -e TELESCOPE_ENABLED=false \
           composer:latest \
@@ -381,7 +387,7 @@ tasks:
         # Incrementele migratie
         echo "--- php artisan migrate (incrementeel) ---"
         docker compose \
-          --project-directory "$WORKTREE" \
+          --project-directory "$APP_DIR" \
           --project-name "$PROJECT_NAME" \
           exec -T web php artisan migrate
 

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\AvgResponsibleProcessingRecordResource;
 
+use App\Filament\Forms\Components\ProcessingRecordStep;
 use App\Filament\Forms\Components\ProcessingRecordWizard;
 use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Wizard\Step;
 use Filament\Forms\Form;
 
 use function __;
@@ -19,35 +19,35 @@ class AvgResponsibleProcessingRecordResourceForm
             ->schema([
                 ProcessingRecordWizard::make()
                     ->schema([
-                        Step::make(__('avg_responsible_processing_record.step_processing_name'))
+                        ProcessingRecordStep::make(__('avg_responsible_processing_record.step_processing_name'))
                             ->schema(AvgResponsibleProcessingRecordResourceFormSchemas::getProcessingName()),
-                        Step::make(__('avg_responsible_processing_record.step_responsible'))
+                        ProcessingRecordStep::make(__('avg_responsible_processing_record.step_responsible'))
                             ->schema(AvgResponsibleProcessingRecordResourceFormSchemas::getResponsible()),
-                        Step::make(__('avg_responsible_processing_record.step_processor'))
+                        ProcessingRecordStep::make(__('avg_responsible_processing_record.step_processor'))
                             ->schema(AvgResponsibleProcessingRecordResourceFormSchemas::getProcessor()),
-                        Step::make(__('avg_responsible_processing_record.step_receiver'))
+                        ProcessingRecordStep::make(__('avg_responsible_processing_record.step_receiver'))
                             ->schema(AvgResponsibleProcessingRecordResourceFormSchemas::getReceiver()),
-                        Step::make(__('avg_responsible_processing_record.step_processing_goal'))
+                        ProcessingRecordStep::make(__('avg_responsible_processing_record.step_processing_goal'))
                             ->schema(AvgResponsibleProcessingRecordResourceFormSchemas::getProcessingGoal()),
-                        Step::make(__('avg_responsible_processing_record.step_stakeholder_data'))
+                        ProcessingRecordStep::make(__('avg_responsible_processing_record.step_stakeholder_data'))
                             ->schema(AvgResponsibleProcessingRecordResourceFormSchemas::getStakeholder()),
-                        Step::make(__('avg_responsible_processing_record.step_decision_making'))
+                        ProcessingRecordStep::make(__('avg_responsible_processing_record.step_decision_making'))
                             ->schema(AvgResponsibleProcessingRecordResourceFormSchemas::getDecisionMaking()),
-                        Step::make(__('avg_responsible_processing_record.step_system'))
+                        ProcessingRecordStep::make(__('avg_responsible_processing_record.step_system'))
                             ->schema(AvgResponsibleProcessingRecordResourceFormSchemas::getSystem()),
-                        Step::make(__('avg_responsible_processing_record.step_security'))
+                        ProcessingRecordStep::make(__('avg_responsible_processing_record.step_security'))
                             ->schema(AvgResponsibleProcessingRecordResourceFormSchemas::getSecurity()),
-                        Step::make(__('avg_responsible_processing_record.step_passthrough'))
+                        ProcessingRecordStep::make(__('avg_responsible_processing_record.step_passthrough'))
                             ->schema(AvgResponsibleProcessingRecordResourceFormSchemas::getPassthrough()),
-                        Step::make(__('avg_responsible_processing_record.step_geb_dpia'))
+                        ProcessingRecordStep::make(__('avg_responsible_processing_record.step_geb_dpia'))
                             ->schema(AvgResponsibleProcessingRecordResourceFormSchemas::getGebDpia()),
-                        Step::make(__('avg_responsible_processing_record.step_contact_person'))
+                        ProcessingRecordStep::make(__('avg_responsible_processing_record.step_contact_person'))
                             ->schema(AvgResponsibleProcessingRecordResourceFormSchemas::getContactPerson()),
-                        Step::make(__('avg_responsible_processing_record.step_attachments'))
+                        ProcessingRecordStep::make(__('avg_responsible_processing_record.step_attachments'))
                             ->schema(AvgResponsibleProcessingRecordResourceFormSchemas::getAttachments()),
-                        Step::make(__('avg_responsible_processing_record.step_remarks'))
+                        ProcessingRecordStep::make(__('avg_responsible_processing_record.step_remarks'))
                             ->schema(AvgResponsibleProcessingRecordResourceFormSchemas::getRemarks()),
-                        Step::make(__('avg_responsible_processing_record.step_publish'))
+                        ProcessingRecordStep::make(__('avg_responsible_processing_record.step_publish'))
                             ->schema(AvgResponsibleProcessingRecordResourceFormSchemas::getPublish()),
                     ])
                     ->skippable()

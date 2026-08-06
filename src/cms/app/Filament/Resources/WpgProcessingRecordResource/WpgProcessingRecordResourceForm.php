@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\WpgProcessingRecordResource;
 
+use App\Filament\Forms\Components\ProcessingRecordStep;
 use App\Filament\Forms\Components\ProcessingRecordWizard;
 use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Wizard\Step;
 use Filament\Forms\Form;
 
 use function __;
@@ -19,33 +19,33 @@ class WpgProcessingRecordResourceForm
             ->schema([
                 ProcessingRecordWizard::make()
                     ->schema([
-                        Step::make(__('wpg_processing_record.step_processing_name'))
+                        ProcessingRecordStep::make(__('wpg_processing_record.step_processing_name'))
                             ->schema(WpgProcessingRecordResourceFormSchemas::getProcessingName()),
-                        Step::make(__('wpg_processing_record.step_responsible'))
+                        ProcessingRecordStep::make(__('wpg_processing_record.step_responsible'))
                             ->schema(WpgProcessingRecordResourceFormSchemas::getResponsible()),
-                        Step::make(__('wpg_processing_record.step_processor'))
+                        ProcessingRecordStep::make(__('wpg_processing_record.step_processor'))
                             ->schema(WpgProcessingRecordResourceFormSchemas::getProcessor()),
-                        Step::make(__('wpg_processing_record.step_receiver'))
+                        ProcessingRecordStep::make(__('wpg_processing_record.step_receiver'))
                             ->schema(WpgProcessingRecordResourceFormSchemas::getReceiver()),
-                        Step::make(__('wpg_processing_record.step_wpg_goal'))
+                        ProcessingRecordStep::make(__('wpg_processing_record.step_wpg_goal'))
                             ->schema(WpgProcessingRecordResourceFormSchemas::getProcessingGoal()),
-                        Step::make(__('wpg_processing_record.step_special_police_data'))
+                        ProcessingRecordStep::make(__('wpg_processing_record.step_special_police_data'))
                             ->schema(WpgProcessingRecordResourceFormSchemas::getSpecialPoliceData()),
-                        Step::make(__('wpg_processing_record.step_decision_making'))
+                        ProcessingRecordStep::make(__('wpg_processing_record.step_decision_making'))
                             ->schema(WpgProcessingRecordResourceFormSchemas::getDecisionMaking()),
-                        Step::make(__('wpg_processing_record.step_system_application'))
+                        ProcessingRecordStep::make(__('wpg_processing_record.step_system_application'))
                             ->schema(WpgProcessingRecordResourceFormSchemas::getSystems()),
-                        Step::make(__('wpg_processing_record.step_security'))
+                        ProcessingRecordStep::make(__('wpg_processing_record.step_security'))
                             ->schema(WpgProcessingRecordResourceFormSchemas::getSecurity()),
-                        Step::make(__('wpg_processing_record.step_geb_dpia'))
+                        ProcessingRecordStep::make(__('wpg_processing_record.step_geb_dpia'))
                             ->schema(WpgProcessingRecordResourceFormSchemas::getGebDpia()),
-                        Step::make(__('wpg_processing_record.step_contact_person'))
+                        ProcessingRecordStep::make(__('wpg_processing_record.step_contact_person'))
                             ->schema(WpgProcessingRecordResourceFormSchemas::getContactPersons()),
-                        Step::make(__('wpg_processing_record.step_attachments'))
+                        ProcessingRecordStep::make(__('wpg_processing_record.step_attachments'))
                             ->schema(WpgProcessingRecordResourceFormSchemas::getAttachments()),
-                        Step::make(__('wpg_processing_record.step_remarks'))
+                        ProcessingRecordStep::make(__('wpg_processing_record.step_remarks'))
                             ->schema(WpgProcessingRecordResourceFormSchemas::getRemarks()),
-                        Step::make(__('wpg_processing_record.step_categories_involved'))
+                        ProcessingRecordStep::make(__('wpg_processing_record.step_categories_involved'))
                             ->schema(WpgProcessingRecordResourceFormSchemas::getCategoriesInvolved()),
                     ])
                     ->skippable()

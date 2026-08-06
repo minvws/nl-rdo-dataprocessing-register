@@ -214,7 +214,7 @@
                             >
                                 <x-filament::icon
                                     alias="forms::components.wizard.completed-step"
-                                    icon="heroicon-o-check"
+                                    :icon="$step->hasRequiredFieldsFilled() ? 'tabler-circle' : 'tabler-progress'"
                                     x-cloak="x-cloak"
                                     x-show="getStepIndex(step) > {{ $loop->index }}"
                                     class="fi-fo-wizard-header-step-icon h-6 w-6 dark:text-primary-600 text-gray-900"
