@@ -1,6 +1,6 @@
 <x-filament-widgets::widget>
     <x-filament::section>
-        <form wire:submit="submit">
+        <form wire:submit="submit" novalidate>
             {{ $this->form }}
 
             <x-filament::button type="submit" class="mt-3">

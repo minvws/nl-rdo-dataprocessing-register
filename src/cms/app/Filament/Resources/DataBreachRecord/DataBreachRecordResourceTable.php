@@ -6,12 +6,12 @@ namespace App\Filament\Resources\DataBreachRecord;
 
 use App\Filament\Tables\Columns\CreatedAtColumn;
 use App\Filament\Tables\Columns\EntityNumber;
+use App\Filament\Tables\Columns\IconColumn;
 use App\Filament\Tables\Columns\UpdatedAtColumn;
 use App\Filament\Tables\DocumentFilter;
 use App\Filament\Tables\ResponsibleFilter;
 use App\Services\DateFormatService;
 use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
@@ -23,6 +23,7 @@ class DataBreachRecordResourceTable
     public static function table(Table $table): Table
     {
         return $table
+            ->recordUrl(null)
             ->columns([
                 EntityNumber::make()
                     ->label(__('data_breach_record.number')),

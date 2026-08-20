@@ -22,7 +22,9 @@ trait IsPublishable
 {
     final public static function bootIsPublishable(): void
     {
-        static::observe(PublishableObserver::class);
+        static::whenBooted(static function (): void {
+            static::observe(PublishableObserver::class);
+        });
     }
 
     final public function getPublicIdentifier(): string

@@ -7,9 +7,9 @@ namespace App\Filament\Actions\Exports;
 use App\Models\Contracts\SnapshotSource;
 use App\Models\Snapshot;
 use Illuminate\Database\Eloquent\Model;
+use Webmozart\Assert\Assert;
 
 use function __;
-use function assert;
 use function sprintf;
 
 class SnapshotLatestStatusColumn extends ExportColumn
@@ -19,7 +19,8 @@ class SnapshotLatestStatusColumn extends ExportColumn
         return parent::make($name)
             ->label(__('snapshot.latest_status'))
             ->default(static function (Model $model): ?string {
-                assert($model instanceof SnapshotSource);
+                Assert::isInstanceOf($model, SnapshotSource::class);
+
                 $snapshot = $model->snapshots()
                     ->orderBy('version', 'desc')
                     ->first();

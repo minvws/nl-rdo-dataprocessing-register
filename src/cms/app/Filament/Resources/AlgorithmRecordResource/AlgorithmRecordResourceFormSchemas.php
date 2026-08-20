@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\AlgorithmRecordResource;
 
-use App\Filament\Forms\Components\DatePicker\DatePicker;
 use App\Filament\Forms\Components\Section\InformationBlockSection;
 use App\Filament\Forms\Components\Select\SelectSingleWithLookup;
 use App\Filament\Forms\Components\SelectMultipleWithLookup;
@@ -16,6 +15,7 @@ use App\Models\Algorithm\AlgorithmStatus;
 use App\Models\Algorithm\AlgorithmTheme;
 use App\Models\Document;
 use Filament\Forms\Components\Component;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Textarea;

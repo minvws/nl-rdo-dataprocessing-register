@@ -1,0 +1,146 @@
+/*
+ * Corrections to Filament's own styling that are needed to meet WCAG 2.2 level AA.
+ */
+
+/*
+ * Placeholder text is text, so it needs 4.5:1 (WCAG 1.4.3)
+ */
+.fi-body ::placeholder,
+.fi-body .choices__placeholder.choices__item {
+    color: rgb(var(--gray-500));
+}
+
+.dark .fi-body ::placeholder,
+.dark .fi-body .choices__placeholder.choices__item {
+    color: rgb(var(--gray-400));
+}
+
+/*
+ * The outline of inputs, radio buttons and checkboxes identifies them as a component, so it needs 3:1
+ * against its surroundings (WCAG 1.4.11)
+ */
+.fi-body .ring-gray-950\/10:not(:focus):not(:focus-within) {
+    --tw-ring-color: rgba(var(--gray-950), 0.5);
+}
+
+.dark .fi-body .dark\:ring-white\/20:not(:focus):not(:focus-within) {
+    --tw-ring-color: rgb(255 255 255 / 0.4);
+}
+
+/*
+ * Grey icons (notifications, filters, column toggle, search, navigation)
+ */
+.fi-body .text-gray-400:not(:hover) {
+    color: rgb(var(--gray-500));
+}
+
+html:not(.dark) .fi-body .hover\:text-gray-500:hover {
+    color: rgb(var(--gray-600));
+}
+
+/*
+ * Navigation labels are truncated to one line, wrapping keeps them complete (WCAG 1.4.12).
+ */
+.fi-body .fi-sidebar-item-label.truncate {
+    white-space: normal;
+}
+
+/*
+ * Update toggle button colors to meet 3:1 contrast (WCAG 1.4.11)
+ */
+html:not(.dark) .fi-body .fi-fo-toggle.bg-gray-200 {
+    border-color: rgba(var(--gray-950), 0.5);
+}
+
+.dark .fi-body .fi-fo-toggle.bg-gray-200 {
+    border-color: rgb(255 255 255 / 0.4);
+}
+
+.dark .fi-body .fi-fo-toggle.fi-color-primary.bg-custom-600 {
+    background-color: rgb(var(--primary-400));
+}
+
+/*
+ * Below the desktop breakpoint the navigation panel covers the page,
+ * show close button to allow users to dismiss it
+ */
+@media (max-width: 1023px) {
+    .fi-sidebar {
+        max-width: 100vw;
+    }
+
+    .fi-sidebar-header .fi-icon-btn {
+        display: flex;
+    }
+}
+
+/*
+ * Upload result bars (FilePond) color updates
+ */
+[data-filepond-item-state='processing-complete'] .filepond--item-panel {
+    background-color: #15803d;
+}
+
+[data-filepond-item-state*='error'] .filepond--item-panel,
+[data-filepond-item-state*='invalid'] .filepond--item-panel {
+    background-color: #b91c1c;
+}
+
+[data-filepond-item-state='processing-complete'] .filepond--file-status-sub,
+[data-filepond-item-state='processing-complete']
+    .filepond--action-revert-item-processing
+    ~ .filepond--file-info
+    .filepond--file-info-sub,
+[data-filepond-item-state='processing-error']
+    .filepond--action-retry-item-processing
+    ~ .filepond--file-status
+    .filepond--file-status-sub {
+    opacity: 1;
+}
+
+.fi-body .fi-ta-row:has([data-row-target]) {
+    cursor: pointer;
+}
+
+.fi-body .fi-ta-row:has([data-row-target]):hover {
+    background-color: rgb(var(--gray-50));
+}
+
+.dark .fi-body .fi-ta-row:has([data-row-target]):hover {
+    background-color: rgb(255 255 255 / 0.05);
+}
+
+.fi-body input.filepond--browser{
+    display: none;
+}
+
+.fi-body .filepond--drop-label,
+.fi-body .filepond--drop-label label {
+    cursor: pointer;
+}
+
+.fi-body .filepond--root[data-disabled] .filepond--drop-label,
+.fi-body .filepond--root[data-disabled] .filepond--drop-label label {
+    cursor: default;
+}
+
+.fi-body .filepond--drop-label:hover {
+    background-color: rgb(var(--gray-50));
+}
+
+.dark .fi-body .filepond--drop-label:hover {
+    background-color: rgb(255 255 255 / 0.05);
+}
+
+.fi-body :focus-visible {
+    outline: 2px solid rgb(var(--gray-950));
+    outline-offset: 2px;
+}
+
+.dark .fi-body :focus-visible {
+    outline-color: rgb(255 255 255);
+}
+
+.fi-body .fi-fo-repeater-item-header .opacity-0 {
+    visibility: hidden;
+}

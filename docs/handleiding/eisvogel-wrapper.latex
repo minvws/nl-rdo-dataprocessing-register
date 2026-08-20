@@ -1,0 +1,5 @@
+$-- Wrapper rond eisvogel-template (pandoc), zodat de
+$-- handleiding een getagde PDF wordt (WCAG)
+$document-metadata.latex()$
+\RequirePackage{eisvogel-article}
+$eisvogel.latex()$

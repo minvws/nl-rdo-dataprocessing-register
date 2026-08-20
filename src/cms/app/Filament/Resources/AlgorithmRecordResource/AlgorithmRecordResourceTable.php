@@ -20,6 +20,7 @@ class AlgorithmRecordResourceTable
     public static function table(Table $table): Table
     {
         return $table
+            ->recordUrl(null)
             ->columns([
                 EntityNumber::make()
                     ->label(__('algorithm_record.number')),

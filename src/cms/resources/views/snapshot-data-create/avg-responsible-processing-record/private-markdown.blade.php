@@ -118,15 +118,6 @@
 @endif
 @endif
 
-## {{ __('avg_responsible_processing_record.step_contact_person') }}
-
-@foreach($record->users as $user)
-- {!! Str::toSingleLineEscapedString($user->name) !!} @if($user->email)&lt;{!! Str::toSingleLineEscapedString($user->email) !!}&gt;@endif
-
-@endforeach
-
-<!--- #App\Models\ContactPerson# --->
-
 ## {{ __('avg_responsible_processing_record.step_attachments') }}
 
 @forelse($record->documents as $document)

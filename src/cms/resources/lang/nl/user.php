@@ -26,7 +26,7 @@ return [
 
     'name' => 'Naam',
     'password' => 'Wachtwoord',
-    'email' => 'E-mail',
+    'email' => 'E-mailadres',
     'email_domain_not_allowed' => 'E-mail domein niet toegestaan, toegestane domeinen zijn: :allowedEmailDomains',
 
     'one_time_password' => [

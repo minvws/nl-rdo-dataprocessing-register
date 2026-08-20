@@ -1,3 +1,112 @@
-# 2f341f1c\-9e52\-330b\-a19c\-f73db7c85681
+## Naam verwerking
 
-- Velit eius itaque distinctio tempore\. Quam commodi a minus cumque placeat voluptatem impedit et\.
+- **Nummer verwerking**: 7cb7c7db\-6e97\-3391\-8153\-477df1e8fde8
+- **Import nummer**: 
+- **Naam verwerking**: 2f341f1c\-9e52\-330b\-a19c\-f73db7c85681
+- **Primair / Secundair**: Secundair
+- **WPG Verwerking Dienst**: In modi dolore aspernatur nobis ullam magni minus ipsum\.
+- **Labels**: -
+- **Periodieke review**: 21-07-2001
+- **Hoofdverwerking**: -
+
+## Verwerkingsverantwoordelijke
+
+<!--- #App\Models\Responsible# --->
+
+## Verwerker
+
+- **Heeft verwerkers**: ja
+
+<!--- #App\Models\Processor# --->
+
+## Ontvanger
+
+- **Politiegegevens ter beschikking gesteld**
+  - **Artikel 15: Aan ontvangers binnen het Wpg-domein in Nederland**: ja
+  - **Artikel 15a: Aan ontvangers belast met politietaken en EU-organisaties belast met opsporing binnen de EU maar anders dan Nederland**: nee
+  - **Toelichting**: Et dicta illo suscipit sint sunt accusamus\.
+- **Politiegegevens verstrekt aan derden**
+  - **Artikel 16: aan het Openbaar Ministerie, de burgermeester of de verwerkingsverantwoordelijke zelf voor specifieke taken zoals genoemdn in art. 16, lid 1 sub c Wpg**: ja
+  - **Artikel 17: aan de Nederlandse veiligheidsdiensten**: nee
+  - **Artikel 18: aan ontvangers genoemd in lagere regelgeving of op basis van een machtiging van de minister van J&amp;V**: nee
+  - **Artikel 19: aan ontvangers van incidentele gevallen**: ja
+  - **Artikel 20: aan ontvangers in samenwerkingsverbanden**: nee
+  - **Artikel 22: aan ontvangers t.b.v. wetenschappelijk onderzoek en statistiek**: ja
+  - **Artikel 23: rechtstreekse verstrekking**: nee
+  - **Artikel 24: rechtstreekse verstrekking aan inlichtingen- en veiligheidsdiensten**: ja
+  - **Toelichting**: -
+- **Politiegegevens doorgegeven**
+  - **Artikel 17a: aan ontvangers in derde landen of aan internationale organisaties die belast zijn met opsporingstaken**: ja
+  - **Toelichting**: Aut porro et nulla\.
+
+## Doel &amp; Grondslag
+
+- **Omschrijving**: Velit eius itaque distinctio tempore\. Quam commodi a minus cumque placeat voluptatem impedit et\.
+  - **Art. 8: Uitvoering dagelijkse politietaak (signaalafhandeling)**: ja
+  - **Art. 9: Onderzoek i.v.m. handhaving rechtsorde**: nee
+  - **Art. 10, lid 1a: Register zware criminaliteit**: ja
+  - **Art. 10, lid 1b: Themaverwerkingen**: nee
+  - **Art. 10, lid 1c: Regionale Inlichtingen diensten Openbare Orde**: ja
+  - **Art. 12: Controle en beheer informanten**: nee
+  - **Art. 13, lid 1: Landelijk raadpleegbare politiegegevens**: ja
+  - **Art. 13, lid 2: Specialistische onderwerpen**: nee
+  - **Art. 13, lid 3: Geautomatiseerde vergelijking**: ja
+  - **Uitleg**: Quam commodi a minus cumque placeat voluptatem impedit et\.
+
+## Bijzondere politiegegevens
+
+- **Politiegegevens waaruit ras of etnische afkomst blijkt**: ja
+- **Politiegegevens waaruit politieke opvatting blijken**: nee
+- **Politiegegevens waaruit religieuze of levensbeschouwelijke overtuigingen blijken**: ja
+- **Politiegegevens waaruit het lidmaatschap van een vakbond blijkt**: nee
+- **Genetische politiegegevens**: ja
+- **Biotmetrische politiegegevens met het oog op de unieke identificatie van een persoon**: nee
+- **Politiegegevens over gezondheid**: ja
+- **Politiegegevens net betrekking tot iemands seksueel gedrag of seksuele geaardheid**: nee
+
+## Besluitvorming
+
+- **Geautomatiseerde besluitvorming**: ja
+- **Toelichting**: Et dicta illo suscipit sint sunt accusamus\.
+- **Consequenties**: Et dicta illo suscipit sint sunt accusamus\.
+
+## Systemen / Applicaties
+
+- **Heeft systeem / applicatie**: ja
+
+<!--- #App\Models\System# --->
+
+## Beveiliging
+
+- **Beveiliging**: ja
+- **Maatregelen**
+  - **Vastgesteld beveiligingsbeleid dat ook is geïmplementeerd**: ja
+  - **Overige maatregelen**: nee
+  - **Toelichting maatregelen**: Et dicta illo suscipit sint sunt accusamus\.
+- **Gebruikt u pseudonimisering?**: ja
+  - **Pseudonimisering**: Aut porro et nulla\.
+
+## GEB (DPIA)
+
+- **GEB (DPIA)**: ja
+
+## Documenten &amp; Bijlagen
+
+- Geen
+
+## Opmerkingen
+
+- Geen
+
+## Categorieën betrokkenen
+
+- **Verdachten**: ja
+- **Slachtoffers**: nee
+- **Veroordeelden**: ja
+- **Politie/Justitie**: nee
+- **Derden**: ja
+- **Toelichting derden**: Et dicta illo suscipit sint sunt accusamus\.
+
+## Publiceren
+
+- **Publiceer vanaf**: 24-05-2012 02:00

@@ -27,7 +27,6 @@ class SqlExecute extends Command
 
         $fileSystem = Storage::disk(Config::string('sql-generator.filesystem_disk'));
         $allFiles = $fileSystem->allFiles($version);
-        Assert::allString($allFiles);
         $versionedFiles = $this->getVersionedFiles($allFiles);
 
         foreach ($versionedFiles as $files) {
@@ -35,6 +34,7 @@ class SqlExecute extends Command
                 $query = $fileSystem->get($file);
                 Assert::string($query);
 
+                // @phpstan-ignore argument.type
                 $databaseManager->unprepared($query);
                 $this->output->writeln(sprintf('Executed %s', $file));
             }

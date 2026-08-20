@@ -17,6 +17,7 @@ class OrganisationResourceTable
     public static function table(Table $table): Table
     {
         return $table
+            ->recordUrl(null)
             ->columns([
                 TextColumn::make('name')
                     ->label(__('general.name'))

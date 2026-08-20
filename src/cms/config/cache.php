@@ -108,4 +108,18 @@ return [
 
     'prefix' => env('CACHE_PREFIX', 'verwerkingsregister_cache_'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Serializable Classes
+    |--------------------------------------------------------------------------
+    |
+    | This option hardens cache unserialization to help prevent PHP
+    | deserialization gadget chain attacks if the application's APP_KEY
+    | is ever leaked. Classes that may be unserialized when reading from
+    | the cache should be listed explicitly, or false to allow none.
+    |
+    */
+
+    'serializable_classes' => false,
+
 ];

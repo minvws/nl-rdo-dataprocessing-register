@@ -37,9 +37,9 @@ class ContactPersonResourceInfolist
                     TextEntry::make('contactPersonPosition.name')
                         ->label(__('contact_person_position.model_singular')),
                     TextEntry::make('email')
-                        ->label(__('responsible.email')),
+                        ->label(__('contact_person.email')),
                     TextEntry::make('phone')
-                        ->label(__('responsible.phone')),
+                        ->label(__('contact_person.phone')),
                 ]),
             AddressRepeatableEntry::make(),
         ];

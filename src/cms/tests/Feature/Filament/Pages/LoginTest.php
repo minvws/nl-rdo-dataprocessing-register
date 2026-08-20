@@ -5,14 +5,22 @@ declare(strict_types=1);
 use App\Components\Uuid\Uuid;
 use App\Enums\RouteName;
 use App\Filament\Pages\Login;
+use App\Livewire\SessionExpiryWarning;
 use App\Models\User;
 use App\Models\UserLoginToken;
 use Illuminate\Support\Facades\URL;
+use Livewire\Livewire;
 use Tests\Helpers\ConfigTestHelper;
 
 it('can show the login page', function (): void {
     $response = $this->get('/login');
     $response->assertOk();
+});
+
+it('identifies the purpose of the email field', function (): void {
+    $this->get('/login')
+        ->assertOk()
+        ->assertSee('autocomplete="email"', escape: false);
 });
 
 it('accepts a valid email on the login page', function (): void {
@@ -246,4 +254,27 @@ it('cannot process the login confirm form with invalid token', function (): void
         'token' => $token,
         'user_id' => $user->id,
     ]);
+});
+
+it('shows a notification when the user was logged out after session expiry', function (): void {
+    ConfigTestHelper::set('session.lifetime', 30);
+
+    Livewire::withQueryParams([SessionExpiryWarning::EXPIRED_QUERY_PARAMETER => 1])
+        ->test(Login::class)
+        ->assertNotified(__('session.expired_notification_title'));
+});
+
+it('does not show a session expiry notification on a regular visit', function (): void {
+    $this->createLivewireTestable(Login::class)
+        ->assertNotNotified(__('session.expired_notification_title'));
+});
+
+it('does not show a session expiry notification when the user is still authenticated', function (): void {
+    ConfigTestHelper::set('session.lifetime', 30);
+
+    $this->be(User::factory()->withOrganisation()->create());
+
+    Livewire::withQueryParams([SessionExpiryWarning::EXPIRED_QUERY_PARAMETER => 1])
+        ->test(Login::class)
+        ->assertNotNotified(__('session.expired_notification_title'));
 });

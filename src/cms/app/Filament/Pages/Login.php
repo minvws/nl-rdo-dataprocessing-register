@@ -6,9 +6,14 @@ namespace App\Filament\Pages;
 
 use App\Config\Config;
 use App\Facades\AdminLog;
+use App\Livewire\SessionExpiryWarning;
 use App\Models\User;
 use App\Services\UserLoginToken\UserLoginService;
+use Carbon\CarbonInterval;
 use DanHarrin\LivewireRateLimiting\Exceptions\TooManyRequestsException;
+use Filament\Facades\Filament;
+use Filament\Forms\Components\Component;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Http\Responses\Auth\Contracts\LoginResponse;
 use Filament\Notifications\Notification;
@@ -21,9 +26,32 @@ use Webmozart\Assert\Assert;
 use function __;
 use function app;
 use function ceil;
+use function request;
 
 class Login extends FilamentLogin
 {
+    public function mount(): void
+    {
+        parent::mount();
+
+        if (Filament::auth()->check()) {
+            return;
+        }
+
+        if (!request()->boolean(SessionExpiryWarning::EXPIRED_QUERY_PARAMETER)) {
+            return;
+        }
+
+        Notification::make()
+            ->title(__('session.expired_notification_title'))
+            ->body(__('session.expired_notification_body', [
+                'duration' => CarbonInterval::minutes(Config::integer('session.lifetime'))->cascade()->forHumans(),
+            ]))
+            ->warning()
+            ->persistent()
+            ->send();
+    }
+
     public function form(Form $form): Form
     {
         return $form->schema([
@@ -95,6 +123,18 @@ class Login extends FilamentLogin
     public function getHeading(): string
     {
         return '';
+    }
+
+    /**
+     * Filament defaults to autocomplete="on", which does not tell the browser what to fill in. The purpose of
+     * the field has to be programmatically determinable for autofill to work (WCAG 1.3.5).
+     */
+    protected function getEmailFormComponent(): Component
+    {
+        $emailFormComponent = parent::getEmailFormComponent();
+        Assert::isInstanceOf($emailFormComponent, TextInput::class);
+
+        return $emailFormComponent->autocomplete('email');
     }
 
     private function sendNotification(): void

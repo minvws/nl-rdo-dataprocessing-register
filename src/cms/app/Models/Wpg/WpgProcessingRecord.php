@@ -217,8 +217,9 @@ class WpgProcessingRecord extends Model implements Cloneable, EntityNumerable, R
             'police_health' => 'bool',
             'police_sexual_life' => 'bool',
             'data_collection_source' => CoreEntityDataCollectionSource::class,
-            'measures' => 'bool',
+            'measures_implemented' => 'bool',
             'other_measures' => 'bool',
+            'has_pseudonymization' => 'bool',
         ];
     }
 

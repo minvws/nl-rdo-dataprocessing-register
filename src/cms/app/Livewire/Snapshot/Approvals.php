@@ -12,6 +12,7 @@ use App\Facades\Authentication;
 use App\Facades\Authorization;
 use App\Filament\Forms\Components\CheckboxList;
 use App\Filament\Resources\SnapshotResource\Pages\ViewSnapshot;
+use App\Filament\Tables\Columns\IconColumn;
 use App\Models\Snapshot;
 use App\Models\SnapshotApproval;
 use App\Models\User;
@@ -22,7 +23,6 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
@@ -63,6 +63,9 @@ class Approvals extends Component implements HasForms, HasTable
                             SnapshotApprovalStatus::DECLINED => 'heroicon-o-x-mark',
                             SnapshotApprovalStatus::UNKNOWN => 'heroicon-o-clock',
                         };
+                    })
+                    ->textAlternative(static function (SnapshotApprovalStatus $state): string {
+                        return $state->getLabel();
                     }),
                 TextColumn::make('assignedTo.name')
                     ->label(__('snapshot_approval.assigned_to')),
@@ -125,8 +128,8 @@ class Approvals extends Component implements HasForms, HasTable
     private function createRequestApprovalForm(): array
     {
         $allowedUserIds = $this->snapshot->organisation->users()
-            ->whereHas('organisationRoles', static function (Builder $query): Builder {
-                return $query->where(['role' => Role::MANDATE_HOLDER]);
+            ->whereHas('organisationRoles', static function (Builder $query): void {
+                $query->where(['role' => Role::MANDATE_HOLDER]);
             })
             ->whereNot('user_id', Authentication::user()->id)
             ->whereNotIn('user_id', $this->snapshot->snapshotApprovals()

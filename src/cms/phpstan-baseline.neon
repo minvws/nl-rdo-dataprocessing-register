@@ -73,7 +73,7 @@ parameters:
 			path: app/Filament/Resources/OrganisationUserResource/Pages/EditOrganisationUser.php
 
 		-
-			message: '#^Parameter \#2 \$callback of method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\Snapshot\>\:\:whereHas\(\) expects \(Closure\(Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\SnapshotApproval\>\)\: mixed\)\|null, Closure\(App\\Models\\Builders\\SnapshotApprovalBuilder\)\: void given\.$#'
+			message: '#^Parameter \#2 \$callback of method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\Snapshot\>\:\:whereHas\(\) expects \(Closure\(Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\SnapshotApproval\>\)\: mixed\)\|null, static\-Closure\(App\\Models\\Builders\\SnapshotApprovalBuilder\)\: void given\.$#'
 			identifier: argument.type
 			count: 2
 			path: app/Filament/Resources/PersonalSnapshotApprovalResource/Pages/ListPersonalSnapshotApprovalItems.php

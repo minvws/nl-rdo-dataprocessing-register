@@ -26,3 +26,24 @@ it('can load the table', function (): void {
         ->loadTable()
         ->assertCountTableRecords(1);
 });
+
+it('renders a status text alternative', function (SnapshotApprovalStatus $status, string $label): void {
+    $organisation = OrganisationTestHelper::create();
+    $snapshot = Snapshot::factory()
+        ->recycle($organisation)
+        ->create();
+    SnapshotApproval::factory()
+        ->for($snapshot)
+        ->create(['status' => $status]);
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ApprovalsValidation::class, [
+            'snapshot' => $snapshot,
+        ])
+        ->loadTable()
+        ->assertSeeHtml(sprintf('<span class="sr-only">%s</span>', $label));
+})->with([
+    [SnapshotApprovalStatus::APPROVED, 'Akkoord'],
+    [SnapshotApprovalStatus::DECLINED, 'Niet akkoord'],
+    [SnapshotApprovalStatus::UNKNOWN, 'Nog niet ondertekend'],
+]);

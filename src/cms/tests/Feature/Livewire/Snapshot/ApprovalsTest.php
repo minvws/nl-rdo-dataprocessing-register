@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Enums\Authorization\Permission;
 use App\Enums\Authorization\Role;
+use App\Enums\Snapshot\SnapshotApprovalStatus;
 use App\Livewire\Snapshot\Approvals;
 use App\Models\Snapshot;
 use App\Models\SnapshotApproval;
@@ -115,3 +116,24 @@ it('can delete a reviewer', function (): void {
         'assigned_to' => $approvalRequestUser->id,
     ]);
 });
+
+it('renders a status text alternative', function (SnapshotApprovalStatus $status, string $label): void {
+    $organisation = OrganisationTestHelper::create();
+    $snapshot = Snapshot::factory()
+        ->recycle($organisation)
+        ->create();
+    SnapshotApproval::factory()
+        ->for($snapshot)
+        ->create(['status' => $status]);
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(Approvals::class, [
+            'snapshot' => $snapshot,
+        ])
+        ->loadTable()
+        ->assertSeeHtml(sprintf('<span class="sr-only">%s</span>', $label));
+})->with([
+    [SnapshotApprovalStatus::APPROVED, 'Akkoord'],
+    [SnapshotApprovalStatus::DECLINED, 'Niet akkoord'],
+    [SnapshotApprovalStatus::UNKNOWN, 'Nog niet ondertekend'],
+]);

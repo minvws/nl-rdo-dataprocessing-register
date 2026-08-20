@@ -1,0 +1,19 @@
+\ProvidesPackage{eisvogel-article}[2026/08/03 WCAG-compliant article class for eisvogel]
+\makeatletter
+
+% Vang \documentclass af en vervang scrartcl door article; opties gaan ongewijzigd door.
+\let\shim@orig@documentclass\documentclass
+\def\documentclass{\@ifnextchar[{\shim@dc}{\shim@dc[]}}
+\def\shim@dc[#1]#2{\shim@orig@documentclass[#1]{article}}
+
+% No-ops voor KOMA-commando's die eisvogel aanroept; beide puur cosmetisch.
+\providecommand\setcapindent[1]{}
+\providecommand\addtokomafont[2]{}
+
+% article rekent de kophoogte niet uit; zonder dit een overfull \vbox.
+\PassOptionsToPackage{head=15pt}{geometry}
+
+% scrbase definieert \addtokomafont opnieuw met \newcommand; no-op daarvóór weghalen.
+\AddToHook{package/scrbase/before}{\let\addtokomafont\@undefined}
+
+\makeatother

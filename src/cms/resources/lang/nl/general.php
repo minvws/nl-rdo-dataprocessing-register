@@ -15,6 +15,8 @@ return [
     'data_collection_source' => 'Primair / Secundair',
     'data_collection_source_help' => 'Binnen het ministerie zijn vele verwerkingen met persoonsgegevens aanwezig. Enerzijds hebben deze betrekking op de specifieke taken van het ministerie. Dit zijn de verwerkingen betreffende de taken en werkzaamheden van het ministerie op haar specifieke beleidsterreinen (de primaire processen op concernniveau). Deze verwerkingen worden ook wel primaire verwerkingen genoemd. Daarnaast zijn er de verwerkingen op het gebied van de bedrijfsvoering (de secundaire processen op concernniveau). Dit worden ook wel secundaire verwerkingen genoemd. Secundaire verwerkingen zijn in de regel verwerkingen die vaker voorkomen, en min of meer een standaardkarakter hebben. Het onderscheid primair/secundair kan van belang zijn voor de wijze waarop de informatie over de verwerking wordt gepubliceerd. Wanneer secundaire verwerkingen steeds betrekking hebben op verwerking van gegevens van het personeel, kan in het publicatiebeleid ervoor zijn gekozen om de informatie niet op de extern toegankelijke website te plaatsen, maar op de interne website, zoals het Rijksportaal.',
     'attention' => 'Let op',
+    'hint' => 'Toelichting',
+    'skip_to_content' => 'Direct naar inhoud',
 
     'all' => 'Alle',
     'add' => 'Toevoegen',

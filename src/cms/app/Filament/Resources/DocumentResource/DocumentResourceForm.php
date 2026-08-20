@@ -6,7 +6,6 @@ namespace App\Filament\Resources\DocumentResource;
 
 use App\Enums\Authorization\Permission;
 use App\Facades\Authorization;
-use App\Filament\Forms\Components\DatePicker\DatePicker;
 use App\Filament\Forms\Components\Select\SelectSingleWithLookup;
 use App\Filament\Forms\Components\SelectMultipleWithLookup;
 use App\Filament\Forms\Components\Upload\AttachmentFileField;
@@ -19,6 +18,7 @@ use App\Models\Wpg\WpgProcessingRecord;
 use Carbon\CarbonImmutable;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Component;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -51,17 +51,33 @@ class DocumentResourceForm
     private static function getGeneralSection(): Section
     {
         return Section::make()
+            ->columns([
+                'default' => 1,
+                'sm' => 5,
+            ])
             ->schema([
                 TextInput::make('name')
                     ->label(__('document.name'))
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->columnSpan([
+                        'default' => 1,
+                        'sm' => 2,
+                    ]),
                 SelectSingleWithLookup::makeWithDisabledOptions('document_type_id', 'documentType', DocumentType::class, 'name')
-                    ->label(__('document.type')),
+                    ->label(__('document.type'))
+                    ->columnSpan([
+                        'default' => 1,
+                        'sm' => 3,
+                    ]),
                 DatePicker::make('expires_at')
                     ->label(__('document.expires_at'))
                     ->live()
-                    ->validationMessages(['required_unless' => __('document.expires_at_required_unless')]),
+                    ->validationMessages(['required_unless' => __('document.expires_at_required_unless')])
+                    ->columnSpan([
+                        'default' => 1,
+                        'sm' => 1,
+                    ]),
                 DatePicker::make('notify_at')
                     ->label(__('document.notify_at'))
                     ->hintAction(
@@ -79,6 +95,10 @@ class DocumentResourceForm
                                 $set('notify_at', CarbonImmutable::createFromFormat('Y-m-d H:i:s', $expiresAt));
                             }),
                     )
+                    ->columnSpan([
+                        'default' => 1,
+                        'sm' => 4,
+                    ])
                     ->hintAction(
                         Action::make('notify_at_1_month_before')
                             ->label(__('document.notification_options.1_month_before'))
@@ -117,9 +137,9 @@ class DocumentResourceForm
                     ),
                 Textarea::make('location')
                     ->label(__('document.location'))
-                    ->columnSpan(2),
+                    ->columnSpanFull(),
                 AttachmentFileField::make('Attachments')
-                    ->columnSpan(2),
+                    ->columnSpanFull(),
             ]);
     }
 

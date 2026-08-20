@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace App\Livewire\Snapshot;
 
 use App\Enums\Snapshot\SnapshotApprovalStatus;
+use App\Filament\Tables\Columns\IconColumn;
 use App\Models\Snapshot;
 use App\Models\SnapshotApproval;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
@@ -47,6 +47,9 @@ class ApprovalsValidation extends Component implements HasForms, HasTable
                             SnapshotApprovalStatus::DECLINED => 'heroicon-o-x-mark',
                             SnapshotApprovalStatus::UNKNOWN => 'heroicon-o-clock',
                         };
+                    })
+                    ->textAlternative(static function (SnapshotApprovalStatus $state): string {
+                        return $state->getLabel();
                     }),
                 TextColumn::make('assignedTo.name')
                     ->label(__('snapshot_approval.mandateholder')),

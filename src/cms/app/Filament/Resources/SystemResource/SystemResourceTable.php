@@ -18,6 +18,7 @@ class SystemResourceTable
     public static function table(Table $table): Table
     {
         return $table
+            ->recordUrl(null)
             ->columns([
                 TextColumn::make('description')
                     ->label(__('system.description'))

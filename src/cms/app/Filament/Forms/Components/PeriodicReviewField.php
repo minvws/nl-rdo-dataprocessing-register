@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Forms\Components;
 
-use App\Filament\Forms\Components\DatePicker\DatePicker;
+use Filament\Forms\Components\DatePicker;
 
 use function __;
 

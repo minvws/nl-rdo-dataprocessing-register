@@ -1,6 +1,6 @@
 <x-grid-section md=2 :title="__('user.profile.personal_info.heading')" :description="__('user.profile.personal_info.subheading')">
     <x-filament::card>
-        <form wire:submit.prevent="submit" class="space-y-6">
+        <form wire:submit.prevent="submit" novalidate class="space-y-6">
 
             {{ $this->form }}
 

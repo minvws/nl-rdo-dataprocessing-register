@@ -8,9 +8,9 @@ use App\Models\Contracts\SnapshotSource;
 use App\Models\States\Snapshot\Established;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Model;
+use Webmozart\Assert\Assert;
 
 use function __;
-use function assert;
 
 class SnapshotLatestEstablishedColumn extends ExportColumn
 {
@@ -19,7 +19,8 @@ class SnapshotLatestEstablishedColumn extends ExportColumn
         return parent::make($name)
             ->label(__('snapshot.latest_established'))
             ->default(static function (Model $model): ?CarbonInterface {
-                assert($model instanceof SnapshotSource);
+                Assert::isInstanceOf($model, SnapshotSource::class);
+
                 $snapshot = $model->getLatestSnapshotWithState([Established::class]);
 
                 return $snapshot?->created_at;

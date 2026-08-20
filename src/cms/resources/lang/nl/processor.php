@@ -8,7 +8,7 @@ return [
     'table_empty_heading' => 'Geen verwerkers',
 
     'name' => 'Naam organisatie',
-    'email' => 'E-mail',
+    'email' => 'E-mailadres',
     'phone' => 'Telefoonnummer',
 
     'measures' => 'Maatregelen',

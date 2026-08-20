@@ -30,6 +30,7 @@ class WpgGoalsRepeater extends Repeater
             ->defaultItems(0)
             ->collapsible()
             ->orderColumn()
+            ->reorderableWithButtons()
             ->itemLabel(static function (array $state): ?string {
                 Assert::keyExists($state, 'description');
                 Assert::nullOrString($state['description']);

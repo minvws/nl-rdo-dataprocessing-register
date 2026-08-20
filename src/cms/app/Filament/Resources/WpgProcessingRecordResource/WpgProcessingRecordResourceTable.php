@@ -27,6 +27,7 @@ class WpgProcessingRecordResourceTable
     public static function table(Table $table): Table
     {
         return $table
+            ->recordUrl(null)
             ->columns([
                 EntityNumber::make(),
                 TextColumn::make('name')

@@ -10,6 +10,8 @@
     x-data="{
         step: null,
 
+        baseDocumentTitle: document.title.replace(/\s+/g, ' ').trim(),
+
         nextStep: function () {
             let nextStepIndex = this.getStepIndex(this.step) + 1
 
@@ -56,6 +58,18 @@
             return JSON.parse(this.$refs.stepsData.value)
         },
 
+        getStepLabels: function () {
+            return JSON.parse(this.$refs.stepLabelsData.value)
+        },
+
+        updateDocumentTitle: function () {
+            const label = this.getStepLabels()[this.step]
+
+            document.title = label
+                ? `${label} - ${this.baseDocumentTitle}`
+                : this.baseDocumentTitle
+        },
+
         isFirstStep: function () {
             return this.getStepIndex(this.step) <= 0
         },
@@ -82,9 +96,14 @@
         },
     }"
     x-init="
-        $watch('step', () => updateQueryString())
+        $watch('step', () => {
+            updateQueryString()
+            updateDocumentTitle()
+        })
 
         step = getSteps().at({{ $getStartStep() - 1 }})
+
+        updateDocumentTitle()
 
         autofocusFields()
     "
@@ -113,6 +132,17 @@
         x-ref="stepsData"
     />
 
+    <input
+        type="hidden"
+        value="{{
+            collect($getChildComponentContainer()->getComponents())
+                ->filter(static fn (Step $step): bool => $step->isVisible())
+                ->mapWithKeys(static fn (Step $step) => [$step->getId() => $step->getLabel()])
+                ->toJson()
+        }}"
+        x-ref="stepLabelsData"
+    />
+
     <style>
         .wizzard-layout {
             display: flex;
@@ -133,6 +163,18 @@
 
         .wizzard-layout__steps .fi-fo-wizard-header-step-label {
             text-align: left;
+        }
+
+        /* Below 1024px (f.e. 200% zoom) the fixed 300px step panel pushes over the content */
+        @media (max-width: 1023.9px) {
+            .wizzard-layout {
+                flex-direction: column;
+            }
+
+            .wizzard-layout__steps,
+            .wizzard-layout__steps > ol {
+                width: 100%;
+            }
         }
     </style>
 

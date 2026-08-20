@@ -42,9 +42,7 @@ class SqlFileGenerator
         $this->sqlGenerationManagementFilesystem = Storage::disk($filesystemManagementDisk);
         $this->migrationAdminLogStart = CarbonImmutable::parse($migrationAdminLogStart);
 
-        $allFiles = $this->sqlGenerationFilesystem->allFiles();
-        Assert::allString($allFiles);
-        $this->existingSqlFiles = $allFiles;
+        $this->existingSqlFiles = $this->sqlGenerationFilesystem->allFiles();
     }
 
     /**

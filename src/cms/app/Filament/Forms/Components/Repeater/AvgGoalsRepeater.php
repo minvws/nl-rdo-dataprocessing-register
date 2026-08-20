@@ -28,6 +28,7 @@ class AvgGoalsRepeater extends Repeater
             ->defaultItems(0)
             ->collapsible()
             ->orderColumn()
+            ->reorderableWithButtons()
             ->itemLabel(static function (array $state): ?string {
                 Assert::keyExists($state, 'goal');
                 Assert::nullOrString($state['goal']);

@@ -4,16 +4,22 @@ author: [Schmits, T.]
 keywords: [Verwerkingsregister, VWS, Handleiding, iRealisatie]
 lang: nl
 papersize: "A4"
-titlepage-rule-color: "D97706"
+titlepage-rule-color: "9A3412"
 titlepage: true
 toc-own-page: true
+pdfstandard:
+  version: "2.0"
+  tagging: true
+header-includes:
+  - |
+    \AddToDocumentProperties[document]{pdfstandard-UA}{{2}{2024}}
 toc: true
 footnotes-pretty: true
 ...
 
 \definecolor{blue}{RGB}{37, 99, 235}
-\definecolor{orange}{RGB}{217, 119, 6}
-\definecolor{green}{RGB}{22, 163, 74}
+\definecolor{orange}{RGB}{154, 52, 18}
+\definecolor{green}{RGB}{21, 128, 61}
 \definecolor{gray}{RGB}{82, 82, 91}
 \let\oldtextbf\textbf
 \renewcommand\textbf[1]{{\color{orange}\oldtextbf{#1}}}

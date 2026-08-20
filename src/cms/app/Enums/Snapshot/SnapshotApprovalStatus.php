@@ -4,11 +4,21 @@ declare(strict_types=1);
 
 namespace App\Enums\Snapshot;
 
-enum SnapshotApprovalStatus: string
+use Filament\Support\Contracts\HasLabel;
+
+use function __;
+use function sprintf;
+
+enum SnapshotApprovalStatus: string implements HasLabel
 {
     case APPROVED = 'approved';
     case DECLINED = 'declined';
     case UNKNOWN = 'unknown';
+
+    public function getLabel(): string
+    {
+        return __(sprintf('snapshot_approval_status.%s', $this->value));
+    }
 
     /**
      * @return array<SnapshotApprovalStatus>

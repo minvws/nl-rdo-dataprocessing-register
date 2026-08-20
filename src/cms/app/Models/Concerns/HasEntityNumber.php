@@ -21,7 +21,9 @@ trait HasEntityNumber
 {
     final public static function bootHasEntityNumber(): void
     {
-        static::observe(EntityNumerableObserver::class);
+        static::whenBooted(static function (): void {
+            static::observe(EntityNumerableObserver::class);
+        });
     }
 
     final public function initializeHasEntityNumber(): void

@@ -23,6 +23,7 @@ class SnapshotResourceTable
     public static function table(Table $table): Table
     {
         return $table
+            ->recordUrl(null)
             ->columns([
                 TextColumn::make('version')
                     ->label(__('snapshot.version')),

@@ -5,5 +5,5 @@ declare(strict_types=1);
 return [
     'approved' => 'Akkoord',
     'declined' => 'Niet akkoord',
-    'unknown' => '',
+    'unknown' => 'Nog niet ondertekend',
 ];

@@ -8,6 +8,5 @@ return [
     'table_empty_heading' => 'Geen verwerkingsverantwoordelijken',
 
     'name' => 'Functie',
-    'email' => 'E-mail',
     'phone' => 'Telefoonnummer',
 ];

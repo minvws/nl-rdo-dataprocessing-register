@@ -96,15 +96,6 @@
 
 - **{{ __('avg_processor_processing_record.geb_pia') }}**: {{ $record->geb_pia ? 'ja' : 'nee' }}
 
-## {{ __('avg_processor_processing_record.step_contact_person') }}
-
-@foreach($record->users as $user)
-- {!! Str::toSingleLineEscapedString($user->name) !!} @if($user->email)&lt;{!! Str::toSingleLineEscapedString($user->email) !!}&gt;@endif
-
-@endforeach
-
-<!--- #App\Models\ContactPerson# --->
-
 ## {{ __('avg_processor_processing_record.step_attachments') }}
 
 @forelse($record->documents as $document)

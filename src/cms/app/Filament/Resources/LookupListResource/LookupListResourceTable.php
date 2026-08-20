@@ -6,9 +6,9 @@ namespace App\Filament\Resources\LookupListResource;
 
 use App\Filament\Actions\DeleteBulkActionWithRelationChecks;
 use App\Filament\Tables\Columns\CreatedAtColumn;
+use App\Filament\Tables\Columns\IconColumn;
 use App\Filament\Tables\Columns\UpdatedAtColumn;
 use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
@@ -24,6 +24,7 @@ class LookupListResourceTable
     public static function table(Table $table, string $emptyStateHeading, string $model): Table
     {
         return $table
+            ->recordUrl(null)
             ->columns([
                 TextColumn::make('name')
                     ->label(__('general.name'))
