@@ -9,6 +9,7 @@ use App\Livewire\Snapshot\Approvals;
 use App\Models\Snapshot;
 use App\Models\SnapshotApproval;
 use App\Models\User;
+use Filament\Actions\Testing\TestAction;
 use Tests\Helpers\Model\OrganisationTestHelper;
 use Tests\Helpers\Model\UserTestHelper;
 
@@ -29,11 +30,11 @@ it('can request a mandateholder as reviewer', function (): void {
         ->createLivewireTestable(Approvals::class, [
             'snapshot' => $snapshot,
         ])
-        ->mountTableAction('snapshot_approval_request_action')
-        ->callTableAction('snapshot_approval_request_action', $snapshot, [
-            'user_ids' => [$approvalRequestUser->id],
-        ])
-        ->assertHasNoTableActionErrors();
+        ->callAction(
+            TestAction::make('snapshot_approval_request_action')->table(),
+            ['user_ids' => [$approvalRequestUser->id]],
+        )
+        ->assertHasNoActionErrors();
 
     $this->assertDatabaseHas(SnapshotApproval::class, [
         'assigned_to' => $approvalRequestUser->id,
@@ -56,11 +57,11 @@ it('can not request a non-mandateholder as reviewer', function (): void {
         ->createLivewireTestable(Approvals::class, [
             'snapshot' => $snapshot,
         ])
-        ->mountTableAction('snapshot_approval_request_action')
-        ->callTableAction('snapshot_approval_request_action', $snapshot, [
-            'user_ids' => [$approvalRequestUser->id],
-        ])
-        ->assertHasTableActionErrors(['user_ids']);
+        ->callAction(
+            TestAction::make('snapshot_approval_request_action')->table(),
+            ['user_ids' => [$approvalRequestUser->id]],
+        )
+        ->assertHasActionErrors(['user_ids']);
 });
 
 it('can not request a mandateholder from another organisation as reviewer', function (): void {
@@ -81,11 +82,11 @@ it('can not request a mandateholder from another organisation as reviewer', func
         ->createLivewireTestable(Approvals::class, [
             'snapshot' => $snapshot,
         ])
-        ->mountTableAction('snapshot_approval_request_action')
-        ->callTableAction('snapshot_approval_request_action', $snapshot, [
-            'user_ids' => [$approvalRequestUser->id],
-        ])
-        ->assertHasTableActionErrors(['user_ids']);
+        ->callAction(
+            TestAction::make('snapshot_approval_request_action')->table(),
+            ['user_ids' => [$approvalRequestUser->id]],
+        )
+        ->assertHasActionErrors(['user_ids']);
 });
 
 it('can delete a reviewer', function (): void {
@@ -109,8 +110,9 @@ it('can delete a reviewer', function (): void {
         ->createLivewireTestable(Approvals::class, [
             'snapshot' => $snapshot,
         ])
-        ->callTableBulkAction('snapshot_approval_notify_bulk_delete', [$snapshotApproval], ['user_ids' => [$approvalRequestUser->id]])
-        ->assertHasNoTableBulkActionErrors();
+        ->selectTableRecords([$snapshotApproval])
+        ->callAction(TestAction::make('snapshot_approval_notify_bulk_delete')->table()->bulk())
+        ->assertHasNoActionErrors();
 
     $this->assertDatabaseMissing(SnapshotApproval::class, [
         'assigned_to' => $approvalRequestUser->id,

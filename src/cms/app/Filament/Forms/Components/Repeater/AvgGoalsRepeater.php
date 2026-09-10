@@ -7,21 +7,21 @@ namespace App\Filament\Forms\Components\Repeater;
 use App\Facades\Authentication;
 use App\Filament\Forms\FormHelper;
 use App\Filament\TenantScoped;
-use Filament\Forms\Components\Actions\Action;
-use Filament\Forms\Components\Component;
+use Filament\Actions\Action;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Textarea;
+use Filament\Schemas\Components\Component;
 use Webmozart\Assert\Assert;
 
 use function __;
 
 class AvgGoalsRepeater extends Repeater
 {
-    public static function make(string $name = 'avgGoals'): static
+    public static function make(?string $name = null): static
     {
-        return parent::make($name)
+        return parent::make($name ?? 'avgGoals')
             ->label(__('avg_goal.model_plural'))
             ->relationship(modifyQueryUsing: TenantScoped::getAsClosure())
             ->schema(self::getAvgGoalSchema())

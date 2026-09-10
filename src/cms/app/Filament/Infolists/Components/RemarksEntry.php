@@ -10,9 +10,9 @@ use function __;
 
 class RemarksEntry extends RepeatableEntry
 {
-    public static function make(string $name = 'remarks'): static
+    public static function make(?string $name = null): static
     {
-        return parent::make($name)
+        return parent::make($name ?? 'remarks')
             ->label(__('remark.model_plural'))
             ->placeholder(__('general.none_selected'))
             ->schema([

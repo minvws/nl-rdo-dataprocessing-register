@@ -17,6 +17,7 @@ use App\Models\States\Snapshot\Approved;
 use App\Models\States\Snapshot\Established;
 use App\Models\States\Snapshot\InReview;
 use App\Models\States\Snapshot\Obsolete;
+use App\Models\StaticWebsiteSnapshotEntry;
 use App\Models\Wpg\WpgProcessingRecord;
 use Tests\Helpers\Model\OrganisationTestHelper;
 use Tests\Helpers\Model\UserTestHelper;
@@ -293,6 +294,29 @@ it('shows the transition button for all states', function (string $currentState,
     [Established::$name, Obsolete::$name],
 ]);
 
+it('displays approval-data of the current user', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisation($organisation);
+    $snapshot = Snapshot::factory()
+        ->recycle($organisation)
+        ->create([
+            'state' => InReview::class,
+        ]);
+    SnapshotApproval::factory()
+        ->for($snapshot)
+        ->for($user, 'assignedTo')
+        ->create([
+            'status' => SnapshotApprovalStatus::APPROVED,
+        ]);
+
+    $this->asFilamentUser($user)
+        ->createLivewireTestable(ViewSnapshot::class, [
+            'record' => $snapshot->getRouteKey(),
+        ])
+        ->assertSee(__('snapshot_approval.reviewed_at'))
+        ->assertSee(__(sprintf('snapshot_approval_status.%s', SnapshotApprovalStatus::APPROVED->value)));
+});
+
 it('does not display approval-data if none given', function (): void {
     $organisation = OrganisationTestHelper::create();
     $snapshot = Snapshot::factory()
@@ -306,6 +330,31 @@ it('does not display approval-data if none given', function (): void {
             'record' => $snapshot->getRouteKey(),
         ])
         ->assertDontSee(__('snapshot_approval.reviewed_at'));
+});
+
+it('displays the url of a published snapshot', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->create();
+    $snapshot = Snapshot::factory()
+        ->recycle($organisation)
+        ->for($avgResponsibleProcessingRecord, 'snapshotSource')
+        ->create([
+            'state' => Established::class,
+        ]);
+    $staticWebsiteSnapshotEntry = StaticWebsiteSnapshotEntry::factory()
+        ->recycle($organisation)
+        ->create([
+            'snapshot_id' => $snapshot->id,
+            'end_date' => null,
+        ]);
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ViewSnapshot::class, [
+            'record' => $snapshot->getRouteKey(),
+        ])
+        ->assertSee($staticWebsiteSnapshotEntry->url);
 });
 
 it('can render the page if snapshot has no snapshot-data', function (): void {

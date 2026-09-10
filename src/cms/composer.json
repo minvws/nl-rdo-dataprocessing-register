@@ -18,22 +18,22 @@
         "bacon/bacon-qr-code": "^3.0",
         "barryvdh/laravel-dompdf": "^3.1",
         "bkwld/cloner": "^3.13",
-        "filament/filament": "^3.3.52",
-        "filament/spatie-laravel-media-library-plugin": "^3.0-stable",
+        "filament/filament": "^5.0",
+        "filament/spatie-laravel-media-library-plugin": "^5.0",
         "guzzlehttp/guzzle": "^7.2",
         "laravel/framework": "^13.0",
         "laravel/tinker": "^3.0",
         "league/flysystem-aws-s3-v3": "^3.31",
-        "livewire/livewire": "^3.4",
+        "livewire/livewire": "^4.0",
         "minvws/laravel-logging": "^4.0",
         "mlocati/ip-lib": "^1.18",
         "owen-it/laravel-auditing": "^14.0",
         "secondnetwork/blade-tabler-icons": "^3.44",
-        "solution-forest/filament-tree": "^2.1",
+        "solution-forest/filament-tree": "^4.0",
         "spatie/laravel-csp": "^3.13",
         "spatie/laravel-model-states": "^2.6",
         "spomky-labs/otphp": "^11.2",
-        "tapp/filament-auditing": "^3.0",
+        "tapp/filament-auditing": "^4.0",
         "webmozart/assert": "^2.1",
         "xenolope/quahog": "^3.0"
     },
@@ -48,6 +48,7 @@
         "mockery/mockery": "^1.4.4",
         "nunomaduro/collision": "^8.0",
         "pestphp/pest": "^5.0",
+        "pestphp/pest-plugin-browser": "^5.0",
         "pestphp/pest-plugin-faker": "^5.0",
         "pestphp/pest-plugin-laravel": "^5.0",
         "phpcsstandards/phpcsextra": "^1.2.0",
@@ -128,17 +129,18 @@
         "reset-test-db": "DB_DATABASE=testing php artisan migrate:fresh",
         "static-check": "php artisan static-website:check",
         "static-refresh": "php artisan static-website:refresh",
-        "test": "php artisan test --parallel --coverage --compact",
+        "test": "php artisan test --testsuite=Unit,Feature --parallel --coverage --compact",
+        "test-browser": "php vendor/bin/pest --testsuite=Browser",
         "test-update-snapshots": [
             "@reset-test-db",
-            "php vendor/bin/pest --update-snapshots"
+            "php vendor/bin/pest --testsuite=Unit,Feature --update-snapshots"
         ],
-        "test-report": "php artisan test --coverage-html storage/phpunit",
+        "test-report": "php artisan test --testsuite=Unit,Feature --coverage-html storage/phpunit",
         "test-reset": [
             "rm -rf storage/app/livewire-tmp",
             "php artisan optimize:clear",
             "@reset-test-db",
-            "php artisan test --parallel --recreate-databases"
+            "php artisan test --testsuite=Unit,Feature --parallel --recreate-databases"
         ]
     },
     "extra": {

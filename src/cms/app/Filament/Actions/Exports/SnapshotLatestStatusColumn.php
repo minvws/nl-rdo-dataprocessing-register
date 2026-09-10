@@ -14,9 +14,9 @@ use function sprintf;
 
 class SnapshotLatestStatusColumn extends ExportColumn
 {
-    public static function make(string $name = 'snapshot_latest_status'): static
+    public static function make(?string $name = null): static
     {
-        return parent::make($name)
+        return parent::make($name ?? 'snapshot_latest_status')
             ->label(__('snapshot.latest_status'))
             ->default(static function (Model $model): ?string {
                 Assert::isInstanceOf($model, SnapshotSource::class);

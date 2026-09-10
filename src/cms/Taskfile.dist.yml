@@ -144,3 +144,7 @@ tasks:
   test:
     desc: Run the unit tests
     cmd: vendor/bin/sail composer run-script test
+
+  test:browser:
+    desc: Run the browser tests
+    cmd: vendor/bin/sail composer run-script test-browser

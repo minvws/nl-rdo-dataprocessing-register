@@ -10,9 +10,9 @@ use function __;
 
 class WpgGoalsRepeatableEntry extends RepeatableEntry
 {
-    public static function make(string $name = 'wpgGoals'): static
+    public static function make(?string $name = null): static
     {
-        return parent::make($name)
+        return parent::make($name ?? 'wpgGoals')
             ->label(__('wpg_goal.model_plural'))
             ->placeholder(__('general.none_selected'))
             ->schema([

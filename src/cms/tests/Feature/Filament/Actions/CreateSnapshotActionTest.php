@@ -52,6 +52,8 @@ it('cannot create a snapshot if validation fails', function (): void {
             'record' => $avgResponsibleProcessingRecord->id,
         ])
         ->callAction('snapshot_create')
+        ->assertActionNotMounted()
+        ->assertHasFormErrors()
         ->assertNotNotified(__('snapshot.created'));
 
     $avgResponsibleProcessingRecord->refresh();

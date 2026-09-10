@@ -13,10 +13,10 @@ use App\Filament\Resources\OrganisationUserResource;
 use App\Models\OrganisationUserRole;
 use App\Models\User;
 use Closure;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
@@ -36,9 +36,9 @@ class CreateOrganisationUser extends CreateRecord
         return __('user.organisation_role_attach');
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->components([
             Section::make(__('user.model_singular'))
                 ->schema([
                     TextInput::make('email')

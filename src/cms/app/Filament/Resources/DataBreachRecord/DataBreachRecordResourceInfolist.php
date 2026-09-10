@@ -5,20 +5,19 @@ declare(strict_types=1);
 namespace App\Filament\Resources\DataBreachRecord;
 
 use App\Filament\Infolists\Components\ProcessingRecordTabs;
-use Filament\Infolists\Components\Section;
-use Filament\Infolists\Components\Tabs\Tab;
-use Filament\Infolists\Infolist;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Schema;
 
 use function __;
 
 class DataBreachRecordResourceInfolist
 {
-    public static function stepsInfolist(Infolist $infolist): Infolist
+    public static function stepsInfolist(Schema $schema): Schema
     {
-        return $infolist
+        return $schema
             ->columns(1)
-            ->extraAttributes(['class' => 'vertical'])
-            ->schema([
+            ->components([
                 ProcessingRecordTabs::make()
                     ->tabs([
                         Tab::make(__('data_breach_record.step_name'))
@@ -37,10 +36,10 @@ class DataBreachRecordResourceInfolist
             ]);
     }
 
-    public static function onePageInfolist(Infolist $infolist): Infolist
+    public static function onePageInfolist(Schema $schema): Schema
     {
-        return $infolist
-            ->schema([
+        return $schema
+            ->components([
                 Section::make(__('data_breach_record.step_name'))
                     ->schema(DataBreachRecordResourceInfolistSchemas::getName())
                     ->compact()

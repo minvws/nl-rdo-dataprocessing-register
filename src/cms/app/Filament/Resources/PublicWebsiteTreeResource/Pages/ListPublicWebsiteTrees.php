@@ -21,15 +21,16 @@ class ListPublicWebsiteTrees extends TreePage
     protected static string $resource = PublicWebsiteTreeResource::class;
     protected static ?string $breadcrumb = '';
 
-    protected function getActions(): array
+    protected function configureCreateAction(CreateAction $action): CreateAction
     {
-        return [
-            CreateAction::make()
-                ->label(__('public_website_tree.create')),
-        ];
+        return parent::configureCreateAction($action)
+            ->label(__('public_website_tree.create'));
     }
 
-    public static function canAccess(): bool
+    /**
+     * @param array<string, mixed> $parameters
+     */
+    public static function canAccess(array $parameters = []): bool
     {
         return Gate::allows('update', PublicWebsiteTree::class);
     }

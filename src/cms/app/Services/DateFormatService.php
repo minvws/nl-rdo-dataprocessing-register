@@ -13,6 +13,7 @@ class DateFormatService
     public const FORMAT_FILENAME = 'Y-m-d-H.i';
     public const FORMAT_DATE = 'd-m-Y';
     public const FORMAT_DATE_TIME = 'd-m-Y H:i';
+    public const FORMAT_TIME = 'H:i';
     public const FORMAT_VALID_UNTIL_SHORT = 'H:i d/m/Y';
     public const FORMAT_DATE_TIME_INPUT = 'Y-m-d H:i:s';
 
@@ -40,6 +41,15 @@ class DateFormatService
         }
 
         return self::format($date, self::FORMAT_DATE_TIME);
+    }
+
+    public static function toTime(CalendarDate|CarbonImmutable|null $date): ?string
+    {
+        if ($date === null) {
+            return null;
+        }
+
+        return self::format($date, self::FORMAT_TIME);
     }
 
     public static function forValidUntilShort(CalendarDate|CarbonImmutable $date): string

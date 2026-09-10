@@ -6,9 +6,9 @@ namespace App\Filament\Forms\Components;
 
 use App\Filament\Forms\FormHelper;
 use Closure;
-use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Group;
 use Webmozart\Assert\Assert;
 
 use function __;

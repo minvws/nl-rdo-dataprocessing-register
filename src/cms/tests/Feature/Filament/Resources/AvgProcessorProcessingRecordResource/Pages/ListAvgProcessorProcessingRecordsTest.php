@@ -41,9 +41,13 @@ it('can export', function (): void {
         ->withSnapshots(1)
         ->create();
 
-    $this->asFilamentOrganisationUser($organisation)
-        ->createLivewireTestable(ListAvgProcessorProcessingRecords::class)
-        ->callAction('export')
-        ->assertHasNoActionErrors()
+    $listPage = $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ListAvgProcessorProcessingRecords::class);
+
+    $listPage->callAction('export');
+
+    $this->restoreFilamentSession();
+
+    $listPage->assertHasNoActionErrors()
         ->assertNotified();
 });

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Console;
 
 use App\Console\Commands\DocumentNotificationsSend;
+use App\Console\Commands\FormDraftDeleteExpired;
 use App\Console\Commands\SnapshotApprovalBatchNotifications;
 use App\Console\Commands\StaticWebsiteRefresh;
 use App\Console\Commands\UserDeleteExpiredLoginTokens;
@@ -30,6 +31,8 @@ class Kernel extends ConsoleKernel
         // daily
         $schedule->command(StaticWebsiteRefresh::class)
             ->dailyAt('01:00');
+        $schedule->command(FormDraftDeleteExpired::class)
+            ->dailyAt('01:30');
         $schedule->command(DocumentNotificationsSend::class)
             ->dailyAt('09:00');
         $schedule->command(UserDeleteWithoutOrganisation::class)

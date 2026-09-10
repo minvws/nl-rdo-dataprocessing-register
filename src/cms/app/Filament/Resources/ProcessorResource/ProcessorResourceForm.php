@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace App\Filament\Resources\ProcessorResource;
 
 use App\Filament\Forms\Components\Repeater\AddressRepeater;
-use Filament\Forms\Components\Component;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Schema;
 
 use function __;
 
 class ProcessorResourceForm
 {
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema(self::getSchema());
+        return $schema
+            ->components(self::getSchema());
     }
 
     /**

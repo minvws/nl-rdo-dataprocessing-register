@@ -10,9 +10,9 @@ use function __;
 
 class SnapshotStatusColumn extends ViewColumn
 {
-    public static function make(string $name = 'snapshot_latest'): static
+    public static function make(?string $name = null): static
     {
-        return parent::make($name)
+        return parent::make($name ?? 'snapshot_latest')
             ->label(__('snapshot.state'))
             ->view('filament.tables.columns.snapshot_status');
     }

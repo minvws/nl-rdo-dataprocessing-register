@@ -6,10 +6,16 @@ namespace App\Filament\Tables\Columns;
 
 use Closure;
 use Filament\Tables\Columns\IconColumn as FilamentIconColumn;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Webmozart\Assert\Assert;
 
 use function __;
+use function array_filter;
+use function array_map;
 use function boolval;
+use function e;
+use function implode;
 
 /**
  * An icon on its own carries no information for assistive software, so every rendered icon is
@@ -17,9 +23,27 @@ use function boolval;
  */
 class IconColumn extends FilamentIconColumn
 {
-    protected string $view = 'filament.tables.columns.icon_column';
-
     protected Closure|string|null $textAlternative = null;
+
+    public function toEmbeddedHtml(): string
+    {
+        $states = $this->getState();
+        $states = $states instanceof Collection ? $states->all() : $states;
+
+        $textAlternatives = array_filter(
+            array_map(
+                function (mixed $state): ?string {
+                    return $this->getTextAlternative($state);
+                },
+                Arr::wrap($states),
+            ),
+            static function (?string $textAlternative): bool {
+                return $textAlternative !== null && $textAlternative !== '';
+            },
+        );
+
+        return '<span class="sr-only">' . e(implode(', ', $textAlternatives)) . '</span>' . parent::toEmbeddedHtml();
+    }
 
     public function textAlternative(Closure|string|null $textAlternative): static
     {

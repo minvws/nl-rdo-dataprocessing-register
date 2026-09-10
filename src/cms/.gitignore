@@ -4,6 +4,7 @@
 /public/static-website
 /storage/*.key
 /storage/phpunit
+/tests/Browser/Screenshots
 /vendor
 .env
 .env.backup

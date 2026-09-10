@@ -16,25 +16,25 @@ use App\Models\DataBreachRecord;
 use App\Models\DocumentType;
 use App\Models\Wpg\WpgProcessingRecord;
 use Carbon\CarbonImmutable;
-use Filament\Forms\Components\Actions\Action;
-use Filament\Forms\Components\Component;
+use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
-use Filament\Forms\Get;
-use Filament\Forms\Set;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Schema;
 use Webmozart\Assert\Assert;
 
 use function __;
 
 class DocumentResourceForm
 {
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema(self::getSchema());
+        return $schema
+            ->components(self::getSchema());
     }
 
     /**
@@ -92,7 +92,7 @@ class DocumentResourceForm
                                     return;
                                 }
 
-                                $set('notify_at', CarbonImmutable::createFromFormat('Y-m-d H:i:s', $expiresAt));
+                                $set('notify_at', CarbonImmutable::parse($expiresAt));
                             }),
                     )
                     ->columnSpan([
@@ -111,8 +111,7 @@ class DocumentResourceForm
                                     return;
                                 }
 
-                                $expiresAt = CarbonImmutable::createFromFormat('Y-m-d H:i:s', $expiresAt);
-                                Assert::isInstanceOf($expiresAt, CarbonImmutable::class);
+                                $expiresAt = CarbonImmutable::parse($expiresAt);
 
                                 $set('notify_at', $expiresAt->subMonth());
                             }),
@@ -129,8 +128,7 @@ class DocumentResourceForm
                                     return;
                                 }
 
-                                $expiresAt = CarbonImmutable::createFromFormat('Y-m-d H:i:s', $expiresAt);
-                                Assert::isInstanceOf($expiresAt, CarbonImmutable::class);
+                                $expiresAt = CarbonImmutable::parse($expiresAt);
 
                                 $set('notify_at', $expiresAt->subMonths(3));
                             }),
@@ -146,7 +144,6 @@ class DocumentResourceForm
     private static function getAttachProcessingRecordsSection(): Section
     {
         return Section::make(__('document.attach_processing_records'))
-            ->label('foo')
             ->collapsible()
             ->collapsed()
             ->schema([

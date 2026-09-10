@@ -10,8 +10,8 @@ use App\Filament\Resources\LookupListResource\LookupListResourceForm;
 use App\Models\ContactPerson;
 use App\Models\OrganisationUser;
 use App\Rules\CurrentOrganisation;
-use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Select;
+use Filament\Schemas\Components\Group;
 use Illuminate\Database\Eloquent\Builder;
 
 use function __;

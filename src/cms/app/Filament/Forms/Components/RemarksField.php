@@ -11,9 +11,9 @@ use function __;
 
 class RemarksField extends Repeater
 {
-    public static function make(string $name = 'remarks'): static
+    public static function make(?string $name = null): static
     {
-        return parent::make($name)
+        return parent::make($name ?? 'remarks')
             ->schema([
                 Textarea::make('body')
                     ->label(__('remark.body'))

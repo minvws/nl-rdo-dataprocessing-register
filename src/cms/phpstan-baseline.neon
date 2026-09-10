@@ -43,12 +43,6 @@ parameters:
 			path: app/Filament/Actions/Exports/SnapshotLatestStatusColumn.php
 
 		-
-			message: '#^Parameter \#1 \$query \(Illuminate\\Database\\Eloquent\\Builder\<TModel of Illuminate\\Database\\Eloquent\\Model\>\) of method App\\Filament\\Exports\\Exporter\:\:modifyQuery\(\) should be contravariant with parameter \$query \(Illuminate\\Database\\Eloquent\\Builder\) of method Filament\\Actions\\Exports\\Exporter\:\:modifyQuery\(\)$#'
-			identifier: method.childParameterType
-			count: 1
-			path: app/Filament/Exports/Exporter.php
-
-		-
 			message: '#^Dynamic call to static method App\\Models\\Builders\\SnapshotBuilder\:\:distinct\(\)\.$#'
 			identifier: staticMethod.dynamicCall
 			count: 1
@@ -245,3 +239,4 @@ parameters:
 			identifier: staticMethod.dynamicCall
 			count: 2
 			path: app/Services/Snapshot/SnapshotService.php
+

@@ -59,6 +59,16 @@ it('fails with a invalid code', function (): void {
         ->assertHasFormErrors(['code' => __('user.profile.one_time_password.confirmation.invalid_code')]);
 });
 
+it('fails without a code', function (): void {
+    $this->asFilamentUser();
+
+    SessionTestHelper::setOtpInvalid();
+
+    $this->createLivewireTestable(OneTimePasswordValidation::class)
+        ->call('authenticate')
+        ->assertHasFormErrors(['code' => 'required']);
+});
+
 it('fails if rate limit reached', function (): void {
     ConfigTestHelper::set('auth.one_time_password.validation_rate_limit.max_attempts', 1);
     ConfigTestHelper::set('auth.one_time_password.validation_rate_limit.decay_in_seconds', 60);

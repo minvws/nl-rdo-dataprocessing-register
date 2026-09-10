@@ -10,9 +10,9 @@ use function __;
 
 class EntityNumber extends TextColumn
 {
-    public static function make(string $name = 'entityNumber.number'): static
+    public static function make(?string $name = null): static
     {
-        return parent::make($name)
+        return parent::make($name ?? 'entityNumber.number')
             ->label(__('processing_record.number'))
             ->searchable()
             ->sortable();

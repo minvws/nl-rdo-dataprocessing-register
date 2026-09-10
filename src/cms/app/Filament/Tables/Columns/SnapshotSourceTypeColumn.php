@@ -13,9 +13,9 @@ use function sprintf;
 
 class SnapshotSourceTypeColumn extends TextColumn
 {
-    public static function make(string $name = 'snapshot_source_type'): static
+    public static function make(?string $name = null): static
     {
-        return parent::make($name)
+        return parent::make($name ?? 'snapshot_source_type')
             ->label(__('snapshot.snapshot_source_type'))
             ->sortable()
             ->formatStateUsing(static function (string $state): string {

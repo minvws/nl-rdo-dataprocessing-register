@@ -15,10 +15,13 @@ use App\Filament\RelationManagers\WpgProcessingRecordRelationManager;
 use App\Filament\Resources\DataBreachRecord\DataBreachRecordResourceForm;
 use App\Filament\Resources\DataBreachRecord\DataBreachRecordResourceInfolist;
 use App\Filament\Resources\DataBreachRecord\DataBreachRecordResourceTable;
-use App\Filament\Resources\DataBreachRecord\Pages;
+use App\Filament\Resources\DataBreachRecord\Pages\CreateDataBreachRecord;
+use App\Filament\Resources\DataBreachRecord\Pages\EditDataBreachRecord;
+use App\Filament\Resources\DataBreachRecord\Pages\ListDataBreachRecords;
+use App\Filament\Resources\DataBreachRecord\Pages\ViewDataBreachRecord;
 use App\Models\DataBreachRecord;
-use Filament\Forms\Form;
-use Filament\Infolists\Infolist;
+use BackedEnum;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 
 use function __;
@@ -27,7 +30,7 @@ class DataBreachRecordResource extends Resource
 {
     protected static bool $hasNavigationBadge = true;
     protected static ?string $model = DataBreachRecord::class;
-    protected static ?string $navigationIcon = 'heroicon-o-megaphone';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-megaphone';
     protected static ?int $navigationSort = 5;
 
     public static function getNavigationGroup(): ?string
@@ -35,19 +38,19 @@ class DataBreachRecordResource extends Resource
         return __(NavigationGroup::REGISTERS->value);
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
         return match (Authentication::user()->register_layout) {
-            RegisterLayout::STEPS => DataBreachRecordResourceForm::stepsForm($form),
-            RegisterLayout::ONE_PAGE => DataBreachRecordResourceForm::onePageForm($form),
+            RegisterLayout::STEPS => DataBreachRecordResourceForm::stepsForm($schema),
+            RegisterLayout::ONE_PAGE => DataBreachRecordResourceForm::onePageForm($schema),
         };
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
         return match (Authentication::user()->register_layout) {
-            RegisterLayout::STEPS => DataBreachRecordResourceInfolist::stepsInfolist($infolist),
-            RegisterLayout::ONE_PAGE => DataBreachRecordResourceInfolist::onePageInfolist($infolist),
+            RegisterLayout::STEPS => DataBreachRecordResourceInfolist::stepsInfolist($schema),
+            RegisterLayout::ONE_PAGE => DataBreachRecordResourceInfolist::onePageInfolist($schema),
         };
     }
 
@@ -70,10 +73,10 @@ class DataBreachRecordResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListDataBreachRecords::route('/'),
-            'create' => Pages\CreateDataBreachRecord::route('/create'),
-            'view' => Pages\ViewDataBreachRecord::route('/{record}'),
-            'edit' => Pages\EditDataBreachRecord::route('/{record}/edit'),
+            'index' => ListDataBreachRecords::route('/'),
+            'create' => CreateDataBreachRecord::route('/create'),
+            'view' => ViewDataBreachRecord::route('/{record}'),
+            'edit' => EditDataBreachRecord::route('/{record}/edit'),
         ];
     }
 

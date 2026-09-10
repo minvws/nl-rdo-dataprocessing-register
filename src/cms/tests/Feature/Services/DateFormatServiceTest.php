@@ -75,6 +75,24 @@ it('can format for datetime with null', function (): void {
         ->toBeNull();
 });
 
+it('can format for time', function (): void {
+    $timezone = fake()->timezone();
+    ConfigTestHelper::set('app.display_timezone', $timezone);
+    $date = CarbonImmutable::instance(fake()->dateTime);
+
+    $result = DateFormatService::toTime($date);
+
+    expect($result)
+        ->toBe($date->setTimezone($timezone)->format('H:i'));
+});
+
+it('can format for time with null', function (): void {
+    $result = DateFormatService::toTime(null);
+
+    expect($result)
+        ->toBeNull();
+});
+
 it('can format for valid until short', function (): void {
     $timezone = fake()->timezone();
     ConfigTestHelper::set('app.display_timezone', $timezone);

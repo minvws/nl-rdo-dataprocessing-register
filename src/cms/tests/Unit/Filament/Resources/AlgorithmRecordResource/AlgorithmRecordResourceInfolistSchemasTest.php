@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 use App\Filament\Resources\AlgorithmRecordResource\AlgorithmRecordResourceInfolistSchemas;
 use Filament\Infolists\Components\TextEntry;
+use Tests\Helpers\FilamentTestHelper;
 use Tests\TestCase;
 
 uses(TestCase::class);
 
 it('formats nullable impact boolean entries', function (?bool $state, ?string $expectedTranslationKey): void {
     $impactSchema = AlgorithmRecordResourceInfolistSchemas::getImpact();
-    $impactEntry = $impactSchema[0];
+    $impactEntry = FilamentTestHelper::createTestForm()
+        ->components($impactSchema)
+        ->getComponents()[0];
 
     expect($impactSchema)
         ->toHaveCount(4)

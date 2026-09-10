@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', RedirectToTenantController::class)->name(RouteName::HOME);
 
-Route::prefix('/login/consume')->middleware('signed')->group(static function (): void {
+Route::prefix('/login/consume')->middleware(['panel:admin', 'signed'])->group(static function (): void {
     Route::get('/', [PasswordlessLoginController::class, 'consume'])->name(RouteName::PASSWORDLESS_LOGIN_VALIDATE_CONSUME);
     Route::post('/', [PasswordlessLoginController::class, 'confirm'])->name(RouteName::PASSWORDLESS_LOGIN_VALIDATE_CONFIRM);
 });
@@ -20,7 +20,7 @@ Route::prefix('/login/consume')->middleware('signed')->group(static function ():
 Route::get('/media/{media}', PrivateMediaController::class)
     ->name(RouteName::MEDIA_PRIVATE);
 
-Route::prefix('/snapshot/sign')->middleware('signed')->group(static function (): void {
+Route::prefix('/snapshot/sign')->middleware(['panel:admin', 'signed'])->group(static function (): void {
     Route::prefix('/batch')->group(static function (): void {
         Route::get('/', [SnapshotSignLoginController::class, 'openBatch'])->name(RouteName::SNAPSHOT_SIGN_LOGIN_BATCH_OPEN);
         Route::post('/', [SnapshotSignLoginController::class, 'loginBatch'])->name(RouteName::SNAPSHOT_SIGN_LOGIN_BATCH_LOGIN);
@@ -32,4 +32,5 @@ Route::prefix('/snapshot/sign')->middleware('signed')->group(static function ():
 });
 
 Route::get('/{tenant}/two-factor-authentication', OneTimePasswordValidation::class)
+    ->middleware('panel:admin')
     ->name(RouteName::TWO_FACTOR_AUTHENTICATION_REQUEST);

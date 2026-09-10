@@ -11,7 +11,7 @@ use App\Filament\Tables\Columns\UpdatedAtColumn;
 use App\Filament\Tables\DocumentFilter;
 use App\Filament\Tables\ResponsibleFilter;
 use App\Services\DateFormatService;
-use Filament\Tables\Actions\EditAction;
+use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
@@ -44,8 +44,8 @@ class DataBreachRecordResourceTable
             ->defaultSort('data_breach_records.updated_at', 'desc')
             ->emptyStateHeading(__('data_breach_record.table_empty_heading'))
             ->emptyStateDescription(null)
-            ->actionsColumnLabel(__('general.edit'))
-            ->actions([
+            ->recordActionsColumnLabel(__('general.edit'))
+            ->recordActions([
                 EditAction::make()
                     ->hiddenLabel()
                     ->tooltip(static fn (EditAction $action) => $action->getLabel()),

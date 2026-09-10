@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace App\Filament\Forms\Components;
 
-use Filament\Forms\Components\Component;
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Forms\Components\Field;
-use Filament\Forms\Components\Wizard;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Wizard\Step;
 
 use function blank;
 
-class ProcessingRecordStep extends Wizard\Step
+class ProcessingRecordStep extends Step
 {
     /**
      * Returns whether every required field in this step has been filled.
@@ -20,38 +22,47 @@ class ProcessingRecordStep extends Wizard\Step
     public function hasRequiredFieldsFilled(): bool
     {
         return $this->requiredFieldsAreFilled(
-            $this->getChildComponentContainer()->getComponents(),
+            $this->getChildSchema()?->getComponents() ?? [],
         );
     }
 
     /**
-     * @param array<Component> $components
+     * @param array<Action|ActionGroup|Component> $components
      */
     private function requiredFieldsAreFilled(array $components): bool
     {
         foreach ($components as $component) {
-            $container = $component->getChildComponentContainer();
-            if (!$this->requiredFieldsAreFilled($container->getComponents())) {
+            if (!$component instanceof Component) {
+                continue;
+            }
+
+            $container = $component->getChildSchema();
+            if ($container !== null && !$this->requiredFieldsAreFilled($container->getComponents())) {
                 return false;
             }
 
-            if (!$component instanceof Field) {
-                continue;
-            }
-
-            if ($component->isHidden() || $component->isDisabled()) {
-                continue;
-            }
-
-            if (!$component->isRequired()) {
-                continue;
-            }
-
-            if (blank($component->getState())) {
+            if ($this->isUnfilledRequiredField($component)) {
                 return false;
             }
         }
 
         return true;
+    }
+
+    private function isUnfilledRequiredField(Component $component): bool
+    {
+        if (!$component instanceof Field) {
+            return false;
+        }
+
+        if ($component->isHidden() || $component->isDisabled()) {
+            return false;
+        }
+
+        if (!$component->isRequired()) {
+            return false;
+        }
+
+        return blank($component->getState());
     }
 }

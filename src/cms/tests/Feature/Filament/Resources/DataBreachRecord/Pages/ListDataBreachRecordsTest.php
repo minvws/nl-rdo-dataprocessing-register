@@ -37,9 +37,13 @@ it('can export', function (): void {
         ->recycle($organisation)
         ->create();
 
-    $this->asFilamentOrganisationUser($organisation)
-        ->createLivewireTestable(ListDataBreachRecords::class)
-        ->callAction('export')
-        ->assertHasNoActionErrors()
+    $listPage = $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ListDataBreachRecords::class);
+
+    $listPage->callAction('export');
+
+    $this->restoreFilamentSession();
+
+    $listPage->assertHasNoActionErrors()
         ->assertNotified();
 });

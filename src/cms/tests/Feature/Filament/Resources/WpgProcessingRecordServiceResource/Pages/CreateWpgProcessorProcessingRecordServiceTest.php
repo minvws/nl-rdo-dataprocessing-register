@@ -9,6 +9,7 @@ use App\Filament\Resources\WpgProcessingRecordServiceResource\Pages\CreateWpgPro
 use App\Models\Tag;
 use App\Models\Wpg\WpgProcessingRecord;
 use App\Models\Wpg\WpgProcessingRecordService;
+use Filament\Actions\Testing\TestAction;
 use Tests\Helpers\Model\OrganisationTestHelper;
 
 it('loads the create page', function (): void {
@@ -54,9 +55,9 @@ it('can create an entry with a new tag', function (): void {
             'name' => $name,
             'wpg_processing_record_service_id' => $wpgProcessingRecordService->id->toString(),
         ])
-        ->call('mountFormComponentAction', 'data.tags', 'createOption')
-        ->set('mountedFormComponentActionsData.0.name', $tagName)
-        ->call('callMountedFormComponentAction')
+        ->mountAction(TestAction::make('createOption')->schemaComponent('tags'))
+        ->set('mountedActions.0.data.name', $tagName)
+        ->call('callMountedAction')
         ->assertHasNoFormErrors()
         ->call('create')
         ->assertHasNoFormErrors();

@@ -10,9 +10,9 @@ use function __;
 
 class StakeholderDataItemsRepeatableEntry extends RepeatableEntry
 {
-    public static function make(string $name = 'stakeholderDataItems'): static
+    public static function make(?string $name = null): static
     {
-        return parent::make($name)
+        return parent::make($name ?? 'stakeholderDataItems')
             ->label('')
             ->placeholder(__('general.none_selected'))
             ->schema([

@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Forms\Components\Section;
 
-use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Section;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Section;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\Str;
 
 class InformationBlockSection extends Section
 {
@@ -17,23 +18,23 @@ class InformationBlockSection extends Section
         if ($extraInfo === null) {
             return $informationBlockSection
                 ->schema([
-                    self::makePlaceholderWithHtmlString($info),
+                    self::makePlaceholderWithHtmlString($info, $heading),
                 ]);
         }
 
         return $informationBlockSection
             ->description(self::makeHtmlString($info))
             ->schema([
-                self::makePlaceholderWithHtmlString($extraInfo),
+                self::makePlaceholderWithHtmlString($extraInfo, $heading),
             ])
             ->collapsed();
     }
 
-    private static function makePlaceholderWithHtmlString(string $info): Placeholder
+    private static function makePlaceholderWithHtmlString(string $info, string $heading): TextEntry
     {
-        return Placeholder::make('')
+        return TextEntry::make('information_block_' . Str::slug($heading))
             ->hiddenLabel()
-            ->content(self::makeHtmlString($info));
+            ->state(self::makeHtmlString($info));
     }
 
     private static function makeHtmlString(string $input): HtmlString

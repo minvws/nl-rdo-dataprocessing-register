@@ -7,6 +7,7 @@ use App\Filament\Resources\DocumentResource\Pages\CreateDocument;
 use App\Models\Document;
 use App\Models\DocumentType;
 use Carbon\CarbonImmutable;
+use Filament\Actions\Testing\TestAction;
 use Tests\Helpers\Model\OrganisationTestHelper;
 
 it('loads the create page', function (): void {
@@ -54,8 +55,8 @@ it('can use the notify_at_expires_at action', function (): void {
             'expires_at' => $expiresAt->format('Y-m-d H:i:s'),
             'document_type_id' => $documentType->id,
         ])
-        ->mountFormComponentAction('notify_at', 'notify_at_expires_at')
-        ->callFormComponentAction('notify_at', 'notify_at_expires_at')
+        ->mountAction(TestAction::make('notify_at_expires_at')->schemaComponent('notify_at'))
+        ->callAction(TestAction::make('notify_at_expires_at')->schemaComponent('notify_at'))
         ->call('create')
         ->assertHasNoFormErrors();
 
@@ -81,8 +82,8 @@ it('can use the notify_at_expires_at action if expires_at not set', function ():
             'expires_at' => null,
             'document_type_id' => $documentType->id,
         ])
-        ->mountFormComponentAction('notify_at', 'notify_at_expires_at')
-        ->callFormComponentAction('notify_at', 'notify_at_expires_at')
+        ->mountAction(TestAction::make('notify_at_expires_at')->schemaComponent('notify_at'))
+        ->callAction(TestAction::make('notify_at_expires_at')->schemaComponent('notify_at'))
         ->call('create')
         ->assertHasNoFormErrors();
 
@@ -109,8 +110,8 @@ it('can use the notify_at_1_month_before action', function (): void {
             'expires_at' => $expiresAt->format('Y-m-d H:i:s'),
             'document_type_id' => $documentType->id,
         ])
-        ->mountFormComponentAction('notify_at', 'notify_at_1_month_before')
-        ->callFormComponentAction('notify_at', 'notify_at_1_month_before')
+        ->mountAction(TestAction::make('notify_at_1_month_before')->schemaComponent('notify_at'))
+        ->callAction(TestAction::make('notify_at_1_month_before')->schemaComponent('notify_at'))
         ->call('create')
         ->assertHasNoFormErrors();
 
@@ -136,8 +137,8 @@ it('can use the notify_at_1_month_before action if expires_at not set', function
             'expires_at' => null,
             'document_type_id' => $documentType->id,
         ])
-        ->mountFormComponentAction('notify_at', 'notify_at_1_month_before')
-        ->callFormComponentAction('notify_at', 'notify_at_1_month_before')
+        ->mountAction(TestAction::make('notify_at_1_month_before')->schemaComponent('notify_at'))
+        ->callAction(TestAction::make('notify_at_1_month_before')->schemaComponent('notify_at'))
         ->call('create')
         ->assertHasNoFormErrors();
 
@@ -164,8 +165,8 @@ it('can use the notify_at_3_months_before action', function (): void {
             'expires_at' => $expiresAt->format('Y-m-d H:i:s'),
             'document_type_id' => $documentType->id,
         ])
-        ->mountFormComponentAction('notify_at', 'notify_at_3_months_before')
-        ->callFormComponentAction('notify_at', 'notify_at_3_months_before')
+        ->mountAction(TestAction::make('notify_at_3_months_before')->schemaComponent('notify_at'))
+        ->callAction(TestAction::make('notify_at_3_months_before')->schemaComponent('notify_at'))
         ->call('create')
         ->assertHasNoFormErrors();
 
@@ -191,8 +192,8 @@ it('can use the notify_at_3_months_before action if expires_at not set', functio
             'expires_at' => null,
             'document_type_id' => $documentType->id,
         ])
-        ->mountFormComponentAction('notify_at', 'notify_at_3_months_before')
-        ->callFormComponentAction('notify_at', 'notify_at_3_months_before')
+        ->mountAction(TestAction::make('notify_at_3_months_before')->schemaComponent('notify_at'))
+        ->callAction(TestAction::make('notify_at_3_months_before')->schemaComponent('notify_at'))
         ->call('create')
         ->assertHasNoFormErrors();
 

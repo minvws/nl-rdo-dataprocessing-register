@@ -12,9 +12,9 @@ use function sprintf;
 
 class SnapshotStateEntry extends TextEntry
 {
-    public static function make(string $name = 'state'): static
+    public static function make(?string $name = null): static
     {
-        return parent::make($name)
+        return parent::make($name ?? 'state')
             ->label(__('snapshot.state'))
             ->badge()
             ->color(static function (SnapshotState $state): string {

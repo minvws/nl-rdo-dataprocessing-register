@@ -7,22 +7,22 @@ namespace App\Filament\Forms\Components;
 use App\Facades\Authentication;
 use App\Filament\Forms\FormHelper;
 use App\Filament\TenantScoped;
-use Filament\Forms\Components\Actions\Action;
-use Filament\Forms\Components\Component;
+use Filament\Actions\Action;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Section;
 use Webmozart\Assert\Assert;
 
 use function __;
 
 class StakeholdersRepeater extends Repeater
 {
-    public static function make(string $name = 'stakeholders'): static
+    public static function make(?string $name = null): static
     {
-        return parent::make($name)
+        return parent::make($name ?? 'stakeholders')
             ->label(__('stakeholder.model_plural'))
             ->relationship(modifyQueryUsing: TenantScoped::getAsClosure())
             ->schema(self::getStakeholderSchema())

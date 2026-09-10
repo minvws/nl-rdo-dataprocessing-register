@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\RelationManagers\AlgorithmRecordRelationManager;
-use App\Filament\Resources\AlgorithmMetaSchemaResource\Pages;
+use App\Filament\Resources\AlgorithmMetaSchemaResource\Pages\CreateAlgorithmMetaSchema;
+use App\Filament\Resources\AlgorithmMetaSchemaResource\Pages\EditAlgorithmMetaSchema;
+use App\Filament\Resources\AlgorithmMetaSchemaResource\Pages\ListAlgorithmMetaSchemas;
+use App\Filament\Resources\AlgorithmMetaSchemaResource\Pages\ViewAlgorithmMetaSchema;
 use App\Models\Algorithm\AlgorithmMetaSchema;
 
 use function __;
@@ -19,10 +22,10 @@ class AlgorithmMetaSchemaResource extends LookupListResource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListAlgorithmMetaSchemas::route('/'),
-            'create' => Pages\CreateAlgorithmMetaSchema::route('/create'),
-            'edit' => Pages\EditAlgorithmMetaSchema::route('/{record}/edit'),
-            'view' => Pages\ViewAlgorithmMetaSchema::route('/{record}'),
+            'index' => ListAlgorithmMetaSchemas::route('/'),
+            'create' => CreateAlgorithmMetaSchema::route('/create'),
+            'edit' => EditAlgorithmMetaSchema::route('/{record}/edit'),
+            'view' => ViewAlgorithmMetaSchema::route('/{record}'),
         ];
     }
 

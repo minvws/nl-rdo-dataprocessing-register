@@ -8,13 +8,16 @@ use App\Filament\NavigationGroups\NavigationGroup;
 use App\Filament\RelationManagers\AvgProcessorProcessingRecordRelationManager;
 use App\Filament\RelationManagers\AvgResponsibleProcessingRecordRelationManager;
 use App\Filament\RelationManagers\WpgProcessingRecordRelationManager;
-use App\Filament\Resources\TagResource\Pages;
+use App\Filament\Resources\TagResource\Pages\CreateTag;
+use App\Filament\Resources\TagResource\Pages\EditTag;
+use App\Filament\Resources\TagResource\Pages\ListTags;
+use App\Filament\Resources\TagResource\Pages\ViewTag;
 use App\Filament\Resources\TagResource\TagResourceForm;
 use App\Filament\Resources\TagResource\TagResourceInfolist;
 use App\Filament\Resources\TagResource\TagResourceTable;
 use App\Models\Tag;
-use Filament\Forms\Form;
-use Filament\Infolists\Infolist;
+use BackedEnum;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 
 use function __;
@@ -22,7 +25,7 @@ use function __;
 class TagResource extends Resource
 {
     protected static ?string $model = Tag::class;
-    protected static ?string $navigationIcon = 'heroicon-o-tag';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-tag';
     protected static ?int $navigationSort = 12;
 
     public static function getNavigationGroup(): ?string
@@ -30,14 +33,14 @@ class TagResource extends Resource
         return __(NavigationGroup::MANAGEMENT->value);
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return TagResourceForm::form($form);
+        return TagResourceForm::form($schema);
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
-        return TagResourceInfolist::infolist($infolist);
+        return TagResourceInfolist::infolist($schema);
     }
 
     public static function table(Table $table): Table
@@ -57,10 +60,10 @@ class TagResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListTags::route('/'),
-            'create' => Pages\CreateTag::route('/create'),
-            'edit' => Pages\EditTag::route('/{record}/edit'),
-            'view' => Pages\ViewTag::route('/{record}'),
+            'index' => ListTags::route('/'),
+            'create' => CreateTag::route('/create'),
+            'edit' => EditTag::route('/{record}/edit'),
+            'view' => ViewTag::route('/{record}'),
         ];
     }
 

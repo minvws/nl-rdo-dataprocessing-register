@@ -10,8 +10,8 @@ use App\Filament\Infolists\Components\ParentSelectEntry;
 use App\Filament\Infolists\Components\Section\InformationBlockSection;
 use App\Filament\Infolists\Components\SelectMultipleEntry;
 use App\Filament\Infolists\Components\TextareaEntry;
-use Filament\Infolists\Components\Component;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Component;
 
 use function __;
 

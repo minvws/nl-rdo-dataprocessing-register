@@ -6,9 +6,9 @@ namespace App\Filament\Infolists\Components\Section;
 
 use App\Models\Contracts\Publishable;
 use App\Services\DateFormatService;
-use Filament\Infolists\Components\Component;
-use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Section;
 use Illuminate\Support\Collection;
 use Webmozart\Assert\Assert;
 

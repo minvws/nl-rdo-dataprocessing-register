@@ -16,6 +16,7 @@ use App\Models\ContactPerson;
 use App\Models\ContactPersonPosition;
 use App\Models\DataBreachRecord;
 use App\Models\Document;
+use App\Models\DocumentType;
 use App\Models\Organisation;
 use App\Models\Processor;
 use App\Models\Receiver;
@@ -209,6 +210,18 @@ it('has documents', function (): void {
         ->for($organisation)
         ->create();
     expect($organisation->documents()->count())
+        ->toBe(1);
+});
+
+it('has documentTypes', function (): void {
+    $organisation = Organisation::factory()->create();
+    expect($organisation->documentTypes()->count())
+        ->toBe(0);
+
+    DocumentType::factory()
+        ->for($organisation)
+        ->create();
+    expect($organisation->documentTypes()->count())
         ->toBe(1);
 });
 

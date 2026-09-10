@@ -4,18 +4,30 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Config\Config;
 use App\Facades\Authentication;
 use App\Filament\NavigationGroups\NavigationGroup;
 use App\Filament\Pages\Login;
 use App\Filament\Pages\Profile;
+use App\Filament\Resources\AlgorithmRecordResource\Pages\CreateAlgorithmRecord;
+use App\Filament\Resources\AlgorithmRecordResource\Pages\EditAlgorithmRecord;
+use App\Filament\Resources\AvgProcessorProcessingRecordResource\Pages\CreateAvgProcessorProcessingRecord;
+use App\Filament\Resources\AvgProcessorProcessingRecordResource\Pages\EditAvgProcessorProcessingRecord;
+use App\Filament\Resources\AvgResponsibleProcessingRecordResource\Pages\CreateAvgResponsibleProcessingRecord;
+use App\Filament\Resources\AvgResponsibleProcessingRecordResource\Pages\EditAvgResponsibleProcessingRecord;
+use App\Filament\Resources\DataBreachRecord\Pages\CreateDataBreachRecord;
+use App\Filament\Resources\DataBreachRecord\Pages\EditDataBreachRecord;
+use App\Filament\Resources\WpgProcessingRecordResource\Pages\CreateWpgProcessingRecord;
+use App\Filament\Resources\WpgProcessingRecordResource\Pages\EditWpgProcessingRecord;
 use App\Filament\SimpleAvatarProvider;
 use App\Http\Controllers\HealthController;
 use App\Http\Middleware\EnforceOneTimePassword;
 use App\Http\Middleware\IPAllowFilter;
 use App\Models\Organisation;
 use Exception;
+use Filament\Actions\Action;
+use Filament\Actions\EditAction;
 use Filament\Facades\Filament;
-use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Field;
 use Filament\Forms\Components\Radio;
@@ -24,17 +36,19 @@ use Filament\Forms\Components\Select;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Navigation\MenuItem;
 use Filament\Navigation\NavigationGroup as FilamentNavigationGroup;
+use Filament\Navigation\NavigationItem;
 use Filament\Panel;
 use Filament\PanelProvider;
+use Filament\Schemas\Components\Form;
 use Filament\Support\Assets\Js;
+use Filament\Support\Enums\Width;
 use Filament\Support\Facades\FilamentAsset;
 use Filament\Support\Facades\FilamentView;
-use Filament\Tables\Actions\EditAction;
 use Filament\View\PanelsRenderHook;
 use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -43,6 +57,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Routing\Route;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Route as RouteFacade;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Illuminate\View\View;
@@ -65,17 +80,17 @@ class FilamentServiceProvider extends PanelProvider
      * The 50-900 shades are from Tailwind CSS, and the 950 shade is a custom darker shade.
      */
     private const array PRIMARY_COLOR = [
-        50 => '255, 247, 237',
-        100 => '255, 237, 213',
-        200 => '254, 215, 170',
-        300 => '253, 186, 116',
-        400 => '249, 115, 22',
-        500 => '194, 65, 12',
-        600 => '154, 52, 18',
-        700 => '124, 45, 18',
-        800 => '95, 35, 14',
-        900 => '67, 20, 7',
-        950 => '45, 14, 5',
+        50 => '#fff7ed',
+        100 => '#ffedd5',
+        200 => '#fed7aa',
+        300 => '#fdba74',
+        400 => '#f97316',
+        500 => '#c2410c',
+        600 => '#9a3412',
+        700 => '#7c2d12',
+        800 => '#5f230e',
+        900 => '#431407',
+        950 => '#2d0e05',
     ];
 
     public function boot(): void
@@ -84,11 +99,22 @@ class FilamentServiceProvider extends PanelProvider
             Js::make('wcag', base_path('resources/js/wcag.js')),
         ]);
 
+        $this->configureComponents();
+        $this->registerRenderHooks();
+        $this->registerAutosaveRenderHooks();
+    }
+
+    private function configureComponents(): void
+    {
         foreach ([Radio::class, CheckboxList::class, Select::class] as $choiceField) {
             $choiceField::configureUsing(static function (Field $field): void {
                 $field->validationMessages(['required' => __('validation.required_choice')]);
             });
         }
+
+        Form::configureUsing(static function (Form $form): void {
+            $form->extraAttributes(['novalidate' => 'novalidate'], merge: true);
+        });
 
         EditAction::configureUsing(static function (EditAction $action): void {
             $action->extraAttributes(['data-row-target' => 'true'], merge: true);
@@ -105,7 +131,10 @@ class FilamentServiceProvider extends PanelProvider
                     });
                 });
         });
+    }
 
+    private function registerRenderHooks(): void
+    {
         FilamentView::registerRenderHook(
             PanelsRenderHook::BODY_START,
             static function (): View {
@@ -115,6 +144,13 @@ class FilamentServiceProvider extends PanelProvider
 
         FilamentView::registerRenderHook(
             PanelsRenderHook::CONTENT_START,
+            static function (): View {
+                return view('filament.main_content_anchor');
+            },
+        );
+
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::SIMPLE_LAYOUT_START,
             static function (): View {
                 return view('filament.main_content_anchor');
             },
@@ -146,6 +182,69 @@ class FilamentServiceProvider extends PanelProvider
         );
     }
 
+    private function registerAutosaveRenderHooks(): void
+    {
+        $autosavePages = [
+            CreateAvgResponsibleProcessingRecord::class,
+            EditAvgResponsibleProcessingRecord::class,
+            CreateAvgProcessorProcessingRecord::class,
+            EditAvgProcessorProcessingRecord::class,
+            CreateWpgProcessingRecord::class,
+            EditWpgProcessingRecord::class,
+            CreateAlgorithmRecord::class,
+            EditAlgorithmRecord::class,
+            CreateDataBreachRecord::class,
+            EditDataBreachRecord::class,
+        ];
+
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::PAGE_START,
+            static function (): ?View {
+                if (!Config::boolean('autosave.enabled')) {
+                    return null;
+                }
+
+                return view('filament.autosave.banner');
+            },
+            scopes: $autosavePages,
+        );
+
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::PAGE_HEADER_ACTIONS_BEFORE,
+            static function (): ?View {
+                if (!Config::boolean('autosave.enabled')) {
+                    return null;
+                }
+
+                return view('filament.autosave.status');
+            },
+            scopes: $autosavePages,
+        );
+    }
+
+    public static function getFirstNavigationItemUrl(): ?string
+    {
+        $panel = Filament::getCurrentOrDefaultPanel();
+        Assert::isInstanceOf($panel, Panel::class);
+
+        $firstGroup = Arr::first($panel->getNavigation());
+
+        if ($firstGroup === null) {
+            return null;
+        }
+
+        $items = $firstGroup->getItems();
+
+        if ($items instanceof Arrayable) {
+            $items = $items->toArray();
+        }
+
+        $firstItem = Arr::first($items);
+        Assert::isInstanceOf($firstItem, NavigationItem::class);
+
+        return $firstItem->getUrl();
+    }
+
     /**
      * @throws Exception
      */
@@ -159,6 +258,9 @@ class FilamentServiceProvider extends PanelProvider
             ->profile(Profile::class)
             ->routes(static function (): void {
                 RouteFacade::get('/health', HealthController::class);
+            })
+            ->homeUrl(static function (): ?string {
+                return self::getFirstNavigationItemUrl();
             })
             ->colors([
                 'primary' => self::PRIMARY_COLOR,
@@ -217,9 +319,9 @@ class FilamentServiceProvider extends PanelProvider
             ], isPersistent: true)
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->userMenuItems([
-                'account' => MenuItem::make()
+                'profile' => Action::make('profile')
                     ->url(static function (): string {
-                        $panel = Filament::getCurrentPanel();
+                        $panel = Filament::getCurrentOrDefaultPanel();
                         Assert::isInstanceOf($panel, Panel::class);
 
                         $route = request()->route();
@@ -233,12 +335,12 @@ class FilamentServiceProvider extends PanelProvider
 
                         return Profile::getUrl(panel: $panel->getId(), tenant: $tenant);
                     }),
-                'manual' => MenuItem::make()
+                'manual' => Action::make('manual')
                     ->url(asset('pdf/verwerkingsregister_handleiding.pdf'), true)
                     ->icon('heroicon-o-document-check')
                     ->label(__('general.manual')),
             ])
-            ->maxContentWidth('screen-2xl')
+            ->maxContentWidth(Width::ScreenTwoExtraLarge)
             ->sidebarWidth('25rem')
             ->sidebarCollapsibleOnDesktop()
             ->favicon(asset('favicon.ico'));

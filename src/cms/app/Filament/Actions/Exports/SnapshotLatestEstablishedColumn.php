@@ -14,9 +14,9 @@ use function __;
 
 class SnapshotLatestEstablishedColumn extends ExportColumn
 {
-    public static function make(string $name = 'snapshot_latest_established'): static
+    public static function make(?string $name = null): static
     {
-        return parent::make($name)
+        return parent::make($name ?? 'snapshot_latest_established')
             ->label(__('snapshot.latest_established'))
             ->default(static function (Model $model): ?CarbonInterface {
                 Assert::isInstanceOf($model, SnapshotSource::class);

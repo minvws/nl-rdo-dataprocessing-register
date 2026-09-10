@@ -7,21 +7,21 @@ namespace App\Filament\Forms\Components;
 use App\Facades\Authentication;
 use App\Filament\Forms\FormHelper;
 use App\Filament\TenantScoped;
-use Filament\Forms\Components\Actions\Action;
-use Filament\Forms\Components\Component;
+use Filament\Actions\Action;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Component;
 use Webmozart\Assert\Assert;
 
 use function __;
 
 class StakeholderDataItemsRepeater extends Repeater
 {
-    public static function make(string $name = 'stakeholder_data_items'): static
+    public static function make(?string $name = null): static
     {
-        return parent::make($name)
+        return parent::make($name ?? 'stakeholder_data_items')
             ->label(__('stakeholder_data_item.model_plural'))
             ->relationship('stakeholderDataItems', TenantScoped::getAsClosure())
             ->schema(self::getStakeholderDataItemSchema())

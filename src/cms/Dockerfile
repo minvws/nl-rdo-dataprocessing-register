@@ -6,8 +6,8 @@ INCLUDE+ ./Dockerfile
 
 
 ARG TARGETARCH
-ARG HUGO_VERSION=0.163.3
-ARG DART_SASS_VERSION=1.101.0
+ARG HUGO_VERSION=0.165.0
+ARG DART_SASS_VERSION=1.103.1
 
 # Install Hugo  -  https://github.com/gohugoio/hugo/releases
 RUN curl -LJO https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-${TARGETARCH}.deb

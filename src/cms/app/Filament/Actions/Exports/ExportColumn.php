@@ -10,6 +10,7 @@ use BackedEnum;
 use Carbon\CarbonInterface;
 use Filament\Actions\Exports\ExportColumn as FilamentExportColumn;
 use Filament\Support\Contracts\HasLabel;
+use Illuminate\Contracts\Support\Htmlable;
 
 use function is_bool;
 
@@ -47,6 +48,10 @@ class ExportColumn extends FilamentExportColumn
         if ($state instanceof HasLabel) {
             $label = $state->getLabel();
             if ($label !== null) {
+                if ($label instanceof Htmlable) {
+                    return $label->toHtml();
+                }
+
                 return $label;
             }
         }

@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Filament\Forms\Components\Section;
 
 use App\Models\Contracts\Publishable;
-use Filament\Forms\Components\Component;
-use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Section;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Section;
 use Illuminate\Support\Collection;
 
 use function __;
@@ -36,7 +36,7 @@ class StaticWebsiteCheckSection extends Section
         $schema = [];
 
         $view = $record->isPublished() ? 'published' : 'unpublished';
-        $schema[] = Placeholder::make('static_website_public_state')
+        $schema[] = TextEntry::make('static_website_public_state')
             ->label(__('static_website.public_from_section.public_state'))
             ->view(sprintf('filament.forms.components.section.static_website_check_section.%s', $view));
 
@@ -63,7 +63,7 @@ class StaticWebsiteCheckSection extends Section
                 ]));
             }
 
-            $schema[] = Placeholder::make('static_website_snapshot_entry')
+            $schema[] = TextEntry::make('static_website_snapshot_entry')
                 ->label(__('static_website.public_from_section.public_history'))
                 ->view('filament.forms.components.section.static-website-history', ['items' => $staticWebsiteHistoryItems]);
         }

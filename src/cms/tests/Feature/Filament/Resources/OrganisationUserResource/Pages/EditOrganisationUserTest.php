@@ -11,6 +11,21 @@ use App\Models\User;
 use Tests\Helpers\Model\OrganisationTestHelper;
 use Tests\Helpers\Model\UserTestHelper;
 
+it('does not load the edit page for a user from another organisation', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $filamentUser = UserTestHelper::createForOrganisation($organisation);
+
+    $otherOrganisation = OrganisationTestHelper::create();
+    $user = User::factory()
+        ->hasAttached($otherOrganisation)
+        ->create();
+
+    $this->withPermissions($filamentUser, [Permission::USER_ROLE_ORGANISATION_MANAGE])
+        ->withFilamentSession($filamentUser, $organisation)
+        ->get(OrganisationUserResource::getUrl('edit', ['record' => $user]))
+        ->assertNotFound();
+});
+
 it('loads the edit page with cpo-manage permission', function (): void {
     $organisation = OrganisationTestHelper::create();
     $user = UserTestHelper::createForOrganisation($organisation);

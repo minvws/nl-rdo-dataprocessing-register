@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Forms\Components;
 
-use App\Config\Config;
 use App\Facades\Authentication;
 use App\Filament\Forms\Components\DatePicker\DateTimePicker;
 use App\Services\DateFormatService;
 use Carbon\CarbonImmutable;
-use Filament\Forms\Components\Actions\Action;
-use Filament\Forms\Set;
+use Filament\Actions\Action;
+use Filament\Schemas\Components\Utilities\Set;
 use Illuminate\Database\Eloquent\Model;
 
 use function __;
@@ -36,7 +35,7 @@ class PublicFromField extends DateTimePicker
                         return Authentication::user()->can('update', $record);
                     })
                     ->action(static function (Set $set): void {
-                        $publicFromNow = CarbonImmutable::now(Config::string('app.display_timezone'))
+                        $publicFromNow = CarbonImmutable::now()
                             ->floorMinute()
                             ->format(DateFormatService::FORMAT_DATE_TIME_INPUT);
 

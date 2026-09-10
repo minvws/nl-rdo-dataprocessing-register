@@ -2,7 +2,23 @@
 
 ## Introduction
 
-This repository contains the Verwerkingsregister. This project has 2 main components:
+Under the GDPR (AVG) and the Dutch police data act (WPG), public bodies must keep a record of every processing activity involving personal data, and publish that record. The Verwerkingsregister is the web application in which the Ministerie van Volksgezondheid, Welzijn en Sport (VWS) and the associated organisations do both: maintain their records in a structured, uniform way, and publish the approved versions to a public website.
+
+**Target audience**
+
+Privacy professionals within the VWS group: data entry staff (*invoerders*), (Chief) Privacy Officers, Data Protection Officers (*functionarissen gegevensbescherming*), mandate holders (*mandaathouders*) who formally approve records, and read-only consultants. Members of the public are the audience for the published website. See [docs/roles_and_permissions.md](docs/roles_and_permissions.md) for the full role model.
+
+**Function and purpose**
+
+- Holds five registers: AVG processing records as controller (*AVG verantwoordelijke verwerkingen*), AVG processing records as processor (*AVG verwerker verwerkingen*), WPG processing records (*WPG verantwoordelijke verwerkingen*), algorithms, and data breaches.
+- Records relations between processing activities, organisations, systems, processors, receivers and other entities, so the register stays coherent instead of being a set of unrelated forms.
+- Stores supporting documents (DPIAs, contracts) with the record they belong to, and warns users by email when a document is about to expire or a record is due for periodic review.
+- Runs a formal approval process: a record version is frozen into a snapshot, mandate holders approve it, and only then is it established.
+- Publishes established snapshots as a public static website, so the legally required publication follows from the same source as the internal administration.
+
+## Repository layout
+
+This project has 2 main components:
 
 **CMS**
 
@@ -18,8 +34,29 @@ Directory: `/src/static-website/`
 
 ## Documentation
 
+
+```mermaid
+flowchart LR
+    user([CMS User]) --> cms
+    cms[CMS] -->|JSON and markdown| hugo[Hugo]
+    hugo --> site[Public website]
+    site --> visitor([Public user])
+
+    cms --> db[(PostgreSQL)]
+    cms --> s3[(S3 object storage)]
+    cms --> clamav[ClamAV]
+    cms --> smtp[SMTP]
+```
+
+The application has no API of its own and calls no external API. At runtime it talks to PostgreSQL, S3 compatible object storage, ClamAV, an SMTP server. Only the public website is reachable from the internet.
+
+
+- See [docs/tech_stack.md](docs/tech_stack.md) for the languages and frameworks used
+- See [docs/database.md](docs/database.md) for the database details, schema versioning and how the SQL files for a release are generated
+- See [docs/database.md](docs/database.md) for the database type and version, the schema, and how the schema is versioned and deployed.
 - See [docs/environment_variables.md](docs/environment_variables.md) for an overview of all environment variables that can be set in the `.env` file.
 - See [docs/roles_and_permissions.md](docs/roles_and_permissions.md) for an overview of all roles and permissions and the location where they are configured.
+- See [docs/scheduled_tasks.md](docs/scheduled_tasks.md) for the periodic tasks, when they run and what depends on them.
 
 ## Getting started
 > All `artisan` commands must be run via Sail (`sail artisan ...` or inside `sail shell`).
@@ -64,7 +101,7 @@ We now need the Public website script to build the static files within your cont
 4. Exit the shell  (`exit`).
 5. Run `sail artisan storage:link` to link the configured (default) /static-website to the actual static files of the website.
 6. Run `sail artisan static-website:refresh` to generate the public website content from the CMS database.
-   
+
 
 As a result of these steps, you have created the static files for the public website and in your browser you can see the Login page.
 - Navigate to http://localhost/static-website (or http://web.cms.orb.local/static-website for Orbstack users)
@@ -108,7 +145,17 @@ You can use the testing database (which is available by default), which requires
 
 1. Bash into the sail-container: `php artisan sail`
 2. Run `DB_DATABASE=testing php artisan migrate:fresh` to (re)run all migrations
-3. Run the test: `php artisan test` (optionally with the `--coverage` parameter)
+3. Run the test: `php artisan test --testsuite=Unit,Feature` (optionally with the `--coverage` parameter)
+
+#### Browser tests
+
+The `Browser` testsuite drives a real Chromium through Playwright, so it is kept out of the runs
+above. It needs a one-off browser download before it can run:
+
+1. `npm install`
+2. `npx playwright install chromium`
+3. `npm run build` — the tests assert on compiled CSS, so a stale `public/build` makes them fail
+4. `composer run-script test-browser`
 
 #### Alternative
 Execute the following bin script to run all CI checks: `./bin/ci-local`

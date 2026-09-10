@@ -12,9 +12,20 @@ use Tests\Helpers\Model\OrganisationTestHelper;
 use Tests\Helpers\Model\UserTestHelper;
 use Tests\Helpers\PermissionTestHelper;
 use Tests\Helpers\SessionTestHelper;
+use Webmozart\Assert\Assert;
 
 trait WithFilament
 {
+    private ?User $filamentSessionUser = null;
+
+    final public function restoreFilamentSession(): static
+    {
+        Assert::isInstanceOf($this->filamentSessionUser, User::class);
+        $this->be($this->filamentSessionUser);
+
+        return $this;
+    }
+
     final public function asFilamentUser(?User $user = null): static
     {
         if ($user === null) {
@@ -43,7 +54,11 @@ trait WithFilament
     {
         SessionTestHelper::setOtpValid();
 
+        $this->filamentSessionUser = $user;
         $this->be($user);
+
+        Filament::setCurrentPanel('admin');
+        Filament::bootCurrentPanel();
         Filament::setTenant($organisation);
 
         return $this;

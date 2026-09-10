@@ -17,6 +17,19 @@ use function sprintf;
 use function strpos;
 use function substr_count;
 
+/**
+ * Name and slug are kept short and fixed on purpose to prevent breaking output assertions.
+ *
+ * @param array<string, string> $attributes
+ */
+function createOrganisation(array $attributes = []): Organisation
+{
+    return OrganisationTestHelper::create($attributes + [
+        'name' => 'Acme Holding',
+        'slug' => 'acme-holding',
+    ]);
+}
+
 function createProcessor(Organisation $organisation, string $name): Processor
 {
     return Processor::factory()
@@ -35,7 +48,7 @@ function runCommand(array $options = []): string
 }
 
 it('reports nothing when there are no duplicates', function (): void {
-    $organisation = OrganisationTestHelper::create();
+    $organisation = createOrganisation();
     createProcessor($organisation, 'Acme BV');
     createProcessor($organisation, 'Zorg Noord Stichting');
 
@@ -45,7 +58,7 @@ it('reports nothing when there are no duplicates', function (): void {
 });
 
 it('finds processors with an identical name within an organisation', function (): void {
-    $organisation = OrganisationTestHelper::create();
+    $organisation = createOrganisation();
     $first = createProcessor($organisation, 'Acme BV');
     $second = createProcessor($organisation, 'Acme BV');
 
@@ -82,7 +95,7 @@ it('finds processors with an identical name within an organisation', function ()
 });
 
 it('ignores casing, punctuation and whitespace differences', function (): void {
-    $organisation = OrganisationTestHelper::create();
+    $organisation = createOrganisation();
     createProcessor($organisation, 'Acme B.V.');
     createProcessor($organisation, '  acme   bv ');
 
@@ -91,7 +104,7 @@ it('ignores casing, punctuation and whitespace differences', function (): void {
 });
 
 it('keeps different legal forms apart', function (): void {
-    $organisation = OrganisationTestHelper::create();
+    $organisation = createOrganisation();
     createProcessor($organisation, 'Acme B.V.');
     createProcessor($organisation, 'Acme N.V.');
 
@@ -100,7 +113,7 @@ it('keeps different legal forms apart', function (): void {
 });
 
 it('skips processors without a comparable name', function (): void {
-    $organisation = OrganisationTestHelper::create();
+    $organisation = createOrganisation();
     createProcessor($organisation, '---');
     createProcessor($organisation, '...');
 
@@ -109,8 +122,8 @@ it('skips processors without a comparable name', function (): void {
 });
 
 it('never compares processors of different organisations', function (): void {
-    createProcessor(OrganisationTestHelper::create(), 'Acme BV');
-    createProcessor(OrganisationTestHelper::create(), 'Acme BV');
+    createProcessor(createOrganisation(), 'Acme BV');
+    createProcessor(createOrganisation(['name' => 'Zorg Noord', 'slug' => 'zorg-noord']), 'Acme BV');
 
     $this->artisan('app:processor-duplicates')
         ->assertOk()
@@ -118,7 +131,7 @@ it('never compares processors of different organisations', function (): void {
 });
 
 it('excludes soft deleted processors', function (): void {
-    $organisation = OrganisationTestHelper::create();
+    $organisation = createOrganisation();
     createProcessor($organisation, 'Acme BV');
     createProcessor($organisation, 'Acme BV')->delete();
 
@@ -128,7 +141,7 @@ it('excludes soft deleted processors', function (): void {
 });
 
 it('reports every pair once and never pairs a processor with itself', function (): void {
-    $organisation = OrganisationTestHelper::create();
+    $organisation = createOrganisation();
     createProcessor($organisation, 'Acme BV');
     createProcessor($organisation, 'Acme BV');
     createProcessor($organisation, 'Acme BV');
@@ -138,7 +151,7 @@ it('reports every pair once and never pairs a processor with itself', function (
 });
 
 it('orders duplicates by descending similarity', function (): void {
-    $organisation = OrganisationTestHelper::create();
+    $organisation = createOrganisation();
     createProcessor($organisation, 'Acme BV Noord');
     createProcessor($organisation, 'Acme BV');
     createProcessor($organisation, 'Acme BV');
@@ -150,11 +163,11 @@ it('orders duplicates by descending similarity', function (): void {
 });
 
 it('reports the same similarity regardless of the record order', function (): void {
-    $organisation = OrganisationTestHelper::create();
+    $organisation = createOrganisation();
     createProcessor($organisation, 'Gemeente Amsterdam');
     createProcessor($organisation, 'Amsterdam Gemeente Zuid');
 
-    $otherOrganisation = OrganisationTestHelper::create();
+    $otherOrganisation = createOrganisation(['name' => 'Zorg Noord', 'slug' => 'zorg-noord']);
     createProcessor($otherOrganisation, 'Amsterdam Gemeente Zuid');
     createProcessor($otherOrganisation, 'Gemeente Amsterdam');
 
@@ -165,7 +178,7 @@ it('reports the same similarity regardless of the record order', function (): vo
 });
 
 it('applies the similarity threshold', function (): void {
-    $organisation = OrganisationTestHelper::create();
+    $organisation = createOrganisation();
     createProcessor($organisation, 'Ministerie van Financien');
     createProcessor($organisation, 'Ministerie van Financien Noord');
 
@@ -176,11 +189,11 @@ it('applies the similarity threshold', function (): void {
 });
 
 it('filters on organisation slug', function (): void {
-    $organisation = OrganisationTestHelper::create();
+    $organisation = createOrganisation();
     createProcessor($organisation, 'Acme BV');
     createProcessor($organisation, 'Acme BV');
 
-    $otherOrganisation = OrganisationTestHelper::create();
+    $otherOrganisation = createOrganisation(['name' => 'Zorg Noord', 'slug' => 'zorg-noord']);
     createProcessor($otherOrganisation, 'Zorg Noord');
     createProcessor($otherOrganisation, 'Zorg Noord');
 
@@ -191,7 +204,7 @@ it('filters on organisation slug', function (): void {
 });
 
 it('filters on a part of the organisation name', function (): void {
-    $organisation = OrganisationTestHelper::create(['name' => 'Gemeente Amsterdam']);
+    $organisation = createOrganisation(['name' => 'Gemeente Amsterdam', 'slug' => 'gemeente-amsterdam']);
     createProcessor($organisation, 'Acme BV');
     createProcessor($organisation, 'Acme BV');
 

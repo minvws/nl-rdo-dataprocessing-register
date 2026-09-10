@@ -78,99 +78,6 @@ document.addEventListener('click', (event) => {
     event.target.closest('.fi-ta-row')?.querySelector('[data-row-target]')?.click()
 })
 
-const labelChoicesInput = (container) => {
-    const select = container?.querySelector('select[id]')
-    const input = container?.querySelector('input.choices__input:not([aria-labelledby])')
-    const label = select?.labels[0]
-
-    if (!input || !label) {
-        return
-    }
-
-    label.id ||= `${select.id}-label`
-    input.setAttribute('aria-labelledby', label.id)
-    input.removeAttribute('aria-label')
-}
-
-/**
- * Fix the roles and attributes of Choices' input and listbox, for improved accessibility screen readers
- * Filament v3 only, in v4 Choices is replaced with a native select, which has the correct roles and attributes by default.
- */
-const makeChoicesInputCombobox = (container) => {
-    const select = container.querySelector('select[id]')
-    const input = container.querySelector('input.choices__input--cloned')
-    const listbox = container.querySelector('.choices__list[role="listbox"]')
-
-    if (!select || !input || !listbox) {
-        return false
-    }
-
-    listbox.id ||= `${select.id}-listbox`
-
-    input.setAttribute('role', 'combobox')
-    input.setAttribute('aria-autocomplete', 'list')
-    input.setAttribute('aria-controls', listbox.id)
-
-    container.removeAttribute('role')
-    container.removeAttribute('aria-autocomplete')
-    container.removeAttribute('aria-haspopup')
-
-    // A missing attribute means it was already mirrored, not that the state changed, so only what is
-    // present moves over.
-    const syncState = () => {
-        const expanded = container.getAttribute('aria-expanded')
-        const activeOption = container.getAttribute('aria-activedescendant')
-
-        if (expanded !== null) {
-            input.setAttribute('aria-expanded', expanded)
-
-            if (expanded === 'false') {
-                input.removeAttribute('aria-activedescendant')
-            }
-        }
-
-        if (activeOption !== null) {
-            input.setAttribute('aria-activedescendant', activeOption)
-        }
-
-        container.removeAttribute('aria-expanded')
-        container.removeAttribute('aria-activedescendant')
-    }
-
-    input.setAttribute('aria-expanded', 'false')
-    syncState()
-    new MutationObserver(syncState).observe(container, {
-        attributes: true,
-        attributeFilter: ['aria-expanded', 'aria-activedescendant'],
-    })
-
-    return true
-}
-
-const patchedChoices = new WeakSet()
-
-const patchChoices = (container) => {
-    if (patchedChoices.has(container)) {
-        return
-    }
-
-    labelChoicesInput(container)
-
-    if (makeChoicesInputCombobox(container)) {
-        patchedChoices.add(container)
-    }
-}
-
-const patchChoicesAround = (node) => {
-    const container = node.closest?.('.choices')
-
-    if (container) {
-        patchChoices(container)
-    }
-
-    node.querySelectorAll?.('.choices').forEach(patchChoices)
-}
-
 // FilePond's "Bladeren" is made interactive with a bare tabindex; the role has to say it acts as a button
 const patchFilePondBrowse = (node) => {
     if (node.matches?.('.filepond--label-action')) {
@@ -200,7 +107,6 @@ const patchModalHeadings = (node) => {
     node.querySelectorAll?.('[role="dialog"][aria-labelledby]').forEach(labelModalHeading)
 }
 
-patchChoicesAround(document.body)
 patchFilePondBrowse(document.body)
 patchModalHeadings(document.body)
 
@@ -209,7 +115,6 @@ new MutationObserver((mutations) => {
     for (const { addedNodes } of mutations) {
         for (const node of addedNodes) {
             if (node instanceof HTMLElement) {
-                patchChoicesAround(node)
                 patchFilePondBrowse(node)
                 patchModalHeadings(node)
             }
@@ -278,7 +183,7 @@ window.addEventListener('form-validation-error', (event) => {
         component
             .querySelector('[data-validation-error]')
             ?.closest('[data-field-wrapper]')
-            ?.querySelector('input:not([type="hidden"]), select:not(.choices__input), textarea')
+            ?.querySelector('input:not([type="hidden"]), select, textarea')
             ?.focus()
     })
 })

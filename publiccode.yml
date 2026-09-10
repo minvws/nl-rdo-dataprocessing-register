@@ -1,0 +1,84 @@
+publiccodeYmlVersion: "0.7"
+name: Verwerkingsregister
+url: "https://github.com/minvws/nl-rdo-dataprocessing-register"
+softwareVersion: "1.21.0"
+releaseDate: "2026-08-20"
+softwareType: standalone/web
+platforms:
+  - web
+categories:
+  - compliance-management
+  - content-management
+  - document-management
+  - workflow-management
+developmentStatus: stable
+description:
+  nl:
+    longDescription: >
+      Op grond van de Algemene verordening gegevensbescherming (AVG) en de Wet
+      politiegegevens (WPG) moeten overheidsorganisaties een register van
+      verwerkingsactiviteiten bijhouden en publiceren. Het Verwerkingsregister
+      is de webapplicatie waarin het ministerie van Volksgezondheid, Welzijn en
+      Sport en de bijbehorende organisaties dat allebei doen: de registers
+      gestructureerd en uniform bijhouden, en de vastgestelde versies
+      publiceren op een openbare website.
+
+      De applicatie bevat vijf registers: AVG verantwoordelijke verwerkingen,
+      AVG verwerker verwerkingen, WPG verantwoordelijke verwerkingen,
+      algoritmes en datalekken. Relaties tussen verwerkingen, organisaties,
+      systemen, verwerkers en ontvangers worden vastgelegd, zodat het register
+      samenhangend blijft in plaats van een verzameling losse formulieren.
+      Onderliggende documenten zoals DPIA's en overeenkomsten worden bewaard
+      bij de verwerking waar ze bij horen, en gebruikers krijgen een e-mail
+      wanneer een document verloopt of een verwerking toe is aan periodieke
+      herbeoordeling.
+
+      Publicatie verloopt via een vastgelegd proces. Een versie van een
+      verwerking wordt bevroren tot een snapshot, dat achtereenvolgens in
+      review, goedgekeurd en vastgesteld wordt. Mandaathouders worden
+      uitgenodigd om te ondertekenen. Het vaststellen wacht daar niet op, dat
+      blijft een aparte handmatige stap. Vastgestelde snapshots worden met Hugo
+      als statische website gegenereerd, zodat de wettelijk verplichte
+      publicatie uit dezelfde bron komt als de interne administratie en het CMS
+      zelf niet vanaf het internet bereikbaar hoeft te zijn. Het CMS is gebouwd
+      met Laravel en Filament, toegang verloopt via een inloglink in combinatie
+      met tweefactorauthenticatie en kritieke wijzigingen worden vastgelegd in
+      een auditlog.
+    shortDescription:
+      Webapplicatie waarin overheidsorganisaties hun registers van
+      verwerkingsactiviteiten volgens de AVG en de WPG bijhouden en publiceren.
+    features:
+      - Vijf registers: AVG verantwoordelijke, AVG verwerker, WPG, algoritmes en datalekken
+      - Relaties tussen verwerkingen, organisaties, systemen, verwerkers en ontvangers
+      - Documenten zoals DPIA's en overeenkomsten bij de verwerking bewaren
+      - E-mailsignalering bij verlopende documenten en periodieke herbeoordeling
+      - Snapshots met de statussen in review, goedgekeurd en vastgesteld
+      - Goedkeuringsverzoeken aan mandaathouders
+      - Publicatie als openbare statische website
+      - Rollen en rechten per organisatie
+      - Auditlog van alle wijzigingen
+      - Export naar PDF
+legal:
+  license: EUPL-1.2
+  mainCopyrightOwner: iRealisatie - Ministerie van Volksgezondheid, Welzijn en Sport
+intendedAudience:
+  countries:
+    - NL
+  scope:
+    - government
+localisation:
+  availableLanguages:
+    - nl
+  localisationReady: true
+maintenance:
+  type: internal
+  contacts:
+    - name: iRealisatie
+      affiliation: Ministerie van Volksgezondheid, Welzijn en Sport
+dependsOn:
+  open:
+    - name: PHP
+      versionMin: "8.4"
+    - name: PostgreSQL
+      versionMin: "14"
+    - name: Hugo

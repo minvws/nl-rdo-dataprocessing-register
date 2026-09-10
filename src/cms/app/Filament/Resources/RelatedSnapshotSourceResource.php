@@ -13,6 +13,8 @@ class RelatedSnapshotSourceResource extends Resource
     protected static ?string $model = RelatedSnapshotSource::class;
     protected static bool $shouldRegisterNavigation = false;
 
+    protected static bool $isScopedToTenant = false;
+
     public static function table(Table $table): Table
     {
         return RelatedSnapshotSourceResourceTable::table($table);

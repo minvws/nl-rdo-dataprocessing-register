@@ -14,13 +14,13 @@ use App\Models\Algorithm\AlgorithmPublicationCategory;
 use App\Models\Algorithm\AlgorithmStatus;
 use App\Models\Algorithm\AlgorithmTheme;
 use App\Models\Document;
-use Filament\Forms\Components\Component;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Get;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Utilities\Get;
 use Illuminate\Support\HtmlString;
 
 use function __;
@@ -181,9 +181,9 @@ class AlgorithmRecordResourceFormSchemas
             self::makeRadio('impact_more_algorithms_applied'),
             self::makeRadio('impact_effect_on_outcome'),
 
-            Placeholder::make('impactvol_algorithm_message')
+            TextEntry::make('impactvol_algorithm_message')
                 ->hiddenLabel()
-                ->content(new HtmlString(
+                ->state(new HtmlString(
                     '<div class="rounded-md bg-warning-50 p-4 text-sm font-medium text-warning-800">'
                     . __('algorithm_record.impact_algorithm_message')
                     . '</div>',

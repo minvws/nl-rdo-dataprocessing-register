@@ -12,9 +12,9 @@ use function sprintf;
 
 class SnapshotStateColumn extends TextColumn
 {
-    public static function make(string $name = 'state'): static
+    public static function make(?string $name = null): static
     {
-        return parent::make($name)
+        return parent::make($name ?? 'state')
             ->label(__('snapshot.state'))
             ->badge()
             ->sortable()

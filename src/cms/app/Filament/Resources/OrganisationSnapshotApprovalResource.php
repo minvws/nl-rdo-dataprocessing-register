@@ -8,24 +8,29 @@ use App\Enums\Authorization\Permission;
 use App\Facades\Authorization;
 use App\Filament\NavigationGroups\NavigationGroup;
 use App\Filament\Resources\OrganisationSnapshotApprovalResource\OrganisationSnapshotApprovalResourceTable;
-use App\Filament\Resources\OrganisationSnapshotApprovalResource\Pages;
+use App\Filament\Resources\OrganisationSnapshotApprovalResource\Pages\ListOrganisationSnapshotApprovalItems;
 use App\Filament\Resources\SnapshotResource\Pages\ViewSnapshot;
 use App\Models\Snapshot;
+use BackedEnum;
 use Filament\Tables\Table;
+use Illuminate\Auth\Access\Response;
 use Illuminate\Database\Eloquent\Model;
+use UnitEnum;
 
 use function __;
 
 class OrganisationSnapshotApprovalResource extends Resource
 {
     protected static ?string $model = Snapshot::class;
-    protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-check';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-clipboard-document-check';
     protected static bool $hasNavigationBadge = true;
     protected static ?int $navigationSort = 2;
 
-    public static function can(string $action, ?Model $record = null): bool
+    public static function getAuthorizationResponse(string|UnitEnum $action, ?Model $record = null): Response
     {
-        return Authorization::hasPermission(Permission::SNAPSHOT_APPROVAL_ORGANISATION_OVERVIEW);
+        return Authorization::hasPermission(Permission::SNAPSHOT_APPROVAL_ORGANISATION_OVERVIEW)
+            ? Response::allow()
+            : Response::deny();
     }
 
     public static function table(Table $table): Table
@@ -41,7 +46,7 @@ class OrganisationSnapshotApprovalResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListOrganisationSnapshotApprovalItems::route('/'),
+            'index' => ListOrganisationSnapshotApprovalItems::route('/'),
             'view' => ViewSnapshot::route('{record}'),
         ];
     }

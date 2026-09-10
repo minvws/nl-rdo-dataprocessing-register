@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Enums\Authorization\Role;
 use App\Filament\Resources\OrganisationUserResource;
 use App\Models\OrganisationUserRole;
+use App\Models\User;
 use Tests\Helpers\Model\OrganisationTestHelper;
 use Tests\Helpers\Model\UserTestHelper;
 
@@ -12,6 +13,21 @@ it('loads the list page', function (): void {
     $this->asFilamentUser()
         ->get(OrganisationUserResource::getUrl())
         ->assertSuccessful();
+});
+
+it('does not list a user from another organisation', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisation($organisation);
+
+    $otherOrganisation = OrganisationTestHelper::create();
+    $userOfOtherOrganisation = User::factory()
+        ->hasAttached($otherOrganisation)
+        ->create();
+
+    $this->asFilamentUser($user)
+        ->get(OrganisationUserResource::getUrl())
+        ->assertSuccessful()
+        ->assertDontSee($userOfOtherOrganisation->email);
 });
 
 it('loads the list page with role-data', function (): void {

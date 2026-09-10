@@ -9,6 +9,7 @@ use App\Enums\YesNoUnknown;
 use App\Filament\Actions\Exports\ExportColumn;
 use App\Services\DateFormatService;
 use Carbon\CarbonImmutable;
+use Tests\Helpers\HtmlableLabel;
 
 use function expect;
 use function fake;
@@ -43,6 +44,14 @@ it('can format enum', function (): void {
 
     expect($output)
         ->toBe($enum->value);
+});
+
+it('can format enum with a htmlable label', function (): void {
+    $exportColumn = new ExportColumn(fake()->word());
+    $output = $exportColumn->formatState(HtmlableLabel::EXAMPLE);
+
+    expect($output)
+        ->toBe('<strong>example</strong>');
 });
 
 it('can format enum that implements hasLabel', function (): void {

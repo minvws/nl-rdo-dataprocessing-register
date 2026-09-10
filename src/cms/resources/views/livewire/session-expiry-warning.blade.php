@@ -10,7 +10,7 @@
         init() {
             setInterval(() => this.tick(), 1000)
 
-            Livewire.hook('commit', ({ succeed }) => succeed(() => this.reset()))
+            Livewire.interceptMessage(({ onSuccess }) => onSuccess(() => this.reset()))
 
             // The session is shared between tabs, so a request from any tab extends it for all of them
             // Without this the other tabs keep counting down and warn about an expiry that will not happen

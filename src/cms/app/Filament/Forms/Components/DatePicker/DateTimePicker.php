@@ -9,7 +9,7 @@ use Filament\Forms\Components\DateTimePicker as FilamentDateTimePicker;
 
 class DateTimePicker extends FilamentDateTimePicker
 {
-    public static function make(string $name): static
+    public static function make(?string $name = null): static
     {
         return parent::make($name)
             ->timezone(Config::string('app.display_timezone'))

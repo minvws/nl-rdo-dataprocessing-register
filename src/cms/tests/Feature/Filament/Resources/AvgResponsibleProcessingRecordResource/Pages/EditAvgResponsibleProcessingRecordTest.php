@@ -236,6 +236,7 @@ it('shows the link to the public page when the record is published', function ()
             'public_from' => $publishedAt,
         ]);
     Snapshot::factory()
+        ->recycle($organisation)
         ->for($avgResponsibleProcessingRecord, 'snapshotSource')
         ->create([
             'state' => Established::class,
@@ -272,6 +273,7 @@ it('shows the data of the publications when the record is published', function (
         ->recycle($organisation)
         ->create();
     $snapshot = Snapshot::factory()
+        ->recycle($organisation)
         ->for($avgResponsibleProcessingRecord, 'snapshotSource')
         ->create([
             'state' => Established::class,
@@ -328,6 +330,26 @@ it('shows a parent record from the same organisation', function (): void {
         );
 });
 
+it('fills the parent field with the uuid as a string', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $parentAvgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->create();
+    $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->create([
+            'parent_id' => $parentAvgResponsibleProcessingRecord->id,
+        ]);
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+            'record' => $avgResponsibleProcessingRecord->getRouteKey(),
+        ])
+        ->assertFormSet([
+            'parent_id' => $parentAvgResponsibleProcessingRecord->id->toString(),
+        ]);
+});
+
 it('does not show a parent record from another organisation', function (): void {
     // record from another organisation, should not show up in the form
     AvgResponsibleProcessingRecord::factory()
@@ -362,6 +384,7 @@ it('does not create a snapshot on unsaved changes', function (): void {
             'name' => 'unsaved change',
         ])
         ->callAction('snapshot_create')
+        ->assertActionNotMounted()
         ->assertNotified(__('snapshot.unsaved_changes'))
         ->assertNotNotified(__('snapshot.created'));
 });

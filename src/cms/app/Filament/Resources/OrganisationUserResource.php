@@ -6,6 +6,7 @@ namespace App\Filament\Resources;
 
 use App\Enums\Authorization\Permission;
 use App\Enums\Authorization\Role;
+use App\Facades\Authentication;
 use App\Facades\Authorization;
 use App\Filament\NavigationGroups\NavigationGroup;
 use App\Filament\Resources\OrganisationUserResource\OrganisationUserResourceForm;
@@ -15,26 +16,49 @@ use App\Filament\Resources\OrganisationUserResource\Pages\CreateOrganisationUser
 use App\Filament\Resources\OrganisationUserResource\Pages\EditOrganisationUser;
 use App\Filament\Resources\OrganisationUserResource\Pages\ListOrganisationUsers;
 use App\Filament\Resources\OrganisationUserResource\Pages\ViewOrganisationUser;
+use App\Models\Builders\UserBuilder;
 use App\Models\User;
-use Filament\Forms\Form;
-use Filament\Infolists\Infolist;
+use BackedEnum;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use Illuminate\Auth\Access\Response;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use UnitEnum;
 
 use function __;
 
+/**
+ * @extends Resource<User>
+ */
 class OrganisationUserResource extends Resource
 {
-    protected static bool $isScopedToTenant = true;
+    /**
+     * Deliberately false. This scopes the User model app-wide, not just this resource,
+     * which breaks login, imports and notifications. Scoping happens in getEloquentQuery()
+     */
+    protected static bool $isScopedToTenant = false;
     protected static ?string $model = User::class;
-    protected static ?string $navigationIcon = 'heroicon-o-user';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-user';
     protected static ?int $navigationSort = 1;
-    protected static ?string $tenantOwnershipRelationshipName = 'organisations';
 
-    public static function can(string $action, ?Model $record = null): bool
+    /**
+     * @return Builder<User>
+     */
+    public static function getEloquentQuery(): Builder
     {
-        return Authorization::hasPermission(Permission::USER_ROLE_ORGANISATION_MANAGE);
+        /** @var UserBuilder $query */
+        $query = parent::getEloquentQuery();
+
+        return $query->withOrganisation(Authentication::organisation());
+    }
+
+    public static function getAuthorizationResponse(string|UnitEnum $action, ?Model $record = null): Response
+    {
+        return Authorization::hasPermission(Permission::USER_ROLE_ORGANISATION_MANAGE)
+            ? Response::allow()
+            : Response::deny();
     }
 
     public static function getNavigationGroup(): ?string
@@ -42,14 +66,14 @@ class OrganisationUserResource extends Resource
         return __(NavigationGroup::ORGANISATION->value);
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return OrganisationUserResourceForm::form($form);
+        return OrganisationUserResourceForm::form($schema);
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
-        return OrganisationUserResourceInfolist::infolist($infolist);
+        return OrganisationUserResourceInfolist::infolist($schema);
     }
 
     public static function table(Table $table): Table

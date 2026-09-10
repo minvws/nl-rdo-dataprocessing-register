@@ -10,9 +10,9 @@ use function __;
 
 class ParentSelectEntry extends TextEntry
 {
-    public static function make(string $name = 'parent.name'): static
+    public static function make(?string $name = null): static
     {
-        return parent::make($name)
+        return parent::make($name ?? 'parent.name')
             ->label(__('general.parent'))
             ->placeholder(__('general.none_selected'));
     }

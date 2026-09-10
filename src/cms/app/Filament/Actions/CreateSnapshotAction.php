@@ -15,6 +15,7 @@ use App\Services\User\UserByRoleService;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Checkbox;
 use Filament\Notifications\Notification;
+use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Mail;
@@ -26,7 +27,6 @@ use function __;
 use function array_key_exists;
 use function json_encode;
 use function md5;
-use function sprintf;
 use function str;
 
 use const JSON_UNESCAPED_UNICODE;
@@ -38,7 +38,7 @@ class CreateSnapshotAction extends Action
         return parent::make($name)
             ->label(__('snapshot.create'))
             ->visible(Authorization::hasPermission(Permission::SNAPSHOT_CREATE))
-            ->form([
+            ->schema([
                 Checkbox::make('notify_po')
                     ->label(__('snapshot_approval.notify_po'))
                     ->default(true),
@@ -62,7 +62,7 @@ class CreateSnapshotAction extends Action
             ->action(static function (
                 ?array $data,
                 CreateSnapshotAction $action,
-                Component $livewire,
+                EditRecord $livewire,
                 Model $record,
                 SnapshotFactory $snapshotFactory,
             ) use (
@@ -72,8 +72,7 @@ class CreateSnapshotAction extends Action
                 try {
                     $livewire->validate();
                 } catch (ValidationException $validationException) {
-                    // @phpstan-ignore argument.type
-                    $livewire->dispatch('close-modal', id: sprintf('%s-action', $livewire->getId()));
+                    $livewire->unmountAction();
 
                     throw $validationException;
                 }
@@ -85,9 +84,7 @@ class CreateSnapshotAction extends Action
                         ->danger()
                         ->send();
 
-                    // @phpstan-ignore argument.type
-                    $livewire->dispatch('close-modal', id: sprintf('%s-action', $livewire->getId()));
-                    $action->halt();
+                    $action->cancel();
                 }
 
                 Assert::isMap($data);

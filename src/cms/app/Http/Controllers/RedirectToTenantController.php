@@ -8,8 +8,8 @@ use App\Enums\RouteName;
 use App\Facades\Authentication;
 use App\Models\Organisation;
 use App\Models\OrganisationUserRole;
+use App\Providers\FilamentServiceProvider;
 use Filament\Facades\Filament;
-use Filament\Panel;
 use Illuminate\Http\RedirectResponse;
 use Throwable;
 use Webmozart\Assert\Assert;
@@ -49,12 +49,16 @@ class RedirectToTenantController
 
     private function redirectToOrganisation(Organisation $organisation): RedirectResponse
     {
-        $panel = Filament::getCurrentPanel();
-        Assert::isInstanceOf($panel, Panel::class);
+        $originalTenant = Filament::getTenant();
+        Filament::setTenant($organisation, isQuiet: true);
 
-        $url = $panel->getUrl($organisation);
-        Assert::string($url);
+        try {
+            $url = FilamentServiceProvider::getFirstNavigationItemUrl();
+            Assert::string($url);
 
-        return redirect($url);
+            return redirect($url);
+        } finally {
+            Filament::setTenant($originalTenant, isQuiet: true);
+        }
     }
 }

@@ -10,6 +10,7 @@ use App\Models\Avg\AvgProcessorProcessingRecord;
 use App\Models\Avg\AvgProcessorProcessingRecordService;
 use App\Models\Responsible;
 use App\Models\Tag;
+use Filament\Actions\Testing\TestAction;
 use Tests\Helpers\Model\OrganisationTestHelper;
 use Tests\Helpers\Model\UserTestHelper;
 
@@ -92,9 +93,9 @@ it('can create an entry with a new tag', function (): void {
             'avg_processor_processing_record_service_id' => $avgProcessorProcessingRecordService->id->toString(),
             'responsible_id' => [$responsible->id->toString()],
         ])
-        ->call('mountFormComponentAction', 'data.tags', 'createOption')
-        ->set('mountedFormComponentActionsData.0.name', $tagName)
-        ->call('callMountedFormComponentAction')
+        ->mountAction(TestAction::make('createOption')->schemaComponent('tags'))
+        ->set('mountedActions.0.data.name', $tagName)
+        ->call('callMountedAction')
         ->assertHasNoFormErrors()
         ->call('create')
         ->assertHasNoFormErrors();

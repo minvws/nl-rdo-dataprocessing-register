@@ -41,6 +41,7 @@ it('loads the list page with an action for a published record', function (): voi
         ->recycle($organisation)
         ->create(['public_from' => fake()->date()]);
     $snapshot = Snapshot::factory()
+        ->recycle($organisation)
         ->for($avgResponsibleProcessingRecord, 'snapshotSource')
         ->create(['state' => Established::$name]);
     $staticWebsiteCheck = StaticWebsiteCheck::factory()
@@ -69,9 +70,13 @@ it('can export', function (): void {
         ->withSnapshots(1)
         ->create();
 
-    $this->asFilamentOrganisationUser($organisation)
-        ->createLivewireTestable(ListAvgResponsibleProcessingRecords::class)
-        ->callAction('export')
-        ->assertHasNoActionErrors()
+    $listPage = $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ListAvgResponsibleProcessingRecords::class);
+
+    $listPage->callAction('export');
+
+    $this->restoreFilamentSession();
+
+    $listPage->assertHasNoActionErrors()
         ->assertNotified();
 });

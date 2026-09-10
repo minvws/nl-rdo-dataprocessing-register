@@ -6,15 +6,19 @@ use App\Filament\RelationManagers\SnapshotsRelationManager;
 use App\Filament\Resources\AvgResponsibleProcessingRecordResource\Pages\EditAvgResponsibleProcessingRecord;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\Snapshot;
+use Tests\Helpers\Model\OrganisationTestHelper;
 
 it('loads the table', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
         ->create();
     $snapshot = Snapshot::factory()
+        ->recycle($organisation)
         ->for($avgResponsibleProcessingRecord, 'snapshotSource')
         ->create();
 
-    $this->asFilamentUser()
+    $this->asFilamentOrganisationUser($organisation)
         ->createLivewireTestable(SnapshotsRelationManager::class, [
             'ownerRecord' => $avgResponsibleProcessingRecord,
             'pageClass' => EditAvgResponsibleProcessingRecord::class,
@@ -23,10 +27,12 @@ it('loads the table', function (): void {
 });
 
 it('reloads the snapshots-table', function (): void {
+    $organisation = OrganisationTestHelper::create();
     $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
         ->create();
 
-    $snapshotRelationManager = $this->asFilamentUser()
+    $snapshotRelationManager = $this->asFilamentOrganisationUser($organisation)
         ->createLivewireTestable(SnapshotsRelationManager::class, [
             'ownerRecord' => $avgResponsibleProcessingRecord,
             'pageClass' => EditAvgResponsibleProcessingRecord::class,

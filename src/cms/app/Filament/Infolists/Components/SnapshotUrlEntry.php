@@ -7,14 +7,15 @@ namespace App\Filament\Infolists\Components;
 use App\Models\Contracts\Publishable;
 use App\Models\Snapshot;
 use Filament\Infolists\Components\TextEntry;
+use Webmozart\Assert\Assert;
 
 use function __;
 
 class SnapshotUrlEntry extends TextEntry
 {
-    public static function make(string $name = 'snapshotSource.public_from'): static
+    public static function make(?string $name = null): static
     {
-        return parent::make($name)
+        return parent::make($name ?? 'snapshotSource.public_from')
             ->label(__('snapshot.url'))
             ->visible(static function (Snapshot $snapshot): bool {
                 $snapshotSource = $snapshot->snapshotSource;
@@ -24,6 +25,20 @@ class SnapshotUrlEntry extends TextEntry
 
                 return false;
             })
-            ->view('filament.infolists.components.entries.snapshot-url-entry');
+            ->state(static function (Snapshot $snapshot): ?string {
+                return self::getPublishedUrl($snapshot);
+            })
+            ->url(static function (Snapshot $snapshot): ?string {
+                return self::getPublishedUrl($snapshot);
+            })
+            ->openUrlInNewTab();
+    }
+
+    private static function getPublishedUrl(Snapshot $snapshot): ?string
+    {
+        $snapshotSource = $snapshot->snapshotSource;
+        Assert::isInstanceOf($snapshotSource, Publishable::class);
+
+        return $snapshotSource->getLatestStaticWebsiteSnapshotEntry()?->url;
     }
 }

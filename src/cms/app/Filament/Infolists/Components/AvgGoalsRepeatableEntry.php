@@ -11,9 +11,9 @@ use function __;
 
 class AvgGoalsRepeatableEntry extends RepeatableEntry
 {
-    public static function make(string $name = 'avgGoals'): static
+    public static function make(?string $name = null): static
     {
-        return parent::make($name)
+        return parent::make($name ?? 'avgGoals')
             ->label(__('avg_goal.model_plural'))
             ->placeholder(__('general.none_selected'))
             ->schema([

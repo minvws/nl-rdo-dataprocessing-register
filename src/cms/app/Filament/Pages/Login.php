@@ -11,13 +11,12 @@ use App\Models\User;
 use App\Services\UserLoginToken\UserLoginService;
 use Carbon\CarbonInterval;
 use DanHarrin\LivewireRateLimiting\Exceptions\TooManyRequestsException;
+use Filament\Auth\Http\Responses\Contracts\LoginResponse;
 use Filament\Facades\Filament;
-use Filament\Forms\Components\Component;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
-use Filament\Http\Responses\Auth\Contracts\LoginResponse;
 use Filament\Notifications\Notification;
-use Filament\Pages\Auth\Login as FilamentLogin;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
@@ -28,7 +27,7 @@ use function app;
 use function ceil;
 use function request;
 
-class Login extends FilamentLogin
+class Login extends \Filament\Auth\Pages\Login
 {
     public function mount(): void
     {
@@ -52,9 +51,9 @@ class Login extends FilamentLogin
             ->send();
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->components([
             $this->getEmailFormComponent(),
         ]);
     }
@@ -71,11 +70,11 @@ class Login extends FilamentLogin
             Assert::integer($secondsUntilAvailable);
 
             Notification::make()
-                ->title(__('filament-panels::pages/auth/login.notifications.throttled.title', [
+                ->title(__('filament-panels::auth/pages/login.notifications.throttled.title', [
                     'seconds' => $secondsUntilAvailable,
                     'minutes' => ceil($secondsUntilAvailable / 60),
                 ]))
-                ->body(__('filament-panels::pages/auth/login.notifications.throttled.body', [
+                ->body(__('filament-panels::auth/pages/login.notifications.throttled.body', [
                     'seconds' => $secondsUntilAvailable,
                     'minutes' => ceil($secondsUntilAvailable / 60),
                 ]))

@@ -11,7 +11,9 @@ use Tests\Helpers\Model\OrganisationTestHelper;
 
 it('can load the table', function (): void {
     $organisation = OrganisationTestHelper::create();
-    $processor = Processor::factory()->create();
+    $processor = Processor::factory()
+        ->recycle($organisation)
+        ->create();
     $snapshot = Snapshot::factory()
         ->recycle($organisation)
         ->create([

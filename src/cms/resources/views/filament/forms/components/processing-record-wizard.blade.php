@@ -1,5 +1,5 @@
 @php
-    use Filament\Forms\Components\Wizard\Step;
+    use Filament\Schemas\Components\Wizard\Step;
     $isContained = $isContained();
     $statePath = $getStatePath();
 @endphp
@@ -107,7 +107,7 @@
 
         autofocusFields()
     "
-    x-on:next-wizard-step.window="if ($event.detail.statePath === '{{ $statePath }}') nextStep()"
+    x-on:next-wizard-step.window="if ($event.detail.key === @js($getKey())) nextStep()"
     {{
         $attributes
             ->merge([
@@ -116,7 +116,7 @@
             ->merge($getExtraAttributes(), escape: false)
             ->merge($getExtraAlpineAttributes(), escape: false)
             ->class([
-                'fi-fo-wizard',
+                'fi-sc-wizard',
             ])
     }}
 >
@@ -125,7 +125,7 @@
         value="{{
             collect($getChildComponentContainer()->getComponents())
                 ->filter(static fn (Step $step): bool => $step->isVisible())
-                ->map(static fn (Step $step) => $step->getId())
+                ->map(static fn (Step $step) => $step->getKey())
                 ->values()
                 ->toJson()
         }}"
@@ -137,7 +137,7 @@
         value="{{
             collect($getChildComponentContainer()->getComponents())
                 ->filter(static fn (Step $step): bool => $step->isVisible())
-                ->mapWithKeys(static fn (Step $step) => [$step->getId() => $step->getLabel()])
+                ->mapWithKeys(static fn (Step $step) => [$step->getKey() => $step->getLabel()])
                 ->toJson()
         }}"
         x-ref="stepLabelsData"
@@ -152,7 +152,12 @@
         }
 
         .wizzard-layout__content {
-            width: 100%;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .wizzard-layout__steps {
+            flex-shrink: 0;
         }
 
         .wizzard-layout__steps > ol {
@@ -165,8 +170,11 @@
             text-align: left;
         }
 
-        /* Below 1024px (f.e. 200% zoom) the fixed 300px step panel pushes over the content */
-        @media (max-width: 1023.9px) {
+        .wizzard-layout__content .fi-sc-wizard-step.fi-active {
+            margin-top: 0;
+            padding: 1.5rem;
+        }
+        @media (max-width: 1024px) {
             .wizzard-layout {
                 flex-direction: column;
             }
@@ -204,10 +212,10 @@
                 <span
                     x-cloak
                     x-on:click="
-                $wire.dispatchFormEvent(
-                    'wizard::nextStep',
-                    '{{ $statePath }}',
-                    getStepIndex(step),
+                $wire.callSchemaComponentMethod(
+                    @js($getKey()),
+                    'nextStep',
+                    [getStepIndex(step)],
                 )
             "
                     x-show="! isLastStep()"
@@ -245,10 +253,9 @@
                         <button
                             type="button"
                             x-bind:aria-current="getStepIndex(step) === {{ $loop->index }} ? 'step' : null"
-                            x-on:click="step = @js($step->getId())"
-                            x-bind:disabled="! isStepAccessible(@js($step->getId()))"
+                            x-on:click="step = @js($step->getKey())"
+                            x-bind:disabled="! isStepAccessible(@js($step->getKey()))"
                             x-bind:class="{ 'bg-gray-300 dark:bg-gray-700': getStepIndex(step) === {{ $loop->index }} }"
-                            role="step"
                             class="fi-fo-wizard-header-step-button flex h-full w-full items-center gap-x-2 px-3 py-2 rounded-lg"
                         >
                             <div

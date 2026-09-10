@@ -7,6 +7,9 @@ SAIL="${BASE_PATH}/vendor/bin/sail"
 YELLOW="\033[33m"
 NC="\033[0m"
 
+echo -e "\n${YELLOW}===[ Licenses ]======${NC}"
+pipx run --spec 'reuse[charset-normalizer]' reuse --root "$BASE_PATH"/../.. lint
+
 echo -e "\n${YELLOW}===[ Assert Unique Migration Names ]======${NC}"
 "$BASE_PATH"/bin/assert-unique-migration-names
 
@@ -19,5 +22,8 @@ echo -e "\n${YELLOW}===[ PHPStan ]======${NC}"
 echo -e "\n${YELLOW}===[ Mess Detector ]======${NC}"
 "$SAIL" bin phpmd app github ./phpmd.xml && echo "✓ ok"
 
+echo -e "\n${YELLOW}===[ Pest Browser ]======${NC}"
+"$SAIL" pest --testsuite=Browser
+
 echo -e "\n${YELLOW}===[ Pest ]======${NC}"
-XDEBUG_MODE=coverage "$SAIL" pest --coverage --min=100
+XDEBUG_MODE=coverage "$SAIL" pest --testsuite=Unit,Feature --coverage --min=100

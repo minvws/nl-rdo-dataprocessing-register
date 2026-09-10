@@ -11,8 +11,8 @@ use App\Filament\Infolists\Components\SelectMultipleEntry;
 use App\Filament\Infolists\Components\TextareaEntry;
 use App\Filament\Infolists\Components\ToggleEntry;
 use App\Filament\Infolists\InfolistHelper;
-use Filament\Infolists\Components\Component;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Component;
 
 use function __;
 

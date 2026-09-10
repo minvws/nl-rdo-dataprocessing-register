@@ -10,8 +10,8 @@ use App\Filament\Tables\Columns\SnapshotStateColumn;
 use App\Models\Builders\SnapshotBuilder;
 use App\Models\Snapshot;
 use App\Services\DateFormatService;
+use Filament\Actions\ViewAction;
 use Filament\Facades\Filament;
-use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -39,7 +39,7 @@ class SnapshotResourceTable
             })
             ->emptyStateHeading(__('snapshot.table_empty_heading'))
             ->emptyStateDescription(null)
-            ->actions([
+            ->recordActions([
                 ViewAction::make()
                     ->url(static function (Snapshot $snapshot): string {
                         return route(ViewSnapshot::getRouteName(), [

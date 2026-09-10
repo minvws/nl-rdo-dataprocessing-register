@@ -6,6 +6,7 @@ namespace App\Filament\Resources\DataBreachRecord\Pages;
 
 use App\Filament\Pages\ProcessingRecordEditRecord;
 use App\Filament\Resources\DataBreachRecordResource;
+use App\Filament\Resources\Pages\Concerns\HasDraftAutosave;
 use App\Models\DataBreachRecord;
 use App\Services\Notification\DataBreachNotificationService;
 use Filament\Actions\DeleteAction;
@@ -16,6 +17,8 @@ use function sprintf;
 
 class EditDataBreachRecord extends ProcessingRecordEditRecord
 {
+    use HasDraftAutosave;
+
     protected static string $resource = DataBreachRecordResource::class;
 
     protected function getHeaderActions(): array

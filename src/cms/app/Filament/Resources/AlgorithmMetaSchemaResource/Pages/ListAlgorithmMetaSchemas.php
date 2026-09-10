@@ -6,7 +6,7 @@ namespace App\Filament\Resources\AlgorithmMetaSchemaResource\Pages;
 
 use App\Filament\Resources\AlgorithmMetaSchemaResource;
 use App\Filament\Resources\Pages\Concerns\PersistsFiltersInSession;
-use Filament\Actions;
+use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 
 class ListAlgorithmMetaSchemas extends ListRecords
@@ -18,7 +18,7 @@ class ListAlgorithmMetaSchemas extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

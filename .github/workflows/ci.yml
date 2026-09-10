@@ -8,6 +8,16 @@ on:
       - develop
 
 jobs:
+  licenses:
+    name: Licenses
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Assert every file has copyright and license information
+        run: pipx run --spec 'reuse[charset-normalizer]' reuse lint
+
   CI:
     env:
       DB_CONNECTION: pgsql
@@ -61,7 +71,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: "18"
+          node-version: "24"
           cache: "npm"
           registry-url: "https://npm.pkg.github.com"
           cache-dependency-path: "**/package-lock.json"
@@ -126,8 +136,14 @@ jobs:
       - name: Phpmd
         run: vendor/bin/phpmd app github ./phpmd.xml
 
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Pest browser tests
+        run: vendor/bin/pest --testsuite=Browser
+
       - name: Phpunit
-        run: vendor/bin/pest --coverage --min=100 --log-junit=reports/report-phpunit.xml --coverage-clover=reports/coverage-phpunit.xml
+        run: vendor/bin/pest --testsuite=Unit,Feature --coverage --min=100 --log-junit=reports/report-phpunit.xml --coverage-clover=reports/coverage-phpunit.xml
 
       - name: Run SonarQube scan
         uses: minvws/action-sonarqube@v1
