@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\UserResource\Pages;
 
-use App\Components\Uuid\Uuid;
 use App\Enums\Authorization\Permission;
 use App\Enums\Authorization\Role;
 use App\Facades\Authorization;
 use App\Filament\Actions\User\OtpDisableAction;
 use App\Filament\Resources\UserResource;
 use App\Filament\Resources\UserResource\UserResourceForm;
-use App\Models\OrganisationUserRole;
+use App\Models\Organisation;
 use App\Models\User;
 use App\Models\UserGlobalRole;
 use Filament\Actions\DeleteAction;
@@ -91,18 +90,27 @@ class EditUser extends EditRecord
                 Assert::isArray($organisation);
                 Assert::isArray($organisation[UserResourceForm::FIELD_ORGANISATION_USER_ROLES]);
 
+                $selectedOrganisationRoles = [];
                 foreach ($organisation[UserResourceForm::FIELD_ORGANISATION_USER_ROLES] as $role => $value) {
                     if ($value !== true) {
                         continue;
                     }
 
-                    Assert::string($organisation['organisation_id']);
-
-                    $organisationUserRole = new OrganisationUserRole();
-                    $organisationUserRole->role = Role::from($role);
-                    $organisationUserRole->organisation_id = Uuid::fromString($organisation['organisation_id']);
-                    $user->organisationRoles()->save($organisationUserRole);
+                    Assert::string($role);
+                    $selectedOrganisationRoles[] = Role::from($role);
                 }
+
+                if ($selectedOrganisationRoles === []) {
+                    continue;
+                }
+
+                Assert::string($organisation['organisation_id']);
+
+                $user->syncOrganisationRoles(
+                    Organisation::findOrFail($organisation['organisation_id']),
+                    Role::organisationRoles(),
+                    $selectedOrganisationRoles,
+                );
             }
         });
 

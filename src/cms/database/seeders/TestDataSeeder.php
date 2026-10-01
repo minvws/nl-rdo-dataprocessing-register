@@ -130,9 +130,15 @@ class TestDataSeeder extends Seeder
 
     private function createUserWithOrganisationRole(Organisation $organisation, Role $role): void
     {
-        User::factory()
+        $userFactory = User::factory()
             ->hasAttached($organisation)
-            ->hasOrganisationRole($role, $organisation)
+            ->hasOrganisationRole($role, $organisation);
+
+        if ($role === Role::MANDATE_HOLDER_MANAGER) {
+            $userFactory = $userFactory->hasOrganisationRole(Role::PRIVACY_OFFICER, $organisation);
+        }
+
+        $userFactory
             ->withValidOtpRegistration()
             ->create($this->createUserProperties(__(sprintf('role.%s', $role->value))));
     }

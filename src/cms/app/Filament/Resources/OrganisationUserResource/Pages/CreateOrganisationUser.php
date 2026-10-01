@@ -4,13 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrganisationUserResource\Pages;
 
-use App\Enums\Authorization\Permission;
-use App\Enums\Authorization\Role;
 use App\Facades\Authentication;
-use App\Facades\Authorization;
 use App\Filament\Pages\CreateRecord;
 use App\Filament\Resources\OrganisationUserResource;
-use App\Models\OrganisationUserRole;
 use App\Models\User;
 use Closure;
 use Filament\Forms\Components\TextInput;
@@ -92,9 +88,8 @@ class CreateOrganisationUser extends CreateRecord
     private static function getOrganisationRoleToggles(): array
     {
         $organisationRoleToggleSections = [];
-        $includeCpoRoles = Authorization::hasPermission(Permission::USER_ROLE_ORGANISATION_CPO_MANAGE);
 
-        foreach (Role::organisationRoleGroups($includeCpoRoles) as $organisationRoleGroup) {
+        foreach (OrganisationUserResource::getAssignableOrganisationRoleGroups(null, false) as $organisationRoleGroup) {
             $organisationRoleToggles = [];
 
             foreach ($organisationRoleGroup as $organisationRole) {
@@ -125,21 +120,13 @@ class CreateOrganisationUser extends CreateRecord
         ]);
         $user->organisations()->attach($organisation);
         $user->save();
-        $organisationRoles = OrganisationUserResource::getOrganisationUserRoleOptions();
 
-        foreach ($organisationRoles as $organisationRole) {
-            Assert::keyExists($data, $organisationRole->value);
-            Assert::boolean($data[$organisationRole->value]);
-
-            if ($data[$organisationRole->value] !== true) {
-                continue;
-            }
-
-            $organisationUserRole = new OrganisationUserRole();
-            $organisationUserRole->role = $organisationRole;
-            $organisationUserRole->organisation_id = $organisation->id;
-            $user->organisationRoles()->save($organisationUserRole);
-        }
+        $assignableOrganisationRoles = OrganisationUserResource::getAssignableOrganisationRoles(null, false);
+        $user->syncOrganisationRoles(
+            $organisation,
+            $assignableOrganisationRoles,
+            OrganisationUserResource::getSelectedOrganisationRoles($assignableOrganisationRoles, $data),
+        );
 
         return $user;
     }

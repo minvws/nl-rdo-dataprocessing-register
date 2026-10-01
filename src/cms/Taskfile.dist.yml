@@ -84,6 +84,18 @@ tasks:
     desc: Build and watch the frontend
     cmd: vendor/bin/sail npm run watch
 
+  db:open:
+    desc: Start the application and open the database in the default SQL client
+    dotenv: ['.env']
+    vars:
+      DB_URL: 'postgres://$DB_USERNAME:$DB_PASSWORD@127.0.0.1:${FORWARD_DB_PORT:-5432}/$DB_DATABASE?statusColor=6DB33F&name=$DB_DATABASE&environment=local'
+    cmds:
+      - task: docker:up
+      - cmd: open "{{.DB_URL}}"
+        platforms: [darwin]
+      - cmd: xdg-open "{{.DB_URL}}"
+        platforms: [linux]
+
   db:migrate:
     desc: Run database migrations
     cmd: vendor/bin/sail artisan migrate

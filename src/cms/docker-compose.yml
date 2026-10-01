@@ -70,7 +70,7 @@ services:
         platform: 'linux/amd64'
 
     minio:
-        image: 'minio/minio:RELEASE.2025-09-07T16-13-09Z'
+        image: 'ghcr.io/minvws/nl-rdo-dataprocessing-register-private/minio:release.2025-09-07t16-13-09z'
         ports:
             - '${MINIO_PORT:-9000}:9000'
             - '${MINIO_CONSOLE_PORT:-9001}:9001'

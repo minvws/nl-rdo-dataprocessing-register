@@ -53,6 +53,13 @@ jobs:
       - name: Set env
         run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
 
+      - name: Log in to the Container registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Start MinIO
         run: |
           docker run -d \
@@ -61,7 +68,7 @@ jobs:
             -p 9001:9001 \
             -e "MINIO_ROOT_USER=minioadmin" \
             -e "MINIO_ROOT_PASSWORD=minioadmin" \
-            minio/minio:RELEASE.2025-02-28T09-55-16Z \
+            ghcr.io/minvws/nl-rdo-dataprocessing-register-private/minio:release.2025-09-07t16-13-09z \
             server /data --console-address ":9001"
 
           echo "Waiting for MinIO to be ready..."

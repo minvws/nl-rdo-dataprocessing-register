@@ -8,7 +8,6 @@ use App\Facades\Authentication;
 use App\Filament\Actions\User\OtpDisableAction;
 use App\Filament\Resources\OrganisationUserResource;
 use App\Models\OrganisationUser;
-use App\Models\OrganisationUserRole;
 use App\Models\User;
 use App\Models\UserRelatable;
 use App\Rules\CurrentOrganisation;
@@ -16,11 +15,9 @@ use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use Webmozart\Assert\Assert;
 
 use function __;
-use function array_key_exists;
 
 class EditOrganisationUser extends EditRecord
 {
@@ -65,36 +62,14 @@ class EditOrganisationUser extends EditRecord
         $user = $this->record;
         Assert::isInstanceOf($user, User::class);
 
-        $organisation = Authentication::organisation();
-        $organisationRoles = OrganisationUserResource::getOrganisationUserRoleOptions();
+        Assert::isArray($this->data);
 
-        DB::transaction(function () use ($user, $organisation, $organisationRoles): void {
-            $user->organisationRoles()
-                ->where('organisation_id', $organisation->id)
-                ->whereIn('role', $organisationRoles)
-                ->delete();
-
-            $organisationUserRoles = [];
-
-            foreach ($organisationRoles as $organisationRole) {
-                Assert::isArray($this->data);
-                if (!array_key_exists($organisationRole->value, $this->data)) {
-                    continue;
-                }
-
-                Assert::boolean($this->data[$organisationRole->value]);
-                if ($this->data[$organisationRole->value] !== true) {
-                    continue;
-                }
-
-                $organisationUserRoles[] = new OrganisationUserRole([
-                    'user_id' => $user->id,
-                    'organisation_id' => $organisation->id,
-                    'role' => $organisationRole,
-                ]);
-            }
-            $user->organisationRoles()->saveMany($organisationUserRoles);
-        });
+        $assignableOrganisationRoles = OrganisationUserResource::getAssignableOrganisationRoles($user, true);
+        $user->syncOrganisationRoles(
+            Authentication::organisation(),
+            $assignableOrganisationRoles,
+            OrganisationUserResource::getSelectedOrganisationRoles($assignableOrganisationRoles, $this->data),
+        );
 
         $this->redirect(OrganisationUserResource::getUrl('edit', ['record' => $this->getRecord()]));
     }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Forms\Components;
 
 use App\Enums\Authorization\Role;
+use App\Filament\Resources\OrganisationUserResource;
 use App\Models\OrganisationUserRole;
 use App\Models\User;
 use Filament\Forms\Components\Repeater;
@@ -34,7 +35,7 @@ class OrganisationUserRolesRepeater extends Repeater
                     ->in(array_keys(self::getOrganisationOptions($user)))
                     ->columnSpan(2),
 
-                ...self::getOrganisationRoleToggles($name),
+                ...self::getOrganisationRoleToggles($name, $user),
             ])
             ->afterStateHydrated(static function (Repeater $component) use ($user): void {
                 $component->state(self::getOrganisationUserRoles($user));
@@ -61,11 +62,11 @@ class OrganisationUserRolesRepeater extends Repeater
     /**
      * @return array<Section>
      */
-    private static function getOrganisationRoleToggles(string $name): array
+    private static function getOrganisationRoleToggles(string $name, User $user): array
     {
         $organisationRoleToggleSections = [];
 
-        foreach (Role::organisationRoleGroups(true) as $organisationRoleGroup) {
+        foreach (OrganisationUserResource::getAssignableOrganisationRoleGroups($user, true) as $organisationRoleGroup) {
             $organisationRoleToggles = [];
 
             foreach ($organisationRoleGroup as $organisationRole) {

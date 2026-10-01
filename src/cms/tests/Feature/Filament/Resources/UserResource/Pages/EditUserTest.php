@@ -122,6 +122,33 @@ it('saves organisation roles', function (bool $isInputProcessor, bool $isPrivacy
     [false, false, false],
 ]);
 
+it('only saves the mandate-holder-manager role when privacy officer is also selected', function (bool $isPrivacyOfficer): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisation($organisation);
+
+    expect($user->organisationRoles()->get()->count())
+        ->toBe(0);
+
+    $this->asFilamentUser()
+        ->createLivewireTestable(EditUser::class, ['record' => $user->id])
+        ->fillForm([
+            sprintf('organisation_user_roles.%s.organisation_id', $organisation->id->toString()) => $organisation->id->toString(),
+            sprintf('organisation_user_roles.%s.organisation_user_roles.privacy-officer', $organisation->id) => $isPrivacyOfficer,
+            sprintf('organisation_user_roles.%s.organisation_user_roles.mandate-holder-manager', $organisation->id) => true,
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    $user->refresh();
+    expect($user->organisationRoles()->where('role', 'privacy-officer')->count())
+        ->toBe($isPrivacyOfficer ? 1 : 0)
+        ->and($user->organisationRoles()->where('role', 'mandate-holder-manager')->count())
+        ->toBe($isPrivacyOfficer ? 1 : 0);
+})->with([
+    [true],
+    [false],
+]);
+
 it('can edit an entry', function (): void {
     $user = UserTestHelper::create();
     $name = fake()->unique()->name();

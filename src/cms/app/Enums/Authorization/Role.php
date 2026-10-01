@@ -13,6 +13,7 @@ enum Role: string
     case INPUT_PROCESSOR = 'input-processor';
     case INPUT_PROCESSOR_DATABREACH = 'input-processor-databreach';
     case MANDATE_HOLDER = 'mandate-holder';
+    case MANDATE_HOLDER_MANAGER = 'mandate-holder-manager';
     case PRIVACY_OFFICER = 'privacy-officer';
 
     /**
@@ -37,6 +38,7 @@ enum Role: string
             self::INPUT_PROCESSOR,
             self::INPUT_PROCESSOR_DATABREACH,
             self::MANDATE_HOLDER,
+            self::MANDATE_HOLDER_MANAGER,
             self::PRIVACY_OFFICER,
         ];
     }
@@ -44,11 +46,11 @@ enum Role: string
     /**
      * @return array<array-key, array<Role>>
      */
-    public static function organisationRoleGroups(bool $includeCpoRoles): array
+    public static function organisationRoleGroups(bool $includeElevatedRoles): array
     {
         $organisationRoleGroups = [];
 
-        if ($includeCpoRoles) {
+        if ($includeElevatedRoles) {
             $organisationRoleGroups[] = [
                 self::CHIEF_PRIVACY_OFFICER,
                 self::MANDATE_HOLDER,
@@ -59,6 +61,7 @@ enum Role: string
             self::INPUT_PROCESSOR,
             self::INPUT_PROCESSOR_DATABREACH,
             self::PRIVACY_OFFICER,
+            self::MANDATE_HOLDER_MANAGER,
         ];
 
         $organisationRoleGroups[] = [

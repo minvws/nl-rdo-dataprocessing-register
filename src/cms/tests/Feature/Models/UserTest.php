@@ -50,6 +50,58 @@ it('can assign an organisation role', function (): void {
         ->toBe(1);
 });
 
+it('syncs only the manageable organisation roles of the given organisation', function (): void {
+    $user = User::factory()->create();
+    $organisation = Organisation::factory()->create();
+    $otherOrganisation = Organisation::factory()->create();
+    $user->assignOrganisationRole(Role::INPUT_PROCESSOR, $organisation);
+    $user->assignOrganisationRole(Role::COUNSELOR, $organisation);
+    $user->assignOrganisationRole(Role::INPUT_PROCESSOR, $otherOrganisation);
+
+    $user->syncOrganisationRoles($organisation, [Role::INPUT_PROCESSOR, Role::PRIVACY_OFFICER], [Role::PRIVACY_OFFICER]);
+
+    expect($user->organisationRoles()->where('organisation_id', $organisation->id)->pluck('role')->all())
+        ->toEqualCanonicalizing([Role::COUNSELOR, Role::PRIVACY_OFFICER])
+        ->and($user->organisationRoles()->where('organisation_id', $otherOrganisation->id)->pluck('role')->all())
+        ->toBe([Role::INPUT_PROCESSOR]);
+});
+
+it('only syncs the mandate-holder-manager role together with the privacy officer role', function (array $roles, bool $expected): void {
+    $user = User::factory()->create();
+    $organisation = Organisation::factory()->create();
+
+    $user->syncOrganisationRoles($organisation, Role::organisationRoles(), $roles);
+
+    expect($user->organisationRoles()->where('role', Role::MANDATE_HOLDER_MANAGER->value)->exists())
+        ->toBe($expected);
+})->with([
+    'with privacy officer' => [[Role::MANDATE_HOLDER_MANAGER, Role::PRIVACY_OFFICER], true],
+    'without privacy officer' => [[Role::MANDATE_HOLDER_MANAGER, Role::INPUT_PROCESSOR], false],
+]);
+
+it('keeps the mandate-holder-manager role when the privacy officer role is outside the manageable roles', function (): void {
+    $user = User::factory()->create();
+    $organisation = Organisation::factory()->create();
+    $user->assignOrganisationRole(Role::PRIVACY_OFFICER, $organisation);
+
+    $user->syncOrganisationRoles($organisation, [Role::MANDATE_HOLDER_MANAGER], [Role::MANDATE_HOLDER_MANAGER]);
+
+    expect($user->organisationRoles()->where('role', Role::MANDATE_HOLDER_MANAGER->value)->exists())
+        ->toBeTrue();
+});
+
+it('removes the mandate-holder-manager role when the privacy officer role is removed', function (): void {
+    $user = User::factory()->create();
+    $organisation = Organisation::factory()->create();
+    $user->assignOrganisationRole(Role::PRIVACY_OFFICER, $organisation);
+    $user->assignOrganisationRole(Role::MANDATE_HOLDER_MANAGER, $organisation);
+
+    $user->syncOrganisationRoles($organisation, [Role::PRIVACY_OFFICER], []);
+
+    expect($user->organisationRoles()->where('organisation_id', $organisation->id)->exists())
+        ->toBeFalse();
+});
+
 it('will not contain sensitive information on serialization', function (string $key, bool $expectedResult): void {
     $user = User::factory()->create();
 

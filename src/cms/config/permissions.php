@@ -146,6 +146,9 @@ return [
             Permission::USER_ROLE_ORGANISATION_MANAGE->value,
             Permission::OTP_DISABLE->value,
         ],
+        Role::MANDATE_HOLDER_MANAGER->value => [
+            Permission::USER_ROLE_ORGANISATION_MANDATE_HOLDER_MANAGE->value,
+        ],
         Role::PRIVACY_OFFICER->value => [
             Permission::CORE_ENTITY_CREATE->value,
             Permission::CORE_ENTITY_DELETE->value,

@@ -207,6 +207,30 @@ it('can add a role for an new user without cpo-manage permission', function (): 
         ->toBe($role);
 });
 
+it('does not assign the mandate-holder-manager role on create', function (): void {
+    $organisation = OrganisationTestHelper::create([
+        'allowed_email_domains' => [],
+    ]);
+    $email = fake()->unique()->safeEmail();
+
+    $this->assertDatabaseMissing(User::class, [
+        'email' => $email,
+    ]);
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(CreateOrganisationUser::class)
+        ->fillForm([
+            'email' => $email,
+            Role::MANDATE_HOLDER_MANAGER->value => true,
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors();
+
+    $user = User::where('email', $email)->firstOrFail();
+    expect($user->organisationRoles->count())
+        ->toBe(0);
+});
+
 it('can not add a role for a cpo when user has no cpo-manage permission', function (): void {
     $allowedEmailDomain = fake()->unique()->domainName();
     $email = sprintf('%s@%s', fake()->unique()->userName(), $allowedEmailDomain);

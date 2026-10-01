@@ -12,5 +12,6 @@ return [
     Role::INPUT_PROCESSOR->value => 'Invoerder',
     Role::INPUT_PROCESSOR_DATABREACH->value => 'Invoerder Datalekken',
     Role::MANDATE_HOLDER->value => 'Mandaathouder',
+    Role::MANDATE_HOLDER_MANAGER->value => 'Mandaathouder beheerder',
     Role::PRIVACY_OFFICER->value => 'Privacy Officer',
 ];

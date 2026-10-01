@@ -11,6 +11,7 @@ Het portaal kent de volgende rollen:
 - Invoerder
 - Invoerder Datalekken
 - Mandaathouder
+- Mandaathouder beheerder
 - Raadpleger
 - Functionaris Gegevensbescherming
 
@@ -31,6 +32,8 @@ Een Chief Privacy Officer kan:
 ## Privacy Officer
 
 De Privacy Officer voert dezelfde taken uit als de Chief Privacy Officer, met één uitzondering bij het gebruikersbeheer: een Privacy Officer kan geen Chief Privacy Officer of Mandaathouder rollen toekennen. Alleen een Chief Privacy Officer kan deze rollen toewijzen.
+
+Een Privacy Officer die daarnaast de rol Mandaathouder beheerder heeft, mag wél de Mandaathouder rol toekennen (maar nog steeds geen Chief Privacy Officer). Zie "Mandaathouder beheerder".
 
 Verder kan een Privacy Officer:
 
@@ -76,6 +79,12 @@ Een Mandaathouder kan geen gegevens invoeren of wijzigen en geen versies goedkeu
 
 > **Hint**: Voor het akkoord geven op versies: zie Hoofdstuk \ref{Goedkeuringsproces}, "Goedkeuringsproces".
 
+## Mandaathouder beheerder
+
+Mandaathouder beheerder is een aanvullende rol die alleen samen met de rol Privacy Officer kan bestaan. De rol geeft die Privacy Officer één extra bevoegdheid bij het gebruikersbeheer: het toekennen van de Mandaathouder rol aan gebruikers. De rol Chief Privacy Officer kan hij of zij nog steeds niet toekennen. De Mandaathouder rol kan hij of zij niet aan het eigen account toekennen; daarvoor is een Chief Privacy Officer (of een Functioneel beheerder) nodig.
+
+Alleen een Chief Privacy Officer (of een Functioneel beheerder) kan de rol Mandaathouder beheerder toekennen. De rol wordt alleen opgeslagen als bij dezelfde gebruiker ook de rol Privacy Officer aan staat. Wordt de rol Privacy Officer uitgezet, dan vervalt de rol Mandaathouder beheerder ook. Bij het toevoegen van een nieuwe gebruiker aan de organisatie is de rol niet beschikbaar; ken de rol daarna toe via het wijzigen van de gebruiker.
+
 ## Raadpleger
 
 De Raadpleger heeft alleen leesrechten. Deze rol kan registers, documenten, versies en het goedkeuringsproces bekijken, maar geen gegevens invoeren, wijzigen of verwijderen.
@@ -118,4 +127,4 @@ Onderstaand overzicht geeft per onderdeel aan welke rollen toegang hebben. Waar 
 
 **Beschikbaar voor**: (Chief) Privacy Officer
 
-Een Privacy Officer kan ook gebruikers beheren, maar niet de rollen Chief Privacy Officer en Mandaathouder toekennen.
+Een Privacy Officer kan ook gebruikers beheren, maar niet de rollen Chief Privacy Officer en Mandaathouder toekennen. Een Privacy Officer met de aanvullende rol Mandaathouder beheerder mag de Mandaathouder rol wél toekennen, behalve aan zichzelf.

@@ -26,8 +26,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use UnitEnum;
+use Webmozart\Assert\Assert;
 
 use function __;
+use function array_filter;
+use function array_merge;
+use function array_values;
 
 /**
  * @extends Resource<User>
@@ -104,7 +108,7 @@ class OrganisationUserResource extends Resource
     /**
      * @return Collection<int, Role>
      */
-    public static function getOrganisationUserRoleOptions(): Collection
+    public static function getOrganisationUserRoleOptions(?User $organisationUser): Collection
     {
         /** @var Collection<int, Role> $organisationUserRoleOptions */
         $organisationUserRoleOptions = new Collection([
@@ -115,11 +119,95 @@ class OrganisationUserResource extends Resource
             Role::DATA_PROTECTION_OFFICIAL,
         ]);
 
-        if (Authorization::hasPermission(Permission::USER_ROLE_ORGANISATION_CPO_MANAGE)) {
-            $organisationUserRoleOptions->prepend(Role::CHIEF_PRIVACY_OFFICER);
+        if (self::canAssignMandateHolder($organisationUser)) {
             $organisationUserRoleOptions->prepend(Role::MANDATE_HOLDER);
         }
 
+        if (Authorization::hasPermission(Permission::USER_ROLE_ORGANISATION_CPO_MANAGE)) {
+            $organisationUserRoleOptions->prepend(Role::CHIEF_PRIVACY_OFFICER);
+            $organisationUserRoleOptions->prepend(Role::MANDATE_HOLDER_MANAGER);
+        }
+
         return $organisationUserRoleOptions;
+    }
+
+    private static function canAssignMandateHolder(?User $organisationUser): bool
+    {
+        if (Authorization::hasPermission(Permission::USER_ROLE_ORGANISATION_CPO_MANAGE)) {
+            return true;
+        }
+
+        if (!Authorization::hasPermission(Permission::USER_ROLE_ORGANISATION_MANDATE_HOLDER_MANAGE)) {
+            return false;
+        }
+
+        return $organisationUser === null || !$organisationUser->id->equals(Authentication::user()->id);
+    }
+
+    /**
+     * The organisation role groups (see Role::organisationRoleGroups()), limited to the roles the
+     * acting user may assign (see getOrganisationUserRoleOptions()).
+     *
+     * @return list<non-empty-list<Role>>
+     */
+    public static function getAssignableOrganisationRoleGroups(?User $organisationUser, bool $withMandateHolderManager): array
+    {
+        $organisationRoleOptions = self::getOrganisationUserRoleOptions($organisationUser);
+        $includeElevatedRoles = $organisationRoleOptions->contains(Role::MANDATE_HOLDER);
+
+        $assignableOrganisationRoleGroups = [];
+
+        foreach (Role::organisationRoleGroups($includeElevatedRoles) as $organisationRoleGroup) {
+            $assignableOrganisationRoles = array_values(array_filter(
+                $organisationRoleGroup,
+                static function (Role $organisationRole) use ($organisationRoleOptions, $withMandateHolderManager): bool {
+                    if ($organisationRole === Role::MANDATE_HOLDER_MANAGER && !$withMandateHolderManager) {
+                        return false;
+                    }
+
+                    return $organisationRoleOptions->contains($organisationRole);
+                },
+            ));
+
+            Assert::notEmpty($assignableOrganisationRoles);
+
+            $assignableOrganisationRoleGroups[] = $assignableOrganisationRoles;
+        }
+
+        return $assignableOrganisationRoleGroups;
+    }
+
+    /**
+     * The roles of getAssignableOrganisationRoleGroups() as one flat list.
+     *
+     * @return list<Role>
+     */
+    public static function getAssignableOrganisationRoles(?User $organisationUser, bool $withMandateHolderManager): array
+    {
+        return array_merge(...self::getAssignableOrganisationRoleGroups($organisationUser, $withMandateHolderManager));
+    }
+
+    /**
+     * The roles from $organisationRoles whose toggle is switched on in the submitted form data.
+     *
+     * @param array<Role> $organisationRoles
+     * @param array<string, mixed> $data
+     *
+     * @return list<Role>
+     */
+    public static function getSelectedOrganisationRoles(array $organisationRoles, array $data): array
+    {
+        $selectedOrganisationRoles = [];
+
+        foreach ($organisationRoles as $organisationRole) {
+            Assert::keyExists($data, $organisationRole->value);
+            Assert::boolean($data[$organisationRole->value]);
+
+            if ($data[$organisationRole->value] === true) {
+                $selectedOrganisationRoles[] = $organisationRole;
+            }
+        }
+
+        return $selectedOrganisationRoles;
     }
 }

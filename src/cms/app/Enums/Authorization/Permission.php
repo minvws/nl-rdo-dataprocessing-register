@@ -69,4 +69,5 @@ enum Permission: string
     case USER_ROLE_GLOBAL_MANAGE = 'user_role.global_manage';
     case USER_ROLE_ORGANISATION_CPO_MANAGE = 'user_role.organisation_cpo_manage';
     case USER_ROLE_ORGANISATION_MANAGE = 'user_role.organisation_manage';
+    case USER_ROLE_ORGANISATION_MANDATE_HOLDER_MANAGE = 'user_role.organisation_mandate_holder_manage';
 }

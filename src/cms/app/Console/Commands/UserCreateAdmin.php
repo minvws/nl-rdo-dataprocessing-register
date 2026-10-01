@@ -112,9 +112,8 @@ class UserCreateAdmin extends Command
         foreach (Role::globalRoles() as $globalRole) {
             $user->assignGlobalRole($globalRole);
         }
-        foreach (Role::organisationRoles() as $organisationRole) {
-            $user->assignOrganisationRole($organisationRole, $organisation);
-        }
+        $organisationRoles = Role::organisationRoles();
+        $user->syncOrganisationRoles($organisation, $organisationRoles, $organisationRoles);
     }
 
     private function createEntityNumberCounter(EntityNumberType $entityNumberType, string $organisationName): EntityNumberCounter

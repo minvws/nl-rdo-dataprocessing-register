@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrganisationUserResource;
 
-use App\Enums\Authorization\Permission;
 use App\Enums\Authorization\Role;
-use App\Facades\Authorization;
+use App\Filament\Resources\OrganisationUserResource;
 use App\Models\OrganisationUserRole;
 use App\Models\User;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Webmozart\Assert\Assert;
 
 use function __;
 use function sprintf;
@@ -24,6 +24,9 @@ class OrganisationUserResourceForm
 
     public static function form(Schema $schema): Schema
     {
+        $record = $schema->getRecord();
+        Assert::isInstanceOf($record, User::class);
+
         return $schema
             ->components([
                 Section::make(__('user.model_singular'))
@@ -37,19 +40,18 @@ class OrganisationUserResourceForm
                             ->disabled(),
                     ]),
                 Section::make(__('user.organisation_roles'))
-                    ->schema(self::getOrganisationRoleToggles()),
+                    ->schema(self::getOrganisationRoleToggles($record)),
             ]);
     }
 
     /**
      * @return array<Section>
      */
-    private static function getOrganisationRoleToggles(): array
+    private static function getOrganisationRoleToggles(User $record): array
     {
         $organisationRoleToggleSections = [];
-        $includeCpoRoles = Authorization::hasPermission(Permission::USER_ROLE_ORGANISATION_CPO_MANAGE);
 
-        foreach (Role::organisationRoleGroups($includeCpoRoles) as $organisationRoleGroup) {
+        foreach (OrganisationUserResource::getAssignableOrganisationRoleGroups($record, true) as $organisationRoleGroup) {
             $organisationRoleToggles = [];
 
             foreach ($organisationRoleGroup as $organisationRole) {

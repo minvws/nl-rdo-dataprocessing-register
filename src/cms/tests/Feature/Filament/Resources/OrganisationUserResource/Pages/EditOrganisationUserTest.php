@@ -107,7 +107,6 @@ it('can edit a role without assigning any roles', function (): void {
 
     $this->asFilamentOrganisationUser($organisation)
         ->createLivewireTestable(EditOrganisationUser::class, ['record' => $user->id])
-        ->fillForm([])
         ->call('save')
         ->assertHasNoFormErrors();
 
@@ -175,6 +174,160 @@ it('can not assign mandateHolder without cpoManage permissions', function (): vo
     $organisationRoles = $userToEdit->organisationRoles;
     expect($organisationRoles->count())
         ->toBe(0);
+});
+
+it('shows the mandate-holder-manager toggle with cpo-manage permission', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $userToEdit = UserTestHelper::createForOrganisation($organisation);
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditOrganisationUser::class, ['record' => $userToEdit->id])
+        ->assertFormFieldIsVisible(Role::MANDATE_HOLDER_MANAGER->value);
+});
+
+it('only saves mandate-holder-manager together with privacy officer', function (bool $isPrivacyOfficer): void {
+    $organisation = OrganisationTestHelper::create();
+    $userToEdit = UserTestHelper::createForOrganisation($organisation);
+    $userToEdit->assignOrganisationRole(Role::PRIVACY_OFFICER, $organisation);
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditOrganisationUser::class, ['record' => $userToEdit->id])
+        ->fillForm([
+            Role::PRIVACY_OFFICER->value => $isPrivacyOfficer,
+            Role::MANDATE_HOLDER_MANAGER->value => true,
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($userToEdit->organisationRoles()->where('role', Role::MANDATE_HOLDER_MANAGER->value)->exists())
+        ->toBe($isPrivacyOfficer);
+})->with([
+    [true],
+    [false],
+]);
+
+it('removes mandate-holder-manager along with privacy officer without cpo-manage permission', function (bool $isPrivacyOfficer): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisationWithPermissions($organisation, [
+        Permission::USER_ROLE_ORGANISATION_MANAGE,
+    ]);
+    $userToEdit = UserTestHelper::createForOrganisation($organisation);
+    $userToEdit->assignOrganisationRole(Role::PRIVACY_OFFICER, $organisation);
+    $userToEdit->assignOrganisationRole(Role::MANDATE_HOLDER_MANAGER, $organisation);
+
+    $this->withFilamentSession($user, $organisation)
+        ->createLivewireTestable(EditOrganisationUser::class, ['record' => $userToEdit->id])
+        ->fillForm([
+            Role::PRIVACY_OFFICER->value => $isPrivacyOfficer,
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($userToEdit->organisationRoles()->where('role', Role::MANDATE_HOLDER_MANAGER->value)->exists())
+        ->toBe($isPrivacyOfficer);
+})->with([
+    [true],
+    [false],
+]);
+
+it('can not assign mandate-holder-manager without cpo-manage permission', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisationWithPermissions($organisation, [
+        Permission::USER_ROLE_ORGANISATION_MANAGE,
+    ]);
+    $userToEdit = UserTestHelper::createForOrganisation($organisation);
+    $userToEdit->assignOrganisationRole(Role::PRIVACY_OFFICER, $organisation);
+
+    $this->withFilamentSession($user, $organisation)
+        ->createLivewireTestable(EditOrganisationUser::class, ['record' => $userToEdit->id])
+        ->fillForm([
+            Role::MANDATE_HOLDER_MANAGER->value => true,
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($userToEdit->organisationRoles()->where('role', Role::MANDATE_HOLDER_MANAGER->value)->exists())
+        ->toBeFalse();
+});
+
+it('can assign mandate-holder but not chief-privacy-officer with mandate-holder-manage permission', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisationWithPermissions($organisation, [
+        Permission::USER_ROLE_ORGANISATION_MANAGE,
+        Permission::USER_ROLE_ORGANISATION_MANDATE_HOLDER_MANAGE,
+    ]);
+    $userToEdit = UserTestHelper::createForOrganisation($organisation);
+
+    $this->withFilamentSession($user, $organisation)
+        ->createLivewireTestable(EditOrganisationUser::class, ['record' => $userToEdit->id])
+        ->fillForm([
+            Role::MANDATE_HOLDER->value => true,
+            Role::CHIEF_PRIVACY_OFFICER->value => true,
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($userToEdit->organisationRoles()->pluck('role')->all())
+        ->toBe([Role::MANDATE_HOLDER]);
+});
+
+it('hides the mandate-holder toggle on the own account with mandate-holder-manage permission', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisationWithPermissions($organisation, [
+        Permission::USER_ROLE_ORGANISATION_MANAGE,
+        Permission::USER_ROLE_ORGANISATION_MANDATE_HOLDER_MANAGE,
+    ]);
+
+    $this->withFilamentSession($user, $organisation)
+        ->createLivewireTestable(EditOrganisationUser::class, ['record' => $user->id])
+        ->assertFormFieldDoesNotExist(Role::MANDATE_HOLDER->value);
+});
+
+it('shows the mandate-holder toggle on the own account with cpo-manage permission', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisationWithPermissions($organisation, [
+        Permission::USER_ROLE_ORGANISATION_MANAGE,
+        Permission::USER_ROLE_ORGANISATION_CPO_MANAGE,
+    ]);
+
+    $this->withFilamentSession($user, $organisation)
+        ->createLivewireTestable(EditOrganisationUser::class, ['record' => $user->id])
+        ->assertFormFieldIsVisible(Role::MANDATE_HOLDER->value);
+});
+
+it('can not assign mandate-holder to the own account with mandate-holder-manage permission', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisationWithPermissions($organisation, [
+        Permission::USER_ROLE_ORGANISATION_MANAGE,
+        Permission::USER_ROLE_ORGANISATION_MANDATE_HOLDER_MANAGE,
+    ]);
+    $user->assignOrganisationRole(Role::PRIVACY_OFFICER, $organisation);
+
+    $this->withFilamentSession($user, $organisation)
+        ->createLivewireTestable(EditOrganisationUser::class, ['record' => $user->id])
+        ->set(sprintf('data.%s', Role::MANDATE_HOLDER->value), true)
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($user->organisationRoles()->pluck('role')->all())
+        ->toBe([Role::PRIVACY_OFFICER]);
+});
+
+it('keeps mandate-holder when saving the own account with mandate-holder-manage permission', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $user = UserTestHelper::createForOrganisationWithPermissions($organisation, [
+        Permission::USER_ROLE_ORGANISATION_MANAGE,
+        Permission::USER_ROLE_ORGANISATION_MANDATE_HOLDER_MANAGE,
+    ]);
+    $user->assignOrganisationRole(Role::MANDATE_HOLDER, $organisation);
+
+    $this->withFilamentSession($user, $organisation)
+        ->createLivewireTestable(EditOrganisationUser::class, ['record' => $user->id])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($user->organisationRoles()->where('role', Role::MANDATE_HOLDER->value)->exists())
+        ->toBeTrue();
 });
 
 it('can detach a user that is linked to an organisation', function (): void {
