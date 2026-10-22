@@ -39,6 +39,7 @@ class DataBreachRecordResourceInfolist
     public static function onePageInfolist(Schema $schema): Schema
     {
         return $schema
+            ->columns(1)
             ->components([
                 Section::make(__('data_breach_record.step_name'))
                     ->schema(DataBreachRecordResourceInfolistSchemas::getName())

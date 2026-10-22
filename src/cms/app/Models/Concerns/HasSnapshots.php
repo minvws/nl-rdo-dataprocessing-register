@@ -9,6 +9,7 @@ use App\Collections\SnapshotCollection;
 use App\Models\Contracts\SnapshotSource;
 use App\Models\Snapshot;
 use App\Models\States\SnapshotState;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -79,11 +80,11 @@ trait HasSnapshots
     }
 
     /**
-     * @return Collection<class-string<SnapshotSource>, Collection<int, SnapshotSource>>
+     * @return Collection<class-string<SnapshotSource>, Collection<int, Model&SnapshotSource>>
      */
     final public function getRelatedSnapshotSources(): Collection
     {
-        $relatedSnapshotSources = new Collection();
+        $relatedSnapshotSources = [];
 
         $reflectionClass = new ReflectionClass($this);
         foreach ($reflectionClass->getMethods() as $method) {
@@ -94,10 +95,13 @@ trait HasSnapshots
                 $relation = call_user_func($callable);
                 Assert::isInstanceOf($relation, Relation::class);
 
-                $relatedSnapshotSources->put($attribute->getArguments()[0], $relation->get());
+                $relatedModels = $relation->get()->all();
+                Assert::allIsInstanceOf($relatedModels, SnapshotSource::class);
+
+                $relatedSnapshotSources[$attribute->newInstance()->snapshotSourceClass] = new Collection($relatedModels);
             }
         }
 
-        return $relatedSnapshotSources;
+        return new Collection($relatedSnapshotSources);
     }
 }

@@ -17,3 +17,5 @@ Rechtsboven de gebruikerstabel is de knop om gebruikers toe te voegen. Als een g
 ![Gebruikers beheer\label{fig:gebruikers_beheer}](./imgs/04_beheer/01_users_edit.png)
 
 Klik op een gebruiker in de tabel om een gebruiker te wijzigen (Figuur \ref{fig:gebruikers_beheer}). Op deze pagina kunnen rollen worden aangepast en opgeslagen. Het verwijderen van een gebruiker kan met de rode knop rechtsbovenin.
+
+De rol Mandaathouder beheerder staat alleen op deze pagina, niet bij het toevoegen van een gebruiker. Een Chief Privacy Officer kan de rol hier toekennen aan een gebruiker die ook de rol Privacy Officer heeft. Zie Hoofdstuk \ref{RollenEnRechten}, "Rollen en Rechten".

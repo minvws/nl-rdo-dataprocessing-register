@@ -1,8 +1,8 @@
 publiccodeYmlVersion: "0.7"
 name: Verwerkingsregister
 url: "https://github.com/minvws/nl-rdo-dataprocessing-register"
-softwareVersion: "1.21.0"
-releaseDate: "2026-08-20"
+softwareVersion: "1.24.0"
+releaseDate: "2026-10-15"
 softwareType: standalone/web
 platforms:
   - web

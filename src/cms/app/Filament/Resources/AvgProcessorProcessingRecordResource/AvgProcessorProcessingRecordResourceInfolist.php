@@ -55,6 +55,7 @@ class AvgProcessorProcessingRecordResourceInfolist
     public static function onePageInfolist(Schema $schema): Schema
     {
         return $schema
+            ->columns(1)
             ->components([
                 Section::make(__('avg_processor_processing_record.step_processing_name'))
                     ->schema(AvgProcessorProcessingRecordResourceInfolistSchemas::getProcessingName())

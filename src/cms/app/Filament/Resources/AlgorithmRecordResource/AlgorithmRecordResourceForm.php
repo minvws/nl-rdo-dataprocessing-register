@@ -43,6 +43,7 @@ class AlgorithmRecordResourceForm
     public static function onePageForm(Schema $schema): Schema
     {
         return $schema
+            ->columns(1)
             ->components([
                 Section::make(__('algorithm_record.step_processing_name'))
                     ->schema(AlgorithmRecordResourceFormSchemas::getProcessingName())

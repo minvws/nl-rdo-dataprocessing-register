@@ -23,6 +23,7 @@ tasks:
         composer install --ignore-platform-reqs --no-scripts
       - task: docker:up
       - vendor/bin/sail artisan package:discover --ansi
+      - vendor/bin/sail artisan filament:assets
       - vendor/bin/sail artisan optimize:clear
       - task: key-generate
       - task: db:fresh
@@ -53,6 +54,11 @@ tasks:
     desc: Remove the application and services
     cmds:
       - vendor/bin/sail down web --remove-orphans
+
+  docker:down:all:
+    desc: Remove all services including orphans
+    cmds:
+      - vendor/bin/sail down --remove-orphans
 
   docker:stop:
     desc: Stop the application and services

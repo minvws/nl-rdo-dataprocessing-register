@@ -55,6 +55,7 @@ class WpgProcessingRecordResourceInfolist
     public static function onePageInfolist(Schema $schema): Schema
     {
         return $schema
+            ->columns(1)
             ->components([
                 Section::make(__('wpg_processing_record.step_processing_name'))
                     ->schema(WpgProcessingRecordResourceInfolistSchemas::getProcessingName())

@@ -15,6 +15,10 @@ pest()
     ->extend(BrowserTestCase::class)
     ->in('Browser');
 
+pest()
+    ->browser()
+    ->timeout(10_000);
+
 expect()
     ->intercept('toBe', UuidInterface::class, function (UuidInterface $expected): void {
         Assert::isInstanceOf($this->value, UuidInterface::class);

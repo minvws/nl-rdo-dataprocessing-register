@@ -112,6 +112,9 @@ jobs:
       - name: Prepare application
         run: php artisan key:generate
 
+      - name: Publish Filament assets
+        run: php artisan filament:assets
+
       - name: Npm build
         run: npm run build
 

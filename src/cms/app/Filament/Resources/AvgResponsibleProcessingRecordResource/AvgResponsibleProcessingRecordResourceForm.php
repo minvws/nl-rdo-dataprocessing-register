@@ -59,6 +59,7 @@ class AvgResponsibleProcessingRecordResourceForm
     public static function onePageForm(Schema $schema): Schema
     {
         return $schema
+            ->columns(1)
             ->components([
                 Section::make(__('avg_responsible_processing_record.step_processing_name'))
                     ->schema(AvgResponsibleProcessingRecordResourceFormSchemas::getProcessingName())

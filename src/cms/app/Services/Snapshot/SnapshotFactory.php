@@ -11,7 +11,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Throwable;
-use Webmozart\Assert\Assert;
 
 use function is_int;
 
@@ -55,8 +54,6 @@ readonly class SnapshotFactory
             $this->snapshotDataFactory->createDataForSnapshot($snapshot);
             foreach ($snapshotSource->getRelatedSnapshotSources() as $relatedSnapshotSourceClass => $relatedSnapshotSourceCollection) {
                 foreach ($relatedSnapshotSourceCollection as $relatedSnapshotSource) {
-                    Assert::isInstanceOf($relatedSnapshotSource, Model::class);
-
                     $snapshot->relatedSnapshotSources()->create([
                         'snapshot_id' => $snapshot->id,
                         'snapshot_source_type' => $relatedSnapshotSourceClass,

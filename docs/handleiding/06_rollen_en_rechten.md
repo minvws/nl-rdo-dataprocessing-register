@@ -31,9 +31,9 @@ Een Chief Privacy Officer kan:
 
 ## Privacy Officer
 
-De Privacy Officer voert dezelfde taken uit als de Chief Privacy Officer, met één uitzondering bij het gebruikersbeheer: een Privacy Officer kan geen Chief Privacy Officer of Mandaathouder rollen toekennen. Alleen een Chief Privacy Officer kan deze rollen toewijzen.
+De Privacy Officer voert dezelfde taken uit als de Chief Privacy Officer, met één uitzondering bij het gebruikersbeheer: een Privacy Officer kan de rollen Chief Privacy Officer en Mandaathouder niet toekennen. Dat kan alleen een Chief Privacy Officer.
 
-Een Privacy Officer die daarnaast de rol Mandaathouder beheerder heeft, mag wél de Mandaathouder rol toekennen (maar nog steeds geen Chief Privacy Officer). Zie "Mandaathouder beheerder".
+Heeft een Privacy Officer ook de rol Mandaathouder beheerder, dan kan hij of zij de rol Mandaathouder wel toekennen. Zie "Mandaathouder beheerder".
 
 Verder kan een Privacy Officer:
 
@@ -42,7 +42,7 @@ Verder kan een Privacy Officer:
 - versies aanmaken en het goedkeuringsproces begeleiden (goedkeuren, vaststellen en vervallen);
 - registers importeren en exporteren;
 - opzoeklijsten en tags beheren;
-- gebruikers uitnodigen en rollen toekennen, met uitzondering van Chief Privacy Officer en Mandaathouder.
+- gebruikers uitnodigen en rollen toekennen, behalve de rollen Chief Privacy Officer en Mandaathouder (zie hierboven).
 
 ## Invoerder
 

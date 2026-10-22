@@ -31,6 +31,11 @@ trait HasUuidAsId
         return $key;
     }
 
+    final public function getRouteKey(): string
+    {
+        return $this->getKey()->toString();
+    }
+
     final public function getQueueableId(): string
     {
         return $this->getKey()->toString();

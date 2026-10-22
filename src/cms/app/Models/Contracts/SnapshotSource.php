@@ -34,7 +34,7 @@ interface SnapshotSource
     public function getDisplayName(): string;
 
     /**
-     * @return Collection<class-string<SnapshotSource>, Collection<int, SnapshotSource>>
+     * @return Collection<class-string<SnapshotSource>, Collection<int, Model&SnapshotSource>>
      */
     public function getRelatedSnapshotSources(): Collection;
 }

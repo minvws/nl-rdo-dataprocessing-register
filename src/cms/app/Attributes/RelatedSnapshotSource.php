@@ -14,7 +14,7 @@ class RelatedSnapshotSource
     /**
      * @param class-string<SnapshotSource> $snapshotSourceClass
      */
-    public function __construct(string $snapshotSourceClass)
+    public function __construct(public readonly string $snapshotSourceClass)
     {
         Assert::classExists($snapshotSourceClass);
     }
