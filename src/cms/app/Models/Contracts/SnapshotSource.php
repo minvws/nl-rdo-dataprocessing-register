@@ -37,4 +37,9 @@ interface SnapshotSource
      * @return Collection<class-string<SnapshotSource>, Collection<int, Model&SnapshotSource>>
      */
     public function getRelatedSnapshotSources(): Collection;
+
+    /**
+     * @return Collection<int, Model&SnapshotSource>
+     */
+    public function getRelatedSnapshotSourcesWithoutEstablishedSnapshot(): Collection;
 }

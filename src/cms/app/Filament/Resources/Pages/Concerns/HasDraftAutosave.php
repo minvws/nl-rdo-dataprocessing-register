@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Filament\Resources\Pages\Concerns;
 
 use App\Components\Uuid\Uuid;
-use App\Components\Uuid\UuidInterface;
 use App\Config\Config;
 use App\Facades\Authentication;
 use App\Models\FormDraft;
@@ -163,10 +162,10 @@ trait HasDraftAutosave
         $record = $this->record;
         Assert::isInstanceOf($record, Model::class);
 
-        $key = $record->getKey();
-        Assert::isInstanceOf($key, UuidInterface::class);
+        $key = $record->getRouteKey();
+        Assert::string($key);
 
-        return $key->toString();
+        return $key;
     }
 
     private function findRestorableDraft(?string $recordId, string $draftKey): ?FormDraft

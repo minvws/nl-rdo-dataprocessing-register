@@ -141,9 +141,8 @@ class Approvals extends Component implements HasActions, HasForms, HasTable
             ->get()
             ->pluck('name', 'id')
             ->sort()
-            ->toArray();
+            ->all();
         Assert::isMap($allowedUserIds);
-        Assert::allString($allowedUserIds);
 
         return [
             CheckboxList::makeWithValidatedOptions('user_ids', $allowedUserIds)

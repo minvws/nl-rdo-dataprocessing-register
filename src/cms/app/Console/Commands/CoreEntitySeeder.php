@@ -75,7 +75,7 @@ class CoreEntitySeeder extends Command
         $organisations = Organisation::select(['id', 'name'])
             ->get()
             ->pluck('name', 'id')
-            ->toArray();
+            ->all();
 
         return [
             'organisation_id' => (string) select('Organisation', $organisations),

@@ -6,7 +6,6 @@ namespace App\Services\SqlExport;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Webmozart\Assert\Assert;
 
 use function count;
 use function explode;
@@ -52,15 +51,12 @@ class IndexNameTruncater
     {
         $maxLengthPerPart = (int) floor(($indexNameLimit - (count($parts) - 1)) / count($parts));
 
-        $truncatedParts = Arr::map($parts, static function (string $part) use ($maxLengthPerPart): string {
+        return Arr::map($parts, static function (string $part) use ($maxLengthPerPart): string {
             if (!Str::contains($part, '_')) {
                 return Str::substr($part, 0, $maxLengthPerPart);
             }
 
             return Arr::join(self::truncateParts(explode('_', $part), $maxLengthPerPart), '_');
         });
-        Assert::allString($truncatedParts);
-
-        return $truncatedParts;
     }
 }

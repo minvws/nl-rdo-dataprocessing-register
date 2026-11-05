@@ -25,20 +25,25 @@ trait HasUuidAsId
 
     final public function getKey(): UuidInterface
     {
-        $key = $this->getAttribute($this->getKeyName());
-        Assert::isInstanceOf($key, UuidInterface::class);
-
-        return $key;
+        return $this->keyAsUuid();
     }
 
     final public function getRouteKey(): string
     {
-        return $this->getKey()->toString();
+        return $this->keyAsUuid()->toString();
     }
 
     final public function getQueueableId(): string
     {
-        return $this->getKey()->toString();
+        return $this->keyAsUuid()->toString();
+    }
+
+    private function keyAsUuid(): UuidInterface
+    {
+        $key = $this->getAttribute($this->getKeyName());
+        Assert::isInstanceOf($key, UuidInterface::class);
+
+        return $key;
     }
 
     /**

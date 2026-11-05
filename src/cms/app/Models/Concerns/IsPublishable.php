@@ -50,13 +50,9 @@ trait IsPublishable
 
     final public function getStaticWebsiteSnapshotEntries(Collection $snapshotIds): StaticWebsiteSnapshotEntryCollection
     {
-        $staticWebsiteSnapshotEntries = StaticWebsiteSnapshotEntry::whereIn('snapshot_id', $snapshotIds)
+        return StaticWebsiteSnapshotEntry::whereIn('snapshot_id', $snapshotIds)
             ->orderBy('start_date', 'desc')
             ->get();
-
-        Assert::isInstanceOf($staticWebsiteSnapshotEntries, StaticWebsiteSnapshotEntryCollection::class);
-
-        return $staticWebsiteSnapshotEntries;
     }
 
     final public function getLatestStaticWebsiteSnapshotEntry(): ?StaticWebsiteSnapshotEntry

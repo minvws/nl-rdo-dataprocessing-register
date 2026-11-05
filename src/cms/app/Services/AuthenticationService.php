@@ -74,7 +74,6 @@ class AuthenticationService
                 ->organisationRoles()
                 ->where(['organisation_id' => $this->organisation()->id])
                 ->get();
-            Assert::isInstanceOf($organisationUserRoles, OrganisationUserRoleCollection::class);
         } catch (InvalidArgumentException) {
             $organisationUserRoles = new OrganisationUserRoleCollection();
         }

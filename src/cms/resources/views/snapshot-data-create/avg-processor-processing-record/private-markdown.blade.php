@@ -87,10 +87,12 @@
 ## {{ __('avg_processor_processing_record.step_passthrough') }}
 
 - **{{ __('avg_processor_processing_record.outside_eu') }}**: {{ $record->outside_eu ? 'ja' : 'nee' }}
+@if($record->outside_eu)
 - **{{ __('general.country') }}**: {!! Str::toSingleLineEscapedString($record->country, '-') !!} {!! Str::toSingleLineEscapedString($record->country_other) !!}
 - **{{ __('avg_processor_processing_record.outside_eu_protection_level') }}**: {{ $record->outside_eu_protection_level ? 'ja' : 'nee' }}
 - **{{ __('avg_processor_processing_record.outside_eu_protection_level_description') }}**: {!! Str::toSingleLineEscapedString($record->outside_eu_protection_level_description, '-') !!}
 - **{{ __('avg_processor_processing_record.outside_eu_description') }}**: {!! Str::toSingleLineEscapedString($record->outside_eu_description, '-') !!}
+@endif
 
 ## {{ __('avg_processor_processing_record.step_geb_pia') }}
 

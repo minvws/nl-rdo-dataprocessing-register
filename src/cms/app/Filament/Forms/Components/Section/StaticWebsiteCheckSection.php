@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Forms\Components\Section;
 
+use App\Components\Uuid\UuidInterface;
 use App\Models\Contracts\Publishable;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Component;
@@ -40,8 +41,11 @@ class StaticWebsiteCheckSection extends Section
             ->label(__('static_website.public_from_section.public_state'))
             ->view(sprintf('filament.forms.components.section.static_website_check_section.%s', $view));
 
-        /** @var Collection<int, string> $snapshotIds */
-        $snapshotIds = $record->snapshots()->pluck('id');
+        $snapshotIds = $record->snapshots()
+            ->pluck('id')
+            ->map(static function (UuidInterface $id): string {
+                return $id->toString();
+            });
 
         $staticWebsiteSnapshotEntries = $record->getStaticWebsiteSnapshotEntries($snapshotIds);
         if ($staticWebsiteSnapshotEntries->isNotEmpty()) {

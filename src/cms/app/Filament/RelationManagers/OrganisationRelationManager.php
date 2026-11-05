@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Filament\RelationManagers;
 
 use App\Filament\Resources\OrganisationResource;
-use Filament\Actions\AttachAction;
 use Filament\Actions\DetachAction;
 use Filament\Tables\Table;
 
@@ -22,7 +21,7 @@ class OrganisationRelationManager extends RelationManager
         return parent::table($table)
             ->recordTitleAttribute('name')
             ->headerActions([
-                AttachAction::make()
+                $this->makeAttachAction('name')
                     ->modalHeading(__('user.organisation_attach'))
                     ->modalDescription(__('user.organisation_attach_description'))
                     ->multiple()

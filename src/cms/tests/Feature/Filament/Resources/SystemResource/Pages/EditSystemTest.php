@@ -37,3 +37,14 @@ it('can not save a system with a non-unique description', function (): void {
         ->call('save')
         ->assertHasFormErrors(['description' => 'unique']);
 });
+
+it('does not suggest the system itself as a similar system', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $system = System::factory()
+        ->recycle($organisation)
+        ->create(['description' => 'SAP HR Portaal']);
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditSystem::class, ['record' => $system->id])
+        ->assertDontSee(__('system.similar_descriptions', ['descriptions' => 'SAP HR Portaal']));
+});

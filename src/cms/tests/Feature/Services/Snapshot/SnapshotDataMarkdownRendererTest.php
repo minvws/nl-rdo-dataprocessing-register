@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Enums\Snapshot\SnapshotDataSection;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
 use App\Models\Organisation;
+use App\Models\Processor;
 use App\Models\Receiver;
 use App\Models\RelatedSnapshotSource;
 use App\Models\Snapshot;
@@ -12,6 +13,7 @@ use App\Models\SnapshotData;
 use App\Models\States\Snapshot\Established;
 use App\Models\States\Snapshot\InReview;
 use App\Services\Snapshot\SnapshotDataMarkdownRenderer;
+use App\ValueObjects\Markdown;
 
 it('can render', function (SnapshotDataSection $snapshotDataSection): void {
     $organisation = Organisation::factory()
@@ -161,3 +163,50 @@ it('can render but without related records if snapshot not yet established', fun
 
     expect($markdown)->toMatchSnapshot();
 })->with(SnapshotDataSection::cases());
+
+it('renders related processors by name, without the email address stored in older snapshots', function (): void {
+    $organisation = Organisation::factory()
+        ->create();
+    $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
+        ->create();
+
+    $avgResponsibleProcessingRecordSnapshot = Snapshot::factory()
+        ->for($avgResponsibleProcessingRecord, 'snapshotSource')
+        ->recycle($organisation)
+        ->create();
+
+    $processor = Processor::factory()
+        ->create(['name' => 'Acme BV']);
+    $processorSnapshot = Snapshot::factory()
+        ->for($processor, 'snapshotSource')
+        ->recycle($organisation)
+        ->create([
+            'name' => 'Acme BV',
+            'state' => Established::class,
+        ]);
+    SnapshotData::factory()
+        ->for($processorSnapshot)
+        ->create([
+            'private_markdown' => 'Acme BV (info@acme.example)',
+        ]);
+
+    RelatedSnapshotSource::factory()
+        ->create([
+            'snapshot_id' => $avgResponsibleProcessingRecordSnapshot->id,
+            'snapshot_source_id' => $processor->id,
+            'snapshot_source_type' => $processor::class,
+        ]);
+
+    /** @var SnapshotDataMarkdownRenderer $snapshotDataMarkdownRenderer */
+    $snapshotDataMarkdownRenderer = $this->app->get(SnapshotDataMarkdownRenderer::class);
+
+    $markdown = $snapshotDataMarkdownRenderer->fromSnapshotMarkdown(
+        $avgResponsibleProcessingRecordSnapshot,
+        Markdown::fromString('<!--- #App\Models\Processor# --->'),
+        SnapshotDataSection::PRIVATE,
+    );
+
+    expect($markdown)
+        ->toContain('Acme BV')
+        ->not->toContain('info@acme.example');
+});

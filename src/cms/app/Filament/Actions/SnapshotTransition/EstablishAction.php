@@ -5,14 +5,11 @@ declare(strict_types=1);
 namespace App\Filament\Actions\SnapshotTransition;
 
 use App\Facades\Snapshot as SnapshotFacade;
-use App\Models\RelatedSnapshotSource;
 use App\Models\Snapshot;
-use App\Models\States\Snapshot\Established;
 use App\Models\States\SnapshotState;
 use Filament\Schemas\Components\View;
 use Filament\Schemas\Components\Wizard\Step;
 use Filament\Support\Enums\Width;
-use Illuminate\Database\Eloquent\Builder;
 
 use function __;
 
@@ -23,12 +20,7 @@ class EstablishAction extends SnapshotTransitionAction
         return parent::makeForSnapshotState($snapshot, $snapshotState)
             ->color(static function () use ($snapshot): string {
                 $isApproved = SnapshotFacade::isApproved($snapshot);
-                $hasAllEstablishedRelatedSnapshotSources = RelatedSnapshotSource::where(['snapshot_id' => $snapshot->id])
-                    ->whereDoesntHave('snapshotSource', static function (Builder $query): Builder {
-                        return $query->whereHas('snapshots', static function (Builder $query): Builder {
-                            return $query->where(['state' => Established::$name]);
-                        });
-                    })->count() === 0;
+                $hasAllEstablishedRelatedSnapshotSources = !$snapshot->relatedSnapshotSourcesWithoutEstablishedSnapshot()->exists();
 
                 return $isApproved && $hasAllEstablishedRelatedSnapshotSources ? 'success' : 'warning';
             })

@@ -51,6 +51,24 @@ ze de code van de meest recente release uitvoeren.
 - Na de deployment moeten voor deze release alle worker processen opnieuw opgestart worden
 - Na het herstarten van de worker moet eenmalig de statische website opnieuw opgebouwd worden: `php artisan static-website:refresh`
 
+## 1.25.0
+
+- Na deployment moeten de bestaande caches verwijderd worden: `php artisan optimize:clear`
+- Na de deployment moeten voor deze release alle worker processen opnieuw opgestart worden
+- Na het herstarten van de worker moet eenmalig de statische website opnieuw opgebouwd worden: `php artisan static-website:refresh`
+
+## 1.24.0
+
+- Na deployment moeten de bestaande caches verwijderd worden: `php artisan optimize:clear`
+- Na de deployment moeten voor deze release alle worker processen opnieuw opgestart worden
+- Na het herstarten van de worker moet eenmalig de statische website opnieuw opgebouwd worden: `php artisan static-website:refresh`
+
+## 1.23.0
+
+- Na deployment moeten de bestaande caches verwijderd worden: `php artisan optimize:clear`
+- Na de deployment moeten voor deze release alle worker processen opnieuw opgestart worden
+- Na het herstarten van de worker moet eenmalig de statische website opnieuw opgebouwd worden: `php artisan static-website:refresh`
+
 ## 1.22.0
 
 - Na deployment moeten de bestaande caches verwijderd worden: `php artisan optimize:clear`

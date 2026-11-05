@@ -49,7 +49,6 @@ class FgRemarksWidget extends Widget implements HasActions, HasForms
 
         $fgRemark = $record->getAttribute('fgRemark');
 
-        /** @var array<string, mixed>|null $state */
         $state = $fgRemark instanceof FgRemark ? $fgRemark->toArray() : null;
 
         $form->fill($state);

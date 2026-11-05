@@ -27,6 +27,9 @@ abstract class DataFactory
         return null;
     }
 
+    /**
+     * @param view-string $view
+     */
     protected function render(string $view, Snapshot $snapshot): string
     {
         return View::make($view, [

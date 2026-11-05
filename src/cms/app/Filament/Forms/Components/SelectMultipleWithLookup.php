@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Forms\Components;
 
-use App\Components\Uuid\UuidInterface;
 use App\Facades\Authentication;
 use App\Filament\TenantScoped;
 use App\Rules\CurrentOrganisation;
@@ -64,10 +63,10 @@ class SelectMultipleWithLookup extends Select
 
                 $schema->model($record)->saveRelationships();
 
-                $key = $record->getKey();
-                Assert::isInstanceOf($key, UuidInterface::class);
+                $key = $record->getRouteKey();
+                Assert::string($key);
 
-                return $key->toString();
+                return $key;
             })
             ->rules([CurrentOrganisation::forModel($model)])
             ->multiple()

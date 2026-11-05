@@ -7,6 +7,7 @@ namespace App\Filament\Actions;
 use App\Enums\Authorization\Permission;
 use App\Enums\Authorization\Role;
 use App\Facades\Authorization;
+use App\Filament\Forms\Components\NotEstablishedRelatedSnapshotSourcesCallout;
 use App\Filament\RelationManagers\SnapshotsRelationManager;
 use App\Mail\SnapshotApproval\ApprovalRequest;
 use App\Models\Contracts\SnapshotSource;
@@ -17,6 +18,7 @@ use Filament\Forms\Components\Checkbox;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
@@ -39,6 +41,11 @@ class CreateSnapshotAction extends Action
             ->label(__('snapshot.create'))
             ->visible(Authorization::hasPermission(Permission::SNAPSHOT_CREATE))
             ->schema([
+                NotEstablishedRelatedSnapshotSourcesCallout::makeForSnapshotSources(static function (Model $record): Collection {
+                    Assert::isInstanceOf($record, SnapshotSource::class);
+
+                    return $record->getRelatedSnapshotSourcesWithoutEstablishedSnapshot();
+                }),
                 Checkbox::make('notify_po')
                     ->label(__('snapshot_approval.notify_po'))
                     ->default(true),

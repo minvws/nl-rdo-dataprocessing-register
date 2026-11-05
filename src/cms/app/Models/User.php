@@ -190,13 +190,10 @@ class User extends Authenticatable implements FilamentUser, HasTenants, Loggable
 
     public function getRoles(): array
     {
-        $roles = $this->globalRoles
+        return $this->globalRoles
             ->map(static function (UserGlobalRole $role) {
                 return $role->role->value;
             })
-            ->toArray();
-        Assert::allString($roles);
-
-        return $roles;
+            ->all();
     }
 }

@@ -72,7 +72,7 @@ class PersonalSnapshotApprovalResourceTable
                             ->keyBy('snapshot_source_type')
                             ->map(static function (Snapshot $snapshot): string {
                                 return __(sprintf('%s.model_singular', Str::snake(class_basename($snapshot->snapshot_source_type))));
-                            })->toArray();
+                            })->all();
                     }),
                 SelectFilter::make('state')
                     ->label(__('snapshot.state'))
@@ -82,7 +82,7 @@ class PersonalSnapshotApprovalResourceTable
                             ->map(static function ($value, $key): string {
                                 return __(sprintf('snapshot_state.label.%s', $key));
                             })
-                            ->toArray();
+                            ->all();
                     }),
             ])
             ->toolbarActions([

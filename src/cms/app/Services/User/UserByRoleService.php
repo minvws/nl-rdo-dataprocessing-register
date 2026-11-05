@@ -8,7 +8,6 @@ use App\Collections\UserCollection;
 use App\Enums\Authorization\Role;
 use App\Models\Organisation;
 use Illuminate\Database\Eloquent\Builder;
-use Webmozart\Assert\Assert;
 
 class UserByRoleService
 {
@@ -17,15 +16,11 @@ class UserByRoleService
      */
     public function getUsersByOrganisationRole(Organisation $organisation, array $roles): UserCollection
     {
-        $users = $organisation
+        return $organisation
             ->users()
             ->whereHas('organisationRoles', static function (Builder $query) use ($roles): void {
                 $query->whereIn('role', $roles);
             })
             ->get();
-
-        Assert::isInstanceOf($users, UserCollection::class);
-
-        return $users;
     }
 }

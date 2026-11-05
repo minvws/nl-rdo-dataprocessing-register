@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Filament\RelationManagers;
 
 use App\Filament\Resources\Resource;
+use Filament\Actions\AttachAction;
+use Filament\Forms\Components\Select;
 use Filament\Resources\RelationManagers\RelationManager as FilamentRelationManager;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
@@ -27,6 +29,21 @@ abstract class RelationManager extends FilamentRelationManager
             ->recordUrl(static function (Model $record) use ($resource): string {
                 return $resource::getUrl($resource::canEdit($record) ? 'edit' : 'view', ['record' => $record]);
             });
+    }
+
+    protected function makeAttachAction(string $recordTitleAttribute): AttachAction
+    {
+        return AttachAction::make()
+            ->recordTitleAttribute($recordTitleAttribute)
+            ->recordSelect(fn (Select $select): Select => $select
+                ->getOptionLabelsUsing(function (array $values) use ($recordTitleAttribute): array {
+                    $related = $this->getRelationship()->getModel();
+
+                    return $related->newQuery()
+                        ->whereKey($values)
+                        ->pluck($recordTitleAttribute, $related->getKeyName())
+                        ->all();
+                }));
     }
 
     public static function getBadge(Model $ownerRecord, string $pageClass): ?string

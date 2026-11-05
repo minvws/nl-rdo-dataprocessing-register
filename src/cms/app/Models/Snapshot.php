@@ -17,11 +17,13 @@ use App\Models\Concerns\HasUuidAsId;
 use App\Models\Contracts\SnapshotSource;
 use App\Models\Contracts\TenantAware;
 use App\Models\Scopes\OrderByCreatedAtAscScope;
+use App\Models\States\Snapshot\Established;
 use App\Models\States\SnapshotState;
 use Carbon\CarbonImmutable;
 use Database\Factories\SnapshotFactory;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Attributes\UseEloquentBuilder;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -109,5 +111,18 @@ class Snapshot extends Model implements HasStatesContract, TenantAware
     public function relatedSnapshotSources(): HasMany
     {
         return $this->hasMany(RelatedSnapshotSource::class);
+    }
+
+    /**
+     * @return HasMany<RelatedSnapshotSource, $this>
+     */
+    public function relatedSnapshotSourcesWithoutEstablishedSnapshot(): HasMany
+    {
+        return $this->relatedSnapshotSources()
+            ->whereDoesntHave('snapshotSource', static function (Builder $query): Builder {
+                return $query->whereHas('snapshots', static function (Builder $query): Builder {
+                    return $query->where(['state' => Established::$name]);
+                });
+            });
     }
 }

@@ -51,10 +51,9 @@ class OrganisationUserRolesRepeater extends Repeater
     {
         $organisationOptions = $user->organisations()
             ->pluck('name', 'id')
-            ->toArray();
+            ->all();
 
         Assert::isMap($organisationOptions);
-        Assert::allString($organisationOptions);
 
         return $organisationOptions;
     }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services\Notification;
 
-use App\Collections\SnapshotApprovalCollection;
 use App\Enums\Snapshot\MandateholderNotifyDirectly;
 use App\Mail\SnapshotApproval\BatchSignRequest;
 use App\Mail\SnapshotApproval\SingleSignRequest;
@@ -15,7 +14,6 @@ use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Mail;
 use Psr\Log\LoggerInterface;
-use Webmozart\Assert\Assert;
 
 readonly class SnapshotApprovalSignRequestMailer
 {
@@ -62,14 +60,12 @@ readonly class SnapshotApprovalSignRequestMailer
             ->whereSnapshotOrganisation($organisation)
             ->notNotified()
             ->get();
-        Assert::isInstanceOf($snapshotApprovalsNew, SnapshotApprovalCollection::class);
 
         $snapshotApprovalsExisting = SnapshotApproval::unsigned()
             ->assignedTo($user)
             ->whereSnapshotOrganisation($organisation)
             ->notified()
             ->get();
-        Assert::isInstanceOf($snapshotApprovalsExisting, SnapshotApprovalCollection::class);
 
         if ($snapshotApprovalsNew->isEmpty() && $snapshotApprovalsExisting->isEmpty()) {
             return;

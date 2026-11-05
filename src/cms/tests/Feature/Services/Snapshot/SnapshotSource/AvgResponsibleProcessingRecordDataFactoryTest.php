@@ -46,6 +46,24 @@ it('can generate private markdown', function (): void {
         ->toMatchSnapshot();
 });
 
+it('only shows the transfer details when there is a transfer outside the EEA', function (bool $outsideEu): void {
+    $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
+        ->create([
+            'outside_eu' => $outsideEu,
+        ]);
+    $snapshot = Snapshot::factory()
+        ->for($avgResponsibleProcessingRecord, 'snapshotSource')
+        ->create();
+
+    $avgResponsibleProcessingRecordDataFactory = new AvgResponsibleProcessingRecordDataFactory();
+    $privateMarkdown = $avgResponsibleProcessingRecordDataFactory->generatePrivateMarkdown($snapshot);
+
+    expect($privateMarkdown)
+        ->toContain(__('avg_responsible_processing_record.outside_eu'))
+        ->and(str_contains($privateMarkdown, __('avg_responsible_processing_record.outside_eu_protection_level')))
+        ->toBe($outsideEu);
+})->with([true, false]);
+
 it('can generate public frontmatter', function (): void {
     $name = fake()->uuid();
     $number = fake()->uuid();

@@ -4,7 +4,7 @@
 <ul>
 @if($snapshots->count() > 0)
 @foreach ($snapshots as $snapshot)
-  <li><div class="related-record">{!! $snapshot->snapshotData->private_markdown?->toHtml() !!}</div></li>
+  <li><div class="related-record">{{ $snapshot->name }}</div></li>
 @endforeach
 @else
   <li>geen</li>

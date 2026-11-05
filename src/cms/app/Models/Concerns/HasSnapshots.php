@@ -8,6 +8,7 @@ use App\Attributes\RelatedSnapshotSource;
 use App\Collections\SnapshotCollection;
 use App\Models\Contracts\SnapshotSource;
 use App\Models\Snapshot;
+use App\Models\States\Snapshot\Established;
 use App\Models\States\SnapshotState;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -70,13 +71,10 @@ trait HasSnapshots
      */
     final public function getSnapshotsWithState(string $state): SnapshotCollection
     {
-        $snapshots = $this->snapshots()
+        return $this->snapshots()
             ->where('state', $state::$name)
             ->withoutGlobalScope(SoftDeletingScope::class)
             ->get();
-        Assert::isInstanceOf($snapshots, SnapshotCollection::class);
-
-        return $snapshots;
     }
 
     /**
@@ -103,5 +101,18 @@ trait HasSnapshots
         }
 
         return new Collection($relatedSnapshotSources);
+    }
+
+    /**
+     * @return Collection<int, Model&SnapshotSource>
+     */
+    final public function getRelatedSnapshotSourcesWithoutEstablishedSnapshot(): Collection
+    {
+        return $this->getRelatedSnapshotSources()
+            ->flatten(1)
+            ->filter(static function (SnapshotSource $snapshotSource): bool {
+                return $snapshotSource->getLatestSnapshotWithState([Established::class]) === null;
+            })
+            ->values();
     }
 }

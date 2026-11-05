@@ -39,11 +39,10 @@
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^4.0",
-        "calebdw/larastan": "^3.0",
+        "calebdw/phpstan-laravel": "^1.10",
         "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
         "doctrine/sql-formatter": "^1.5",
         "fakerphp/faker": "^1.9.1",
-        "larastan/larastan": "^3.6",
         "laravel/sail": "^1.18",
         "mockery/mockery": "^1.4.4",
         "nunomaduro/collision": "^8.0",

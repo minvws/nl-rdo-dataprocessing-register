@@ -13,7 +13,6 @@ use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Support\Facades\URL;
-use Webmozart\Assert\Assert;
 
 use function __;
 
@@ -59,11 +58,8 @@ class BatchSignRequest extends Mailable
      */
     private function getSnapshotIds(SnapshotApprovalCollection $snapshotApprovalsExisting): array
     {
-        $snapshotIds = $snapshotApprovalsExisting->map(static function (SnapshotApproval $snapshotApproval): string {
+        return $snapshotApprovalsExisting->map(static function (SnapshotApproval $snapshotApproval): string {
                 return $snapshotApproval->id->toString();
-        })->toArray();
-        Assert::allString($snapshotIds);
-
-        return $snapshotIds;
+        })->all();
     }
 }

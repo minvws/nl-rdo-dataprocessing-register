@@ -116,7 +116,7 @@ class FormHelper
         });
 
         /** @var array<string, string> $options */
-        $options = $optionsCollection->toArray();
+        $options = $optionsCollection->all();
 
         return $options;
     }

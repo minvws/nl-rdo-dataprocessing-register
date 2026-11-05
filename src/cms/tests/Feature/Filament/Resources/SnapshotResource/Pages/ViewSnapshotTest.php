@@ -689,3 +689,61 @@ it('does not show button to view all snapshot approvales if no permission', func
         ])
         ->assertActionDisabled('approve_view_all');
 });
+
+it('warns in the approve modal about related entities that are not established yet', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $snapshot = Snapshot::factory()
+        ->recycle($organisation)
+        ->create([
+            'state' => InReview::class,
+        ]);
+    $responsible = Responsible::factory()
+        ->recycle($organisation)
+        ->create();
+    RelatedSnapshotSource::factory()
+        ->for($snapshot)
+        ->create([
+            'snapshot_source_id' => $responsible->id,
+            'snapshot_source_type' => Responsible::class,
+        ]);
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ViewSnapshot::class, [
+            'record' => $snapshot->getRouteKey(),
+        ])
+        ->mountAction('snapshot_transition_to_approved')
+        ->assertMountedActionModalSee([
+            __('snapshot.related_snapshot_sources_not_established'),
+            __('responsible.model_plural'),
+            $responsible->name,
+        ]);
+});
+
+it('does not warn in the approve modal when all related entities are established', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $snapshot = Snapshot::factory()
+        ->recycle($organisation)
+        ->create([
+            'state' => InReview::class,
+        ]);
+    $responsible = Responsible::factory()
+        ->recycle($organisation)
+        ->create();
+    Snapshot::factory()
+        ->recycle($organisation)
+        ->for($responsible, 'snapshotSource')
+        ->create(['state' => Established::$name]);
+    RelatedSnapshotSource::factory()
+        ->for($snapshot)
+        ->create([
+            'snapshot_source_id' => $responsible->id,
+            'snapshot_source_type' => Responsible::class,
+        ]);
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(ViewSnapshot::class, [
+            'record' => $snapshot->getRouteKey(),
+        ])
+        ->mountAction('snapshot_transition_to_approved')
+        ->assertMountedActionModalDontSee(__('snapshot.related_snapshot_sources_not_established'));
+});

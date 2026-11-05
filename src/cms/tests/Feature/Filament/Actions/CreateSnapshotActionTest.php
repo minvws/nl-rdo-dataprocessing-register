@@ -8,6 +8,9 @@ use App\Enums\Authorization\Role;
 use App\Filament\Resources\AvgResponsibleProcessingRecordResource\Pages\EditAvgResponsibleProcessingRecord;
 use App\Mail\SnapshotApproval\ApprovalRequest;
 use App\Models\Avg\AvgResponsibleProcessingRecord;
+use App\Models\Responsible;
+use App\Models\Snapshot;
+use App\Models\States\Snapshot\Established;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 use Tests\Helpers\Model\OrganisationTestHelper;
@@ -107,4 +110,47 @@ it('will not notify po if unchecked', function (): void {
         ->assertSuccessful();
 
     Mail::assertNotQueued(ApprovalRequest::class);
+});
+
+it('warns about related entities that are not established yet', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->withValidState()
+        ->create();
+    $responsible = $avgResponsibleProcessingRecord->responsibles->firstOrFail();
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+            'record' => $avgResponsibleProcessingRecord->id,
+        ])
+        ->mountAction('snapshot_create')
+        ->assertMountedActionModalSee([
+            __('snapshot.related_snapshot_sources_not_established'),
+            __('responsible.model_plural'),
+            $responsible->name,
+        ]);
+});
+
+it('does not warn when all related entities are established', function (): void {
+    $organisation = OrganisationTestHelper::create();
+    $avgResponsibleProcessingRecord = AvgResponsibleProcessingRecord::factory()
+        ->recycle($organisation)
+        ->withValidState()
+        ->create();
+    $avgResponsibleProcessingRecord->responsibles->each(static function (Responsible $responsible) use (
+        $organisation,
+    ): void {
+        Snapshot::factory()
+            ->recycle($organisation)
+            ->for($responsible, 'snapshotSource')
+            ->create(['state' => Established::$name]);
+    });
+
+    $this->asFilamentOrganisationUser($organisation)
+        ->createLivewireTestable(EditAvgResponsibleProcessingRecord::class, [
+            'record' => $avgResponsibleProcessingRecord->id,
+        ])
+        ->mountAction('snapshot_create')
+        ->assertMountedActionModalDontSee(__('snapshot.related_snapshot_sources_not_established'));
 });

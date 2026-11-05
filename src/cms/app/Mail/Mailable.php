@@ -54,7 +54,7 @@ abstract class Mailable extends IlluminateMailable
             ->map(static function (mixed $uuid): string {
                 return $uuid->toString();
             })
-            ->toArray();
+            ->all();
 
         Log::info('Mail message sent', array_merge($this->getLogContext(), [
             'mailable' => static::class,

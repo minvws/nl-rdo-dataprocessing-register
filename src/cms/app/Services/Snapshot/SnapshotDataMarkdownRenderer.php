@@ -20,7 +20,7 @@ use function sprintf;
 readonly class SnapshotDataMarkdownRenderer
 {
     /**
-     * @param array<string, array<string, string>> $renderTemplates
+     * @param array<string, array<string, view-string>> $renderTemplates
      */
     public function __construct(
         private Factory $view,

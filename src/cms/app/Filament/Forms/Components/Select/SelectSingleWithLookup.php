@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Forms\Components\Select;
 
-use App\Components\Uuid\UuidInterface;
 use App\Enums\Authorization\Permission;
 use App\Facades\Authentication;
 use App\Facades\Authorization;
@@ -54,10 +53,10 @@ class SelectSingleWithLookup extends Select
             ->createOptionUsing(static function (array $data) use ($relatedModel): string {
                 Assert::isMap($data);
 
-                $key = $relatedModel::create($data)->getKey();
-                Assert::isInstanceOf($key, UuidInterface::class);
+                $key = $relatedModel::create($data)->getRouteKey();
+                Assert::string($key);
 
-                return $key->toString();
+                return $key;
             })
             ->disableOptionWhen(static function (string $value) use ($disabled): bool {
                 return $disabled->contains($value);

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Filament\RelationManagers;
 
 use App\Filament\Resources\UserResource;
-use Filament\Actions\AttachAction;
 use Filament\Actions\DetachAction;
 use Filament\Tables\Table;
 
@@ -22,7 +21,7 @@ class UsersRelationManager extends RelationManager
         return parent::table($table)
             ->recordTitleAttribute('email')
             ->headerActions([
-                AttachAction::make()
+                $this->makeAttachAction('email')
                     ->modalHeading(__('organisation.user_attach'))
                     ->modalDescription(__('organisation.user_attach_description'))
                     ->multiple()

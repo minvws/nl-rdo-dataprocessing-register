@@ -12,6 +12,7 @@ return [
     'create' => 'Versie aanmaken',
     'created' => 'Versie aangemaakt',
     'unsaved_changes' => 'Versie niet aangemaakt, er zijn nog niet opgeslagen wijzingen',
+    'related_snapshot_sources_not_established' => 'Let op: deze gekoppelde onderdelen zijn nog niet vastgesteld en worden niet opgenomen in deze versie.',
 
     'number' => 'Nummer verwerking',
     'name' => 'Naam versie',
